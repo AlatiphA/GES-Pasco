@@ -179,7 +179,7 @@ async function loadBook() {
 
 }
 
-function startReader() {
+async function startReader() {
 
   rendition =
     book.renderTo(
@@ -194,78 +194,132 @@ function startReader() {
       }
     );
 
-  const savedLocation =
-    localStorage.getItem(
-      "epub-location"
-    );
-
-  rendition.display(
-    savedLocation || undefined
-  );
+  /* =========================
+     THEMES & FONT
+  ========================= */
 
   rendition.themes.fontSize(
     fontSize + "%"
   );
 
   applyTheme();
+
   setupNavigationZones();
 
-  book.ready
-    .then(async () => {
+  /* =========================
+     WAIT FOR BOOK
+  ========================= */
 
-      toc.innerHTML = "";
+  await book.ready;
 
-      const navigation =
-        book.navigation;
+  /* =========================
+     GENERATE LOCATIONS
+  ========================= */
 
-      navigation.toc.forEach(
-        chapter => {
+  await book.locations.generate(
+    1000
+  );
 
-          const link =
-            document.createElement(
-              "a"
-            );
+  /* =========================
+     RESTORE LAST LOCATION
+  ========================= */
 
-          link.textContent =
-            chapter.label;
+  const savedLocation =
+    localStorage.getItem(
+      "epub-location"
+    );
 
-          link.href = "#";
+  try {
 
-          link.addEventListener(
-            "click",
-            e => {
+    if (savedLocation) {
 
-              e.preventDefault();
+      await rendition.display(
+        savedLocation
+      );
 
-              rendition.display(
-                chapter.href
-              );
+    }
 
-              sidebar.classList.remove(
-                "active"
-              );
+    else {
 
-            }
+      await rendition.display();
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Failed to restore location:",
+      error
+    );
+
+    await rendition.display();
+
+  }
+
+  /* =========================
+     BUILD TOC
+  ========================= */
+
+  toc.innerHTML = "";
+
+  const navigation =
+    book.navigation;
+
+  navigation.toc.forEach(
+    chapter => {
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+      link.textContent =
+        chapter.label;
+
+      link.href = "#";
+
+      link.addEventListener(
+        "click",
+        e => {
+
+          e.preventDefault();
+
+          rendition.display(
+            chapter.href
           );
 
-          toc.appendChild(
-            link
+          sidebar.classList.remove(
+            "active"
           );
+
+          showControls();
 
         }
       );
 
-      await book.locations.generate(
-        1000
+      toc.appendChild(
+        link
       );
 
-    });
+    }
+  );
+
+  /* =========================
+     SAVE LOCATION
+  ========================= */
 
   rendition.on(
     "relocated",
     location => {
 
       try {
+
+        localStorage.setItem(
+          "epub-location",
+          location.start.cfi
+        );
 
         const percentage =
           book.locations
@@ -284,16 +338,13 @@ function startReader() {
         progressFill.style.width =
           percent + "%";
 
-        localStorage.setItem(
-          "epub-location",
-          location.start.cfi
-        );
-
       }
 
       catch (error) {
 
-        console.error(error);
+        console.error(
+          error
+        );
 
       }
 
@@ -301,6 +352,7 @@ function startReader() {
   );
 
 }
+
 
 function toggleControls() {
 
