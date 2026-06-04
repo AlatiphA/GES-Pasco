@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    GES Promotion Aptitude Test - Beta
+  </title>
+
+  <!--
+  <link
+    rel="manifest"
+    href="./manifest-beta.json"
+  />
+
+  <meta
+    name="theme-color"
+    content="#111111"
+  />
+  -->
+
+  <link
+    rel="stylesheet"
+    href="./style.css"
+  />
+
+  <!-- Android -->
+  <link rel="manifest"
+    href="./manifest-beta.json"
+  />
+  
+  <meta 
+    name="theme-color"
+    content="#111111"
+  >
+
+  <!-- iPhone -->
+  <link rel="apple-touch-icon"
+    href="icon-192.png"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+
+    <button
+      id="menuBtn"
+      class="iconBtn"
+      aria-label="Open Menu"
+    >
+      ☰
+    </button>
+
+    <h1 class="title">
+      GES Promotion Aptitude Test - Beta
+    </h1>
+
+    <button
+      id="themeBtn"
+      class="iconBtn"
+      aria-label="Toggle Theme"
+    >
+      ☀
+    </button>
+
+  </header>
+
+  <aside
+    id="sidebar"
+    class="sidebar"
+  >
+    <div id="toc"></div>
+  </aside>
+
+  <main>
+
+  <div id="viewer"></div>  
+    
+  <div id="readingInfo"></div>
+    
+  <div id="navOverlay">
+
+    <div
+      id="leftZone"
+      class="navZone"
+    ></div>
+
+    <div
+      id="centerZone"
+      class="navZone"
+    ></div>
+
+    <div
+      id="rightZone"
+      class="navZone"
+    ></div>
+
+  </div>
+
+  </main>
+
+  <footer>
+  
+
+  <div class="topFooter">
+
+    <button
+      id="prevPage"
+      class="navBtn"
+    >
+      ❮
+    </button>
+
+    <div class="progressBar">
+
+      <div
+        id="progressFill"
+        class="progressFill"
+      ></div>
+
+    </div>
+
+    <span id="progressText">
+      0%
+    </span>
+
+    <button
+      id="nextPage"
+      class="navBtn"
+    >
+      ❯
+    </button>
+
+  </div>
+    
+
+  <div class="bottomFooter">
+
+    <button
+      id="bottomMenuBtn"
+      class="bottomBtn"
+      aria-label="Chapters"
+    >
+      ☰
+    </button>
+
+    <button
+      id="bottomDecreaseFont"
+      class="bottomBtn"
+      aria-label="Smaller Font"
+    >
+      A-
+    </button>
+
+    <button
+      id="searchBtn"
+      class="bottomBtn"
+      aria-label="Search"
+    >
+      🔍
+    </button>
+
+    <button
+      id="bottomIncreaseFont"
+      class="bottomBtn"
+      aria-label="Larger Font"
+    >
+      A+
+    </button>
+
+    <button
+      id="bottomThemeBtn"
+      class="bottomBtn"
+      aria-label="Theme"
+    >
+      ☀
+    </button>
+
+  </div>
+
+</footer>
+
+<div id="searchModal">
+
+  <div class="searchBox">
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search book..."
+    />
+
+    <button id="closeSearch">
+      ✕
+    </button>
+
+  </div>
+
+  <div id="searchResults"></div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+
+<script src="./app.js"></script>
+
+</body>
+</html>
