@@ -602,76 +602,83 @@ function startReader() {
 
 
 /* ===================
-   TOGGLE CONTROLS
+   CONTROLS
 =================== */
 
-function toggleControls() {
+/* ===== HIDE HEADER ===== */
 
-  controlsVisible =
-    !controlsVisible;
+function hideHeader() {
 
-  if (controlsVisible) {
-
-    header.classList.remove(
-      "hideControls"
-    );
-
-    footer.classList.remove(
-      "hideControls"
-    );
-
-    document.body.classList.remove(
-      "readingMode"
-    );
-    
-  }
-
-  else {
-
-    header.classList.add(
-      "hideControls"
-    );
-
-    footer.classList.add(
-      "hideControls"
-    );
-
-    document.body.classList.add(
-      "readingMode"
-    );
-    
-  }
-
-}
-
-
-/* =========================
- HIDE CONTROLS 
-========================= */
-
-function hideControlsHeader() {
-  
   header.classList.add(
     "hideControls"
   );
+
 }
 
-function hideControlsFooter() {
-  
-  footer.classList.add( 
+/* ===== SHOW HEADER ===== */
+function showHeader() {
+
+  header.classList.remove(
     "hideControls"
   );
-  
-  controlsVisible = false;
-  
-  document.body.classList.add( 
-    "readingMode"
-  );
+
 }
 
+/* ===== HIDE FOOTER ===== */
+function hideFooter() {
+
+  footer.classList.add(
+    "hideControls"
+  );
+
+}
+
+/* ===== SHOW FOOTER ===== */
+function showFooter() {
+
+  footer.classList.remove(
+    "hideControls"
+  );
+
+}
+
+/* ===== HIDE CONTROLS ===== */
 function hideControls() {
-  hideControlsHeader();
-  hideControlsFooter();
+
+  hideHeader();
+
+  hideFooter();
+
+  controlsVisible = false;
+
+  document.body.classList.add(
+    "readingMode"
+  );
+
+}
+
+/* ===== SHOW CONTROLS ===== */
+function showControls() {
+
+  showHeader();
+
+  showFooter();
+
+  controlsVisible = true;
+
+  document.body.classList.remove(
+    "readingMode"
+  );
+
+}
+
+/* ===== TOGGLE CONTROLS - middle tap ===== */
+function toggleControls() {
+
+  controlsVisible
+    ? hideControls()
+    : showControls();
+
 }
 
 
