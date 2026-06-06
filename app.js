@@ -1208,7 +1208,7 @@ function toggleSidebar() {
 
   updateMenuButtons();
 
-  hideControlsFooter();
+  hideFooter();
 
 }
 
@@ -1216,9 +1216,11 @@ function toggleSidebar() {
 
 function closeSidebar() {
   sidebar.classList.remove("active");
+  
   updateMenuButtons();
 
-  showControls();
+  hideHeader();
+  
 }
 
 /* MENU EVENTS */
@@ -1264,9 +1266,7 @@ nextPage.addEventListener(
 
     rendition.next();
 
-    // hideControls();
-
-    hideControlsHeader();
+    hideHeader();
 
   }
 );
@@ -1277,8 +1277,8 @@ prevPage.addEventListener(
 
     rendition.prev();
     
-    hideControlsHeader();
-
+    hideHeader();
+    
   }
 );
 
