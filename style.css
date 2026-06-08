@@ -14,14 +14,22 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* ── THEMES ─────────────────── */
 body {
   background: #f5f5f5;
   color: #111;
 }
-
 body.dark {
-  background: #111;
-  color: #fff;
+  background: #111111;
+  color: #eeeeee;
+}
+body.sepia {
+  background: #f4ede0;
+  color: #2c1a0e;
+}
+body.night {
+  background: #000000;
+  color: #bbbbbb;
 }
 
 .app {
@@ -37,6 +45,10 @@ body.dark {
    HEADER
 ========================= */
 
+:root {
+  --header-height: 46px;
+}
+
 header {
   position: fixed;
 
@@ -44,7 +56,7 @@ header {
   left: 0;
   right: 0;
 
-  height: 46px;
+  height: var(--header-height);
 
   background: rgba(30,30,30,0.92);
 
@@ -119,15 +131,12 @@ main {
 #viewer {
   width: 100%;
   height: 100%;
-
   overflow: hidden;
-
-  background: white;
+  background: #f5f5f5;
 }
-
-body.dark #viewer {
-  background: #111;
-}
+body.dark #viewer   { background: #111111; }
+body.sepia #viewer  { background: #f4ede0; }
+body.night #viewer  { background: #000000; }
 
 #viewer iframe {
   width: 100% !important;
@@ -291,32 +300,31 @@ footer {
 
 .sidebar {
   position: fixed;
-  top: 56px;
+  top: var(--header-height);
+  height: calc(100dvh - var(--header-height));
   left: -300px;
   width: 300px;
-  height: calc(100dvh - 56px);
   background: white;
   transition: left 0.3s ease;
   z-index: 10000;
   padding: 15px;
   display: flex;
   flex-direction: column;
-
+  overflow: hidden; /* let children handle their own scroll */
 }
 
 .sidebar.active {
   left: 0;
 }
 
-body.dark .sidebar {
-  background: #1e1e1e;
-  color: white;
-}
+body.dark  .sidebar { background: #1e1e1e; color: #eeeeee; }
+body.sepia .sidebar { background: #ede3d0; color: #2c1a0e; }
+body.night .sidebar { background: #0a0a0a; color: #bbbbbb; }
 
 .tocContainer {
   flex: 1;
   overflow-y: auto;
-
+  min-height: 0;
 }
 
 .aboutSection {
@@ -345,6 +353,7 @@ body.dark .sidebar {
 .aboutText strong {
   font-size: 11px;
 }
+
 
 /* =========================
    TOC
@@ -526,6 +535,147 @@ body.dark .searchItem {
    MOBILE
 ========================= */
 
+/* =========================
+   TOC ITEMS — global (not mobile-only)
+========================= */
+
+.tocItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.tocItem a {
+  flex: 1;
+  display: block;
+}
+
+.tocToggle {
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tocChildren {
+  display: none;
+  margin-left: 24px;
+}
+
+.tocChildren.open {
+  display: block;
+}
+
+/* =========================
+   SIDEBAR TABS — global
+========================= */
+
+.sidebarTabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+body.dark .sidebarTabs {
+  border-color: #333;
+}
+
+.sidebarTab {
+  flex: 1;
+  padding: 9px 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.45;
+  border-bottom: 2px solid transparent;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebarTab.active {
+  opacity: 1;
+  border-bottom-color: #4aa3ff;
+  color: #4aa3ff;
+}
+
+/* =========================
+   TAB PANELS — global
+========================= */
+
+.tabPanel {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.tabPanel.active {
+  display: flex;
+  flex-direction: column;
+}
+
+#bookmarksList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+#bookmarksList a {
+  display: block;
+  padding: 10px 8px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 13px;
+  border-bottom: 1px solid #ccc;
+}
+
+body.dark #bookmarksList a { border-color: #333; }
+#bookmarksList a:hover { background: rgba(0,0,0,0.05); }
+body.dark #bookmarksList a:hover { background: rgba(255,255,255,0.05); }
+
+.noBookmarks {
+  padding: 20px 8px;
+  font-size: 13px;
+  opacity: 0.5;
+  text-align: center;
+}
+
+/* =========================
+   READING INFO — global
+========================= */
+
+#readingInfo {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  z-index: 9000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+body.readingMode #readingInfo {
+  opacity: 1;
+}
+
+/* =========================
+   MOBILE ONLY
+========================= */
+
 @media (max-width: 768px) {
 
   .sidebar {
@@ -545,91 +695,145 @@ body.dark .searchItem {
     font-size: 16px;
   }
 
+}
 
 /* =========================
-   READING INFO
+   BOOKMARK ROWS
 ========================= */
 
-  #readingInfo {
-   position: fixed;
-   bottom: 10px;
-   left: 50%;
-   transform: translateX(-50%);
-   background: rgba(0,0,0,0.75);
-   color: white;
-   padding: 2px 8px;
-   border-radius: 20px;
-   font-size: 10px;
-   z-index: 9000;
-   pointer-events: none;
-   opacity: 0;
-   transition: opacity .25s ease;
-   text-align: center;
-   white-space: nowrap; 
- }
-
-  body.readingMode #readingInfo {
-
-  opacity: 1;
-
- }
-
-
- /* =========================
-   TOC ITEMS
-========================= */
-  
-  .tocItem {
-
+.bookmarkRow {
   display: flex;
-
   align-items: center;
-
-  width: 100%;
-
+  border-bottom: 1px solid #ccc;
 }
 
-  .tocItem a {
+body.dark .bookmarkRow {
+  border-color: #333;
+}
 
+.bookmarkLink {
   flex: 1;
-
   display: block;
-
+  padding: 10px 8px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tocToggle {
-
-  width: 24px;
-
-  min-width: 24px;
-
-  height: 24px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
+.bookmarkDelete {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
   cursor: pointer;
-
-  user-select: none;
-
+  border-radius: 6px;
+  opacity: 0.45;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
 
- .tocChildren {
-
-  display: none !important;
-
-  margin-left: 24px;
-
- }
-
-.tocChildren.open {
-
-  display: block !important;
-
- }
-  
-      
+.bookmarkDelete:hover {
+  opacity: 1;
+  background: rgba(255, 80, 80, 0.12);
 }
+
+
+/* =========================
+   THEME PICKER PANEL
+========================= */
+
+.themePicker {
+  position: fixed;
+  bottom: 78px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 19999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.themePicker.open {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+
+.themePickerInner {
+  background: rgba(30,30,30,0.97);
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 8px 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+}
+
+.themePickerLabel {
+  display: block;
+  text-align: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.themeOptions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.themeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+  min-width: 40px;
+}
+
+.themeOption:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+.themeOption.active {
+  color: #4aa3ff;
+}
+
+.themeSwatchWrap {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  padding: 2px;
+  border: 2px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.themeOption.active .themeSwatchWrap {
+  border-color: #4aa3ff;
+}
+
+.themeSwatch {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* Swatch colors */
+.themeSwatchWrap.light .themeSwatch { background: #f5f5f5; border: 1px solid #ccc; }
+.themeSwatchWrap.dark  .themeSwatch { background: #111111; }
+.themeSwatchWrap.sepia .themeSwatch { background: #f4ede0; border: 1px solid #c8b89a; }
+.themeSwatchWrap.night .themeSwatch { background: #000000; border: 1px solid #333; }
