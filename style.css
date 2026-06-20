@@ -122,10 +122,13 @@ header {
 
 main {
   position: absolute;
-
   inset: 0;
-
   overflow: hidden;
+}
+
+/* Slide animation container */
+#viewer {
+  will-change: transform, opacity;
 }
 
 #viewer {
@@ -299,18 +302,29 @@ footer {
 ========================= */
 
 .sidebar {
+
   position: fixed;
+
   top: var(--header-height);
   height: calc(100dvh - var(--header-height));
   left: -300px;
+
   width: 300px;
+
   background: white;
+
   transition: left 0.3s ease;
+
   z-index: 10000;
+
   padding: 15px;
+
   display: flex;
+
   flex-direction: column;
-  overflow: hidden; /* let children handle their own scroll */
+
+  overflow: hidden;
+
 }
 
 .sidebar.active {
@@ -405,28 +419,26 @@ footer.hideControls {
 
 #navOverlay {
   position: absolute;
-
   inset: 0;
-
   display: flex;
-
   z-index: 5000;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .navZone {
   height: 100%;
+  pointer-events: none;
 }
 
-#leftZone {
-  width: 30%;
-}
+#leftZone   { width: 30%; }
+#centerZone { width: 40%; }
+#rightZone  { width: 30%; }
 
-#centerZone {
-  width: 40%;
-}
-
-#rightZone {
-  width: 30%;
+/* Desktop mouse only — zones active */
+@media (pointer: fine) {
+  .navZone { pointer-events: all; cursor: pointer; }
 }
 
 button {
@@ -536,7 +548,49 @@ body.dark .searchItem {
 ========================= */
 
 /* =========================
-   TOC ITEMS — global (not mobile-only)
+   READING INFO
+========================= */
+
+/* =========================
+   PERMANENT INFO BAR
+   Always visible, footer overlays it
+========================= */
+
+#readingInfo {
+  position: fixed;
+  bottom: env(safe-area-inset-bottom, 12px);
+  left: 0;
+  right: 0;
+  height: 22px;
+  background: transparent;
+  color: rgba(120, 120, 120, 0.6);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  z-index: 50;
+  pointer-events: none;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show only when controls are hidden */
+body.readingMode #readingInfo {
+  opacity: 1;
+}
+
+/* Theme colours */
+body.dark  #readingInfo { color: rgba(255,255,255,0.3); }
+body.night #readingInfo { color: rgba(255,255,255,0.25); }
+body.sepia #readingInfo { color: rgba(100, 60, 20, 0.5); }
+
+/* =========================
+   TOC ITEMS
 ========================= */
 
 .tocItem {
@@ -571,7 +625,7 @@ body.dark .searchItem {
 }
 
 /* =========================
-   SIDEBAR TABS — global
+   SIDEBAR TABS
 ========================= */
 
 .sidebarTabs {
@@ -606,7 +660,7 @@ body.dark .sidebarTabs {
 }
 
 /* =========================
-   TAB PANELS — global
+   TAB PANELS
 ========================= */
 
 .tabPanel {
@@ -644,32 +698,6 @@ body.dark #bookmarksList a:hover { background: rgba(255,255,255,0.05); }
   font-size: 13px;
   opacity: 0.5;
   text-align: center;
-}
-
-/* =========================
-   READING INFO — global
-========================= */
-
-#readingInfo {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.75);
-  color: white;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  z-index: 9000;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .25s ease;
-  text-align: center;
-  white-space: nowrap;
-}
-
-body.readingMode #readingInfo {
-  opacity: 1;
 }
 
 /* =========================
@@ -837,3 +865,4 @@ body.dark .bookmarkRow {
 .themeSwatchWrap.dark  .themeSwatch { background: #111111; }
 .themeSwatchWrap.sepia .themeSwatch { background: #f4ede0; border: 1px solid #c8b89a; }
 .themeSwatchWrap.night .themeSwatch { background: #000000; border: 1px solid #333; }
+
