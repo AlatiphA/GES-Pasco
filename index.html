@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    GES Promotion Aptitude Test Pasco
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="./style.css"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+
+  <!-- Android -->
+  <link rel="manifest"
+    href="./manifest.json"
+  />
+  
+  <meta 
+    name="theme-color"
+    content="#111111"
+  >
+
+  <!-- iPhone -->
+  <link rel="apple-touch-icon"
+    href="icon-192.png"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+
+    <button
+      id="clearCacheBtn"
+      class="iconBtn"
+      aria-label="Clear App Data"
+    >
+      <i class="fa-solid fa-trash-can"></i>
+    </button>
+
+    <h1 class="title">
+      GES Promotion Aptitude Test Pasco
+    </h1>
+
+    <button
+      id="themeBtn"
+      class="iconBtn"
+      aria-label="Change Theme"
+    >
+      <i class="fa-solid fa-palette"></i>
+    </button>
+
+  </header>
+
+  <aside
+    id="sidebar"
+    class="sidebar"
+  >
+
+    <!-- Tab Buttons -->
+    <div class="sidebarTabs">
+      <button class="sidebarTab active" data-tab="toc">Contents</button>
+      <button class="sidebarTab" data-tab="bookmarks">Bookmarks</button>
+    </div>
+
+    <!-- Contents Panel -->
+    <div id="tocPanel" class="tabPanel active">
+      <div id="toc" class="tocContainer"></div>
+    </div>
+
+    <!-- Bookmarks Panel -->
+    <div id="bookmarksPanel" class="tabPanel">
+      <div id="bookmarksList"></div>
+    </div>
+
+    <!-- MoMo Support Section -->
+    <div class="momoSection">
+
+      <div class="momoTitle">
+        <i class="fa-solid fa-heart"></i> Support AlatiphA
+      </div>
+
+      <p class="momoDesc">
+        Built with love, shared for free. Support the developer.
+      </p>
+
+      <div class="momoCard">
+
+        <div class="momoCardLeft">
+          <div class="momoNetwork">
+            <i class="fa-solid fa-mobile-screen-button"></i> MTN MoMo
+          </div>
+          <div class="momoNumber" id="momoNumber">0243443688</div>
+          <div class="momoName">Name: Abdul-Latif Ahmed</div>
+        </div>
+
+        <button class="momoCopyBtn" id="momoCopyBtn" onclick="
+          navigator.clipboard.writeText('0243443688').then(function() {
+            var btn = document.getElementById('momoCopyBtn');
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = 'Copy Number'; }, 2000);
+          });
+        ">
+          Copy Number
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- About --> 
+    <div class="aboutSection">
+
+    <img
+      src="icon-192.png"
+      alt="GES Pasco Icon"
+      class="aboutIcon"
+    >
+
+    <div class="aboutText">
+
+      <strong>
+        GES Promotion Aptitude Test Pasco
+      </strong>
+
+      <br>
+
+      ©️ All Rights Reserved | 2026 Edition · <span id="appVersion">v3.0.5</span>
+
+      <br>
+
+      Developed by Abdul-Latif Ahmed [AlatiphA]
+
+    </div>
+
+  </div>
+  
+  </aside>
+
+  <main>
+
+  <div id="viewer"></div>
+
+  <div id="navOverlay">
+    <div id="leftZone"   class="navZone"></div>
+    <div id="centerZone" class="navZone"></div>
+    <div id="rightZone"  class="navZone"></div>
+  </div>
+
+  </main>
+
+  <!-- Permanent info bar — always visible -->
+  <div id="readingInfo"></div>
+
+  <footer>
+  
+
+  <div class="topFooter">
+
+    <button
+      id="prevPage"
+      class="navBtn"
+    >
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <div class="progressBar">
+
+      <div
+        id="progressFill"
+        class="progressFill"
+      ></div>
+
+    </div>
+
+    <span id="progressText">
+      0%
+    </span>
+
+    <button
+      id="nextPage"
+      class="navBtn"
+    >
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+  </div>
+    
+
+  <div class="bottomFooter">
+
+    <button
+      id="bottomMenuBtn"
+      class="bottomBtn"
+      aria-label="Chapters"
+    >
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <button
+      id="bottomDecreaseFont"
+      class="bottomBtn"
+      aria-label="Smaller Font"
+    >
+      <i class="fa-solid fa-a"></i><i class="fa-solid fa-minus" style="font-size:8px;vertical-align:middle;"></i>
+    </button>
+
+    <button
+      id="bookmarkBtn"
+      class="bottomBtn"
+    >
+      <i class="fa-solid fa-bookmark"></i>
+    </button>
+
+    <button
+      id="bottomIncreaseFont"
+      class="bottomBtn"
+      aria-label="Larger Font"
+    >
+      <i class="fa-solid fa-a"></i><i class="fa-solid fa-plus" style="font-size:8px;vertical-align:middle;"></i>
+    </button>
+
+    <button
+      id="searchBtn"
+      class="bottomBtn"
+      aria-label="Search"
+    >
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+
+
+  </div>
+
+</footer>
+
+<div id="searchModal">
+
+  <div class="searchBox">
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search book..."
+    />
+
+    <button id="closeSearch">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+  </div>
+
+  <div id="searchResults"></div>
+
+  </div>
+
+</div>
+
+<!-- Theme Picker Panel -->
+<div id="themePicker" class="themePicker">
+  <div class="themePickerInner">
+    <span class="themePickerLabel">Theme</span>
+    <div class="themeOptions">
+      <button class="themeOption" data-theme="light">
+        <span class="themeSwatchWrap light"><span class="themeSwatch"></span></span>
+        <span>Light</span>
+      </button>
+      <button class="themeOption" data-theme="dark">
+        <span class="themeSwatchWrap dark"><span class="themeSwatch"></span></span>
+        <span>Dark</span>
+      </button>
+      <button class="themeOption" data-theme="sepia">
+        <span class="themeSwatchWrap sepia"><span class="themeSwatch"></span></span>
+        <span>Sepia</span>
+      </button>
+      <button class="themeOption" data-theme="night">
+        <span class="themeSwatchWrap night"><span class="themeSwatch"></span></span>
+        <span>Night</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+
+<script src="./app.js"></script>
+<script src="./install.js"></script>
+
+</body>
+</html>
