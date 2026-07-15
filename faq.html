@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GES Pasco – FAQ</title>
+
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#111111" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Apply saved theme before paint -->
+  <script>
+    (function() {
+      var t = localStorage.getItem("reader-theme") || "dark";
+      if (t === "dark") document.documentElement.classList.add("dark");
+    })();
+  </script>
+
+  <style>
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      font-family: Arial, sans-serif;
+      min-height: 100%;
+    }
+
+    /* THEMES */
+    body {
+      background: #f5f5f5;
+      color: #111111;
+      --bg: #f5f5f5;
+      --text: #111111;
+      --surface: #ffffff;
+      --border: #dddddd;
+      --accent: #956433;
+    }
+
+    html.dark body {
+      background: #111111;
+      color: #eeeeee;
+      --bg: #111111;
+      --text: #eeeeee;
+      --surface: #1e1e1e;
+      --border: #333333;
+      --accent: #5aa3f0;
+    }
+
+    /* HEADER */
+    .faqHeader {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .backLink {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .backLink span {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .faqHeaderTitle {
+      font-size: 16px;
+      font-weight: 700;
+      flex: 1;
+      text-align: center;
+    }
+
+    .themeToggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* HERO */
+    .faqHero {
+      text-align: center;
+      padding: 32px 20px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faqHero img {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+
+    .faqHero h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .faqHero p {
+      font-size: 13px;
+      opacity: 0.6;
+    }
+
+    /* CONTENT */
+    .faqContent {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    .faqSection {
+      margin-bottom: 28px;
+    }
+
+    .faqSectionTitle {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faqItem {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .faqQuestion {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .faqQuestion .icon {
+      flex-shrink: 0;
+      font-size: 12px;
+      opacity: 0.5;
+      transition: transform 0.2s ease;
+    }
+
+    .faqItem.open .faqQuestion .icon {
+      transform: rotate(180deg);
+    }
+
+    .faqAnswer {
+      display: none;
+      padding: 0 16px 14px;
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: 0.85;
+    }
+
+    .faqItem.open .faqAnswer {
+      display: block;
+    }
+
+    /* SUPPORT BOX */
+    .supportBox {
+      background: var(--surface);
+      border: 1px solid rgba(255,196,0,0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+
+    .supportBox .momoNetwork {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffcc00;
+      margin-bottom: 4px;
+    }
+
+    .supportBox .momoNumber {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .supportBox .momoName {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-bottom: 10px;
+    }
+
+    .copyBtn {
+      background: #ffcc00;
+      color: #111;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .copyBtn:active { opacity: 0.8; }
+
+    /* FOOTER */
+    .faqFooter {
+      text-align: center;
+      padding: 20px 16px;
+      font-size: 11px;
+      opacity: 0.4;
+      border-top: 1px solid var(--border);
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="faqHeader">
+    <a href="./index.html" class="backLink">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>App</span>
+    </a>
+    <div class="faqHeaderTitle">Help & FAQ</div>
+    <button class="themeToggle" id="themeToggle" aria-label="Toggle theme">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </div>
+
+  <!-- HERO -->
+  <div class="faqHero">
+    <img src="icon-192.png" alt="GES Pasco" />
+    <h1>GES Pasco</h1>
+    <p>Frequently Asked Questions</p>
+  </div>
+
+  <!-- FAQ CONTENT -->
+  <div class="faqContent">
+
+    <!-- GETTING STARTED -->
+    <div class="faqSection">
+      <div class="faqSectionTitle">Getting Started</div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          What is GES Pasco?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          GES Pasco is a free offline EPUB reader for Ghana Education Service (GES) workers preparing for promotion aptitude exams. It contains past questions and answers, and footnotes.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I install the app?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Visit the app link in your browser and wait for the install prompt, then tap <strong>Install</strong>. If the prompt doesn't appear, tap the 3 dots in your browser and select <strong>Add to Home Screen</strong>. On iPhone, tap the Share button then <strong>Add to Home Screen</strong>.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          Does the app work without internet?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Yes! Once installed and opened at least once with internet, the book and the app itself load fully offline.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- READING -->
+    <div class="faqSection">
+      <div class="faqSectionTitle">Reading</div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I switch between chapters (sections)?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Tap the menu button on the bottom left corner of the reader to open the sidebar, tap on contents tab and select the chapter (section).
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I navigate between pages?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Tap left or right on the reading area, or use the arrow buttons at the bottom of the screen.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I adjust the font size?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Use the <strong>A−</strong> and <strong>A+</strong> buttons in the bottom toolbar to decrease or increase the font size.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I search inside a book?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Tap the magnifying glass icon (🔍) in the bottom toolbar and type your search term. Results will appear as a list — tap any result to jump to that location.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- THEMES & BOOKMARKS -->
+    <div class="faqSection">
+      <div class="faqSectionTitle">Themes & Bookmarks</div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I change the reading theme?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Tap the palette icon (🎨) in the top right of the reader to choose between Light, Dark, Sepia, and Night themes. 
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I bookmark a page?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Tap the bookmark icon (🔖) in the bottom toolbar while reading. Your bookmark is saved automatically with the chapter (section) name and progress.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          How do I find my bookmarks?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Tap the menu icon at the bottom of the reader, then tap the <strong>Bookmarks</strong> tab in the sidebar. The bookmarks will be listed with a delete icons by them. A tap on the delete icon (🗑), deletes the bookmark by it. 
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="faqSection">
+      <div class="faqSectionTitle">Troubleshooting</div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          A book is not loading. What do I do?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Make sure you opened the app at least once with internet so books can be cached. If the problem persists, tap the trash icon (🗑) in the top left of the reader header to clear app data, then reopen with internet on.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          What does the Clear Data button (🗑)on the top left do?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          It resets all app data including bookmarks, themes, and cached files. Use it only if the app is misbehaving. You will need internet to reload the books after clearing.
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          The app is stuck or not responding. What should I do?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Close the app completely and reopen it. If it still doesn't work, tap the trash icon (🗑) in the top left of the reader header, then reopen with internet on.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="faqSection">
+      <div class="faqSectionTitle">Support the Developer</div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          Is GES Pasco free?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Yes, completely free with no ads. If the app has helped your studies, consider sending a small tip to support continued development.
+        </div>
+      </div>
+
+      <div class="faqItem open">
+        <button class="faqQuestion">
+          How can I support the developer?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          Send a tip via MTN Mobile Money:
+          <div class="supportBox" style="margin-top:10px">
+            <div class="momoNetwork"><i class="fa-solid fa-mobile-screen-button"></i> MTN MoMo</div>
+            <div class="momoNumber">0243443688</div>
+            <div class="momoName">Name: Abdul-Latif Ahmed</div>
+            <button class="copyBtn" id="copyBtn">Copy Number</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="faqItem">
+        <button class="faqQuestion">
+          Who developed GES Pasco?
+          <i class="fa-solid fa-chevron-down icon"></i>
+        </button>
+        <div class="faqAnswer">
+          GES Pasco was developed independently by <strong>Abdul-Latif Ahmed (AlatiphA)</strong>, a Ghanaian developer passionate about education and technology.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="faqFooter">
+    GES Pasco &copy; 2026 · Developed by Abdul-Latif Ahmed (AlatiphA)
+  </div>
+
+  <script>
+
+    /* Accordion */
+    document.querySelectorAll(".faqQuestion").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const item = btn.closest(".faqItem");
+        const isOpen = item.classList.contains("open");
+        document.querySelectorAll(".faqItem").forEach(i => i.classList.remove("open"));
+        if (!isOpen) item.classList.add("open");
+      });
+    });
+
+    /* Theme toggle */
+    const themeToggle = document.getElementById("themeToggle");
+
+    function applyFaqTheme(theme) {
+      localStorage.setItem("reader-theme", theme);
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      themeToggle.innerHTML = theme === "dark"
+        ? '<i class="fa-solid fa-moon"></i>'
+        : '<i class="fa-solid fa-sun"></i>';
+    }
+
+    /* Init icon */
+    const savedTheme = localStorage.getItem("reader-theme") || "dark";
+    applyFaqTheme(savedTheme);
+
+    themeToggle.addEventListener("click", () => {
+      const current = localStorage.getItem("reader-theme") || "dark";
+      applyFaqTheme(current === "dark" ? "light" : "dark");
+    });
+
+    /* Copy MoMo number */
+    const copyBtn = document.getElementById("copyBtn");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText("0243443688").then(() => {
+          copyBtn.textContent = "Copied!";
+          setTimeout(() => { copyBtn.textContent = "Copy Number"; }, 2000);
+        });
+      });
+    }
+
+  </script>
+
+</body>
+</html>
