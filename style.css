@@ -1265,3 +1265,58 @@ body.night .momoCard { background: rgba(255,196,0,0.04); }
   .authPanel { padding-left: 18px; padding-right: 18px; }
   .authHero { min-height: 135px; }
 }
+
+/* =====================================================
+   STARTUP / AUTH VISIBILITY
+   The explicit hidden rule is important because .authGate
+   uses display:grid and must never override [hidden].
+===================================================== */
+[hidden] {
+  display: none !important;
+}
+
+.startupGate {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f7f4f1;
+}
+
+.startupCard {
+  width: min(360px, 100%);
+  text-align: center;
+}
+
+.startupLogo {
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+  margin-bottom: 14px;
+}
+
+.startupCard h1 {
+  margin: 0 0 6px;
+  font-size: 1.55rem;
+}
+
+.startupCard p {
+  margin: 0 0 18px;
+  opacity: .72;
+}
+
+.startupSpinner {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  border: 3px solid rgba(149, 100, 51, .20);
+  border-top-color: #956433;
+  border-radius: 50%;
+  animation: gesPascoSpin .8s linear infinite;
+}
+
+@keyframes gesPascoSpin {
+  to { transform: rotate(360deg); }
+}

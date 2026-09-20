@@ -54,8 +54,18 @@
 
 <body>
 
+<!-- STARTUP GATE: prevents Login flashing while Firebase restores the session -->
+<section id="startupGate" class="startupGate" aria-live="polite" aria-busy="true">
+  <div class="startupCard">
+    <img src="./icon-192.png" alt="GES Pasco" class="startupLogo">
+    <h1>GES Pasco</h1>
+    <p>Checking your account...</p>
+    <div class="startupSpinner" aria-hidden="true"></div>
+  </div>
+</section>
+
 <!-- FIREBASE AUTH GATE -->
-<section id="authGate" class="authGate" aria-live="polite">
+<section id="authGate" class="authGate" aria-live="polite" hidden>
   <div class="authShell">
     <div class="authHero">
       <img src="./icon-192.png" alt="GES Pasco" class="authLogo">

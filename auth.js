@@ -4,6 +4,7 @@
 (() => {
   "use strict";
 
+  const startupGate = document.getElementById("startupGate");
   const authGate = document.getElementById("authGate");
   const readerApp = document.getElementById("readerApp");
   const loginForm = document.getElementById("loginForm");
@@ -196,7 +197,16 @@
   });
 
   function startAuthObserver() {
+    let initialAuthResolved = false;
+
     gesPascoAuth.onAuthStateChanged(user => {
+      // Firebase calls this observer only after it has restored the persisted
+      // session. Until this first callback, show only the neutral startup gate.
+      if (!initialAuthResolved) {
+        initialAuthResolved = true;
+        startupGate.hidden = true;
+      }
+
       // createUserWithEmailAndPassword signs a new account in automatically.
       // During registration we deliberately keep the reader closed, create
       // the profile, sign the account out, then return to Login.
@@ -215,6 +225,13 @@
         authGate.hidden = false;
         showForm(loginForm);
       }
+    }, error => {
+      console.error("Authentication state check failed:", error);
+      startupGate.hidden = true;
+      readerApp.hidden = true;
+      authGate.hidden = false;
+      showForm(loginForm);
+      showMessage("We could not check your sign-in session. Check your connection and try again.");
     });
   }
 
