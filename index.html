@@ -138,51 +138,38 @@
     </h1>
 
     <div class="headerActions">
-      <a
-        href="./faq.html"
-        id="faqBtn"
-        class="iconBtn"
-        aria-label="Help and FAQ"
-      >
-        <i class="fa-solid fa-circle-question"></i>
-      </a>
-
       <button id="profileBtn" class="profileBtn" type="button" aria-label="Open account" aria-expanded="false" title="Account">
         <img id="profileAvatarImage" class="profileAvatarImage" alt="" hidden>
         <span id="profileInitials" class="profileInitials">U</span>
       </button>
     </div>
 
-    <div id="profileBackdrop" class="profileBackdrop" hidden></div>
-    <section id="profileMenu" class="profileMenu" aria-label="Account" hidden>
-      <div class="profileHandle" aria-hidden="true"></div>
-      <div class="profileIdentity">
-        <div class="profileAvatarLarge">
-          <img id="profileMenuAvatarImage" alt="" hidden>
-          <span id="profileMenuInitials">U</span>
-        </div>
-        <div class="profileIdentityText">
-          <strong id="profileName">GES Pasco User</strong>
-          <span id="profileEmail"></span>
-        </div>
-      </div>
-      <div class="profileDivider"></div>
-      <div class="profileAccountRow">
-        <i class="fa-regular fa-user"></i>
-        <div><strong>Account</strong><span id="profileAccountType">Signed in</span></div>
-      </div>
-      <button id="logoutBtn" class="profileLogout" type="button">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span>Log out</span>
-      </button>
-    </section>
-
-    <!-- FAQ button is grouped with the Account button above. -->
-    <span hidden
-      data-legacy="faq-placeholder"
-    ></span>
-
   </header>
+
+  <!-- Account UI lives outside the fixed header so mobile browsers cannot clip it. -->
+  <div id="profileBackdrop" class="profileBackdrop" hidden></div>
+  <section id="profileMenu" class="profileMenu" aria-label="Account" hidden>
+    <div class="profileHandle" aria-hidden="true"></div>
+    <div class="profileIdentity">
+      <div class="profileAvatarLarge">
+        <img id="profileMenuAvatarImage" alt="" hidden>
+        <span id="profileMenuInitials">U</span>
+      </div>
+      <div class="profileIdentityText">
+        <strong id="profileName">GES Pasco User</strong>
+        <span id="profileEmail"></span>
+      </div>
+    </div>
+    <div class="profileDivider"></div>
+    <div class="profileAccountRow">
+      <i class="fa-regular fa-user"></i>
+      <div><strong>Account</strong><span id="profileAccountType">Signed in</span></div>
+    </div>
+    <button id="logoutBtn" class="profileLogout" type="button">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Log out</span>
+    </button>
+  </section>
 
   <aside
     id="sidebar"
@@ -272,6 +259,8 @@
       <br>
 
       Developed by Abdul-Latif Ahmed [AlatiphA]
+
+      <a href="./faq.html" class="aboutFaqLink" aria-label="Frequently Asked Questions">FAQ</a>
 
     </div>
 
