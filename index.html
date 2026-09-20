@@ -500,6 +500,14 @@
       p.modal.removeAttribute("hidden");
       p.modal.setAttribute("aria-hidden", "false");
       document.body.classList.add("faqModalOpen");
+      var theme = localStorage.getItem("theme-v2") || "dark";
+      var sendTheme = function () {
+        if (p.frame && p.frame.contentWindow) {
+          p.frame.contentWindow.postMessage({ type: "ges-pasco-theme", theme: theme }, location.origin);
+        }
+      };
+      if (p.frame) p.frame.addEventListener("load", sendTheme, { once: true });
+      sendTheme();
       if (p.closeBtn) setTimeout(function () { p.closeBtn.focus(); }, 0);
       return false;
     },
@@ -514,6 +522,17 @@
       return false;
     }
   };
+
+  var lastFaqTheme = localStorage.getItem("theme-v2") || "dark";
+  new MutationObserver(function () {
+    var theme = localStorage.getItem("theme-v2") || "dark";
+    if (theme === lastFaqTheme) return;
+    lastFaqTheme = theme;
+    var frame = document.getElementById("faqFrame");
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: "ges-pasco-theme", theme: theme }, location.origin);
+    }
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   document.addEventListener("keydown", function (event) {
     var modal = document.getElementById("faqModal");

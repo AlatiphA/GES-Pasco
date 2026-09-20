@@ -1557,3 +1557,14 @@ body.faqModalOpen { overflow: hidden; }
   .faqModal { align-items: center; padding: 24px; }
   .faqModalPanel { height: min(860px, calc(100vh - 48px)); border-radius: 16px; box-shadow: 0 18px 60px rgba(0,0,0,.35); }
 }
+
+/* FAQ shell inherits the active reader theme */
+body.dark .faqModalPanel, body.dark .faqModalHeader { background: #111111; color: #eeeeee; }
+body.dark .faqModalHeader { border-bottom-color: #333333; }
+body.dark .faqModalFrame { background: #111111; }
+body.sepia .faqModalPanel, body.sepia .faqModalHeader { background: #f4ede0; color: #2c1a0e; }
+body.sepia .faqModalHeader { border-bottom-color: #d5c5aa; }
+body.sepia .faqModalFrame { background: #f4ede0; }
+body.night .faqModalPanel, body.night .faqModalHeader { background: #000000; color: #bbbbbb; }
+body.night .faqModalHeader { border-bottom-color: #2a2a2a; }
+body.night .faqModalFrame { background: #000000; }

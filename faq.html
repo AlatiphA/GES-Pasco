@@ -13,11 +13,12 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
 
-  <!-- Apply saved theme before paint -->
+  <!-- Inherit the reader theme before paint -->
   <script>
     (function() {
-      var t = localStorage.getItem("reader-theme") || "dark";
-      if (t === "dark") document.documentElement.classList.add("dark");
+      var t = localStorage.getItem("theme-v2") || "dark";
+      document.documentElement.classList.remove("dark", "sepia", "night");
+      if (t !== "light") document.documentElement.classList.add(t);
     })();
   </script>
 
@@ -49,6 +50,26 @@
       --surface: #1e1e1e;
       --border: #333333;
       --accent: #5aa3f0;
+    }
+
+    html.sepia body {
+      background: #f4ede0;
+      color: #2c1a0e;
+      --bg: #f4ede0;
+      --text: #2c1a0e;
+      --surface: #fbf5e9;
+      --border: #d5c5aa;
+      --accent: #7a4a1a;
+    }
+
+    html.night body {
+      background: #000000;
+      color: #bbbbbb;
+      --bg: #000000;
+      --text: #bbbbbb;
+      --surface: #090909;
+      --border: #2a2a2a;
+      --accent: #4dabff;
     }
 
     /* HEADER */
@@ -265,9 +286,6 @@
       <span>App</span>
     </a>
     <div class="faqHeaderTitle">Help & FAQ</div>
-    <button class="themeToggle" id="themeToggle" aria-label="Toggle theme">
-      <i class="fa-solid fa-moon"></i>
-    </button>
   </div>
 
   <!-- HERO -->
@@ -515,24 +533,25 @@
       });
     });
 
-    /* Theme toggle */
-    const themeToggle = document.getElementById("themeToggle");
-
+    /* FAQ inherits the reader theme. No independent FAQ theme control. */
     function applyFaqTheme(theme) {
-      localStorage.setItem("reader-theme", theme);
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      themeToggle.innerHTML = theme === "dark"
-        ? '<i class="fa-solid fa-moon"></i>'
-        : '<i class="fa-solid fa-sun"></i>';
+      theme = theme || localStorage.getItem("theme-v2") || "dark";
+      document.documentElement.classList.remove("dark", "sepia", "night");
+      if (theme !== "light") document.documentElement.classList.add(theme);
     }
 
-    /* Init icon */
-    const savedTheme = localStorage.getItem("reader-theme") || "dark";
-    applyFaqTheme(savedTheme);
+    applyFaqTheme();
 
-    themeToggle.addEventListener("click", () => {
-      const current = localStorage.getItem("reader-theme") || "dark";
-      applyFaqTheme(current === "dark" ? "light" : "dark");
+    /* localStorage changes in the reader window propagate to this iframe. */
+    window.addEventListener("storage", (event) => {
+      if (event.key === "theme-v2") applyFaqTheme(event.newValue || "dark");
+    });
+
+    /* Parent shell also sends the current theme when FAQ opens/changes. */
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "ges-pasco-theme") {
+        applyFaqTheme(event.data.theme);
+      }
     });
 
     /* Copy MoMo number */
