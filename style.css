@@ -1407,3 +1407,79 @@ body.night .momoCard { background: rgba(255,196,0,0.04); }
     background: #d2d2d2; margin: 0 auto 13px;
   }
 }
+
+/* =========================
+   PROFILE / FAQ UI PATCH - sw v1.0.6
+========================= */
+.headerActions {
+  flex: 0 0 40px;
+  width: 40px;
+  justify-content: center;
+}
+
+.profileBtn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  position: relative;
+  z-index: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.profileInitials { font-size: 13px; }
+
+.aboutDeveloper {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.aboutFaqRow {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.aboutFaqLink {
+  display: inline-block;
+  margin: 0;
+  color: #956433;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  opacity: 1;
+}
+.aboutFaqLink:hover,
+.aboutFaqLink:focus-visible { text-decoration: underline; }
+
+/* These elements are direct children of the app shell, not the fixed header. */
+#readerApp > .profileBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+}
+#readerApp > .profileMenu {
+  position: fixed;
+  z-index: 20010;
+}
+
+@media (max-width: 600px) {
+  #readerApp > .profileMenu {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: min(70dvh, 430px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    border-radius: 18px 18px 0 0;
+    padding: 9px 17px calc(18px + env(safe-area-inset-bottom));
+  }
+}
