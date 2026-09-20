@@ -12,6 +12,7 @@
   const authMessage = document.getElementById("authMessage");
   const logoutBtn = document.getElementById("logoutBtn");
   let readerLoaded = false;
+  let signupInProgress = false;
   const googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
 
@@ -116,10 +117,15 @@
     clearMessage();
     setBusy(loginForm, true);
     try {
-      await gesPascoAuth.signInWithEmailAndPassword(
+      const credential = await gesPascoAuth.signInWithEmailAndPassword(
         document.getElementById("loginEmail").value.trim(),
         document.getElementById("loginPassword").value
       );
+      await gesPascoDb.collection("users").doc(credential.user.uid).set({
+        displayName: credential.user.displayName || "",
+        email: credential.user.email || "",
+        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
     } catch (error) {
       showMessage(friendlyError(error));
     } finally {
@@ -141,6 +147,7 @@
     }
 
     setBusy(signupForm, true);
+    signupInProgress = true;
     try {
       const credential = await gesPascoAuth.createUserWithEmailAndPassword(email, password);
       await credential.user.updateProfile({ displayName: name });
@@ -150,11 +157,17 @@
         role: "user",
         accountStatus: "active",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+        lastLoginAt: null
       }, { merge: true });
+
+      await gesPascoAuth.signOut();
+      signupForm.reset();
+      showForm(loginForm);
+      showMessage("Account created successfully. Please log in.", "success");
     } catch (error) {
       showMessage(friendlyError(error));
     } finally {
+      signupInProgress = false;
       setBusy(signupForm, false);
     }
   });
@@ -182,24 +195,37 @@
     }
   });
 
-  gesPascoAuth.onAuthStateChanged(async user => {
-    if (user) {
-      try {
-        await gesPascoDb.collection("users").doc(user.uid).set({
-          displayName: user.displayName || "",
-          email: user.email || "",
-          lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-      } catch (error) {
-        console.warn("Could not update user profile:", error);
+  function startAuthObserver() {
+    gesPascoAuth.onAuthStateChanged(user => {
+      // createUserWithEmailAndPassword signs a new account in automatically.
+      // During registration we deliberately keep the reader closed, create
+      // the profile, sign the account out, then return to Login.
+      if (signupInProgress) {
+        readerApp.hidden = true;
+        authGate.hidden = false;
+        return;
       }
-      authGate.hidden = true;
-      readerApp.hidden = false;
-      loadReaderOnce();
-    } else {
-      readerApp.hidden = true;
-      authGate.hidden = false;
-      showForm(loginForm);
-    }
-  });
+
+      if (user) {
+        authGate.hidden = true;
+        readerApp.hidden = false;
+        loadReaderOnce();
+      } else {
+        readerApp.hidden = true;
+        authGate.hidden = false;
+        showForm(loginForm);
+      }
+    });
+  }
+
+  // Explicit LOCAL persistence keeps the user signed in across refreshes,
+  // browser restarts and installed-PWA launches until Logout is selected.
+  gesPascoAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(startAuthObserver)
+    .catch(error => {
+      console.error("Could not enable local authentication persistence:", error);
+      showMessage("Sign-in persistence could not be enabled. Please refresh and try again.");
+      startAuthObserver();
+    });
+
 })();
