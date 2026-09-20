@@ -1,24 +1,139 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function validProfileShape() {
+      return request.resource.data.keys().hasOnly([
+               'displayName', 'email', 'role', 'accountStatus',
+               'createdAt', 'lastLoginAt'
+             ])
+             && request.resource.data.keys().hasAll([
+               'displayName', 'email', 'role', 'accountStatus',
+               'createdAt', 'lastLoginAt'
+             ])
+             && request.resource.data.displayName is string
+             && request.resource.data.displayName.size() <= 120
+             && request.resource.data.email is string
+             && request.resource.data.email == request.auth.token.email
+             && request.resource.data.role == 'user'
+             && request.resource.data.accountStatus == 'active'
+             && request.resource.data.createdAt is timestamp
+             && (request.resource.data.lastLoginAt == null
+                 || request.resource.data.lastLoginAt is timestamp);
+    }
+
+    function adminFieldsUnchanged() {
+      return request.resource.data.role == resource.data.role
+             && request.resource.data.accountStatus == resource.data.accountStatus
+             && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function validPosition() {
+      return request.resource.data.keys().hasOnly([
+               'location', 'progress', 'chapter', 'lastRead', 'updatedAt'
+             ])
+             && request.resource.data.keys().hasAll([
+               'location', 'progress', 'chapter', 'lastRead', 'updatedAt'
+             ])
+             && request.resource.data.location is string
+             && request.resource.data.location.size() > 0
+             && request.resource.data.location.size() <= 10000
+             && request.resource.data.progress is number
+             && request.resource.data.progress >= 0
+             && request.resource.data.progress <= 100
+             && request.resource.data.chapter is string
+             && request.resource.data.chapter.size() <= 2000
+             && request.resource.data.lastRead is string
+             && request.resource.data.lastRead.size() <= 64
+             && request.resource.data.updatedAt is timestamp;
+    }
+
+    function validPreferences() {
+      return request.resource.data.keys().hasOnly([
+               'theme', 'fontSize', 'fontFamily', 'lastChanged', 'updatedAt'
+             ])
+             && request.resource.data.keys().hasAll([
+               'theme', 'fontSize', 'fontFamily', 'lastChanged', 'updatedAt'
+             ])
+             && request.resource.data.theme is string
+             && request.resource.data.theme.size() <= 40
+             && request.resource.data.fontSize is number
+             && request.resource.data.fontSize >= 50
+             && request.resource.data.fontSize <= 250
+             && request.resource.data.fontFamily is string
+             && request.resource.data.fontFamily.size() <= 120
+             && request.resource.data.lastChanged is string
+             && request.resource.data.lastChanged.size() <= 64
+             && request.resource.data.updatedAt is timestamp;
+    }
+
+    function validBookmark() {
+      return request.resource.data.keys().hasOnly([
+               'cfi', 'chapter', 'progress', 'date', 'updatedAt'
+             ])
+             && request.resource.data.keys().hasAll([
+               'cfi', 'chapter', 'progress', 'date', 'updatedAt'
+             ])
+             && request.resource.data.cfi is string
+             && request.resource.data.cfi.size() > 0
+             && request.resource.data.cfi.size() <= 10000
+             && request.resource.data.chapter is string
+             && request.resource.data.chapter.size() <= 2000
+             && request.resource.data.progress is number
+             && request.resource.data.progress >= 0
+             && request.resource.data.progress <= 100
+             && request.resource.data.date is string
+             && request.resource.data.date.size() <= 64
+             && request.resource.data.updatedAt is timestamp;
+    }
+
     match /users/{userId} {
-      allow create: if request.auth != null
-                    && request.auth.uid == userId
-                    && request.resource.data.role == "user"
-                    && request.resource.data.accountStatus == "active";
+      allow create: if isOwner(userId) && validProfileShape();
+      allow read: if isOwner(userId);
 
-      allow read: if request.auth != null && request.auth.uid == userId;
-
-      allow update: if request.auth != null
-                    && request.auth.uid == userId
-                    && request.resource.data.role == resource.data.role
-                    && request.resource.data.accountStatus == resource.data.accountStatus;
+      // Ordinary users may refresh their own name/email/login timestamp,
+      // but cannot change role, accountStatus or createdAt.
+      allow update: if isOwner(userId)
+                    && validProfileShape()
+                    && adminFieldsUnchanged();
 
       allow delete: if false;
 
-      match /{document=**} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+      match /readerData/default {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validPosition();
+        allow delete: if false;
       }
+
+      match /readerData/preferences {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validPreferences();
+        allow delete: if false;
+      }
+
+      match /bookmarks/{bookmarkId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validBookmark();
+        allow delete: if isOwner(userId);
+      }
+
+      // Deny any unplanned subcollections/documents under a user.
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    // Everything outside the explicitly declared structure is denied.
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
