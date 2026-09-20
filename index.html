@@ -54,15 +54,20 @@
 
 <body>
 
-<!-- STARTUP GATE: prevents Login flashing while Firebase restores the session -->
-<section id="startupGate" class="startupGate" aria-live="polite" aria-busy="true">
-  <div class="startupCard">
-    <img src="./icon-192.png" alt="GES Pasco" class="startupLogo">
-    <h1>GES Pasco</h1>
-    <p>Checking your account...</p>
-    <div class="startupSpinner" aria-hidden="true"></div>
-  </div>
-</section>
+<!-- SILENT STARTUP GATE: Firebase restores the persisted session in the background. -->
+<script>
+  (function () {
+    try {
+      var savedTheme = localStorage.getItem("theme-v2") || localStorage.getItem("reader-theme");
+      if (savedTheme && savedTheme !== "light") {
+        document.body.classList.add(savedTheme);
+      }
+    } catch (e) {
+      /* Startup must remain silent even when storage is unavailable. */
+    }
+  })();
+</script>
+<section id="startupGate" class="startupGate" aria-hidden="true"></section>
 
 <!-- FIREBASE AUTH GATE -->
 <section id="authGate" class="authGate" aria-live="polite" hidden>
