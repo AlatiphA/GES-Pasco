@@ -1178,3 +1178,90 @@ body.night .momoCard { background: rgba(255,196,0,0.04); }
   min-height: 14px;
 }
 
+
+/* =====================================================
+   GES Pasco v1.0.0 - Authentication
+===================================================== */
+[hidden] { display: none !important; }
+.authGate {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(149,100,51,.22), transparent 32%),
+    linear-gradient(145deg, #f7f4ef 0%, #eee7de 100%);
+  color: #24201c;
+}
+.authShell {
+  width: min(100%, 900px);
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: minmax(270px, .9fr) minmax(360px, 1.1fr);
+  overflow: hidden;
+  border: 1px solid rgba(82,57,34,.12);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(63,43,25,.16);
+}
+.authHero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 34px;
+  text-align: center;
+  color: #fff;
+  background:
+    linear-gradient(rgba(72,44,21,.12), rgba(45,28,14,.22)),
+    linear-gradient(145deg, #a8733f 0%, #79502d 100%);
+}
+.authLogo { width: 96px; height: 96px; border-radius: 24px; box-shadow: 0 12px 32px rgba(0,0,0,.2); }
+.authHeroText { margin-top: 22px; }
+.authEyebrow { font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .78; }
+.authHero h1 { margin: 8px 0 5px; font-size: 2rem; line-height: 1.1; }
+.authHero p { margin: 0; max-width: 280px; font-size: .95rem; line-height: 1.55; opacity: .88; }
+.authPanel { display: flex; flex-direction: column; justify-content: center; padding: 42px 46px 28px; background: #fff; }
+.authHeading { margin-bottom: 4px; text-align: left; }
+.authHeading h2 { margin: 0; font-size: 1.65rem; color: #2a211a; }
+.authHeading p, .authHelp { margin: 6px 0 0; color: #776d64; font-size: .9rem; line-height: 1.5; }
+.authForm { display: grid; gap: 14px; }
+.authForm label { display: grid; gap: 7px; color: #4b4138; font-size: .84rem; font-weight: 700; }
+.authInputWrap { position: relative; display: flex; align-items: center; }
+.authInputWrap > i { position: absolute; left: 13px; color: #9b8d80; pointer-events: none; }
+.authForm input { width: 100%; box-sizing: border-box; min-height: 46px; padding: 11px 42px 11px 39px; border: 1px solid #d9d1c9; border-radius: 10px; background: #fcfbfa; color: #27211c; outline: none; font: inherit; }
+.authForm input:focus { border-color: #956433; box-shadow: 0 0 0 3px rgba(149,100,51,.13); background: #fff; }
+.passwordToggle { position: absolute; right: 8px; width: 34px; height: 34px; border: 0; background: transparent; color: #81766c; cursor: pointer; }
+.authPrimary, .authGoogle { min-height: 46px; border-radius: 10px; font: inherit; font-weight: 750; cursor: pointer; transition: transform .12s ease, opacity .12s ease; }
+.authPrimary { border: 0; background: #956433; color: #fff; box-shadow: 0 5px 14px rgba(149,100,51,.2); }
+.authPrimary:hover, .authGoogle:hover { transform: translateY(-1px); }
+.authPrimary:disabled, .authGoogle:disabled { opacity: .6; cursor: wait; transform: none; }
+.authGoogle { display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #d8d2cc; background: #fff; color: #332b24; }
+.googleMark { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; font-weight: 900; color: #4285f4; font-family: Arial, sans-serif; }
+.authForgot, .authBack, .authSwitch button { border: 0; background: transparent; color: #956433; cursor: pointer; font: inherit; font-weight: 700; }
+.authForgot { justify-self: end; margin-top: -6px; padding: 0; font-size: .83rem; }
+.authBack { justify-self: center; padding: 6px; }
+.authSwitch { margin: 0; text-align: center; color: #776d64; font-size: .88rem; }
+.authSwitch button { padding: 2px; }
+.authDivider { display: flex; align-items: center; gap: 12px; color: #a39a92; font-size: .78rem; }
+.authDivider::before, .authDivider::after { content: ""; flex: 1; height: 1px; background: #e5dfd9; }
+.authMessage { margin-bottom: 16px; padding: 10px 12px; border-radius: 9px; font-size: .86rem; line-height: 1.4; }
+.authMessage.error { color: #9d2e2e; background: #fff0f0; border: 1px solid #f0caca; }
+.authMessage.success { color: #256d3a; background: #effaf2; border: 1px solid #cbe8d3; }
+.authFooter { margin: 24px 0 0; text-align: center; color: #aaa097; font-size: .73rem; }
+@media (max-width: 720px) {
+  .authGate { padding: 0; place-items: stretch; background: #fff; }
+  .authShell { width: 100%; min-height: 100dvh; grid-template-columns: 1fr; border: 0; border-radius: 0; box-shadow: none; }
+  .authHero { min-height: 150px; padding: 26px 22px 22px; justify-content: flex-end; }
+  .authLogo { width: 68px; height: 68px; border-radius: 18px; }
+  .authHeroText { margin-top: 12px; }
+  .authEyebrow { display: none; }
+  .authHero h1 { margin-top: 0; font-size: 1.55rem; }
+  .authHero p { font-size: .84rem; }
+  .authPanel { justify-content: flex-start; padding: 30px 24px 22px; }
+  .authHeading h2 { font-size: 1.45rem; }
+}
+@media (max-width: 380px) {
+  .authPanel { padding-left: 18px; padding-right: 18px; }
+  .authHero { min-height: 135px; }
+}

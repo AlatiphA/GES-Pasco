@@ -54,7 +54,64 @@
 
 <body>
 
-<div class="app">
+<!-- FIREBASE AUTH GATE -->
+<section id="authGate" class="authGate" aria-live="polite">
+  <div class="authShell">
+    <div class="authHero">
+      <img src="./icon-192.png" alt="GES Pasco" class="authLogo">
+      <div class="authHeroText">
+        <span class="authEyebrow">AlatiphA Multimedia</span>
+        <h1>GES Pasco</h1>
+        <p>Promotion Aptitude Test Past Questions</p>
+      </div>
+    </div>
+
+    <div class="authPanel">
+      <div id="authMessage" class="authMessage" hidden></div>
+
+      <form id="loginForm" class="authForm">
+        <div class="authHeading">
+          <h2>Welcome back</h2>
+          <p>Sign in to continue to GES Pasco.</p>
+        </div>
+        <label>Email address
+          <span class="authInputWrap"><i class="fa-regular fa-envelope"></i><input id="loginEmail" type="email" autocomplete="email" placeholder="name@example.com" required></span>
+        </label>
+        <label>Password
+          <span class="authInputWrap"><i class="fa-solid fa-lock"></i><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="passwordToggle" data-target="loginPassword" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></span>
+        </label>
+        <button type="button" id="showForgotBtn" class="authForgot">Forgot password?</button>
+        <button type="submit" class="authPrimary">Log In</button>
+        <div class="authDivider"><span>or</span></div>
+        <button type="button" id="googleSignInBtn" class="authGoogle"><span class="googleMark">G</span> Continue with Google</button>
+        <p class="authSwitch">Don't have an account? <button type="button" id="showSignupBtn">Create account</button></p>
+      </form>
+
+      <form id="signupForm" class="authForm" hidden>
+        <div class="authHeading"><h2>Create account</h2><p>Create your GES Pasco account to continue.</p></div>
+        <label>Full name<span class="authInputWrap"><i class="fa-regular fa-user"></i><input id="signupName" type="text" autocomplete="name" maxlength="80" placeholder="Your full name" required></span></label>
+        <label>Email address<span class="authInputWrap"><i class="fa-regular fa-envelope"></i><input id="signupEmail" type="email" autocomplete="email" placeholder="name@example.com" required></span></label>
+        <label>Password<span class="authInputWrap"><i class="fa-solid fa-lock"></i><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" placeholder="At least 6 characters" required><button type="button" class="passwordToggle" data-target="signupPassword" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></span></label>
+        <label>Confirm password<span class="authInputWrap"><i class="fa-solid fa-lock"></i><input id="signupConfirm" type="password" autocomplete="new-password" minlength="6" placeholder="Repeat your password" required><button type="button" class="passwordToggle" data-target="signupConfirm" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></span></label>
+        <button type="submit" class="authPrimary">Create Account</button>
+        <div class="authDivider"><span>or</span></div>
+        <button type="button" class="authGoogle googleSignInBtn"><span class="googleMark">G</span> Continue with Google</button>
+        <p class="authSwitch">Already have an account? <button type="button" class="showLoginBtn">Log In</button></p>
+      </form>
+
+      <form id="forgotForm" class="authForm" hidden>
+        <div class="authHeading"><h2>Reset password</h2><p>Enter your email and we'll send you a reset link.</p></div>
+        <label>Email address<span class="authInputWrap"><i class="fa-regular fa-envelope"></i><input id="forgotEmail" type="email" autocomplete="email" placeholder="name@example.com" required></span></label>
+        <button type="submit" class="authPrimary">Send Reset Link</button>
+        <button type="button" class="authBack showLoginBtn"><i class="fa-solid fa-arrow-left"></i> Back to Log In</button>
+      </form>
+
+      <p class="authFooter">GES Pasco v1.0.0 · AlatiphA Multimedia</p>
+    </div>
+  </div>
+</section>
+
+<div id="readerApp" class="app" hidden>
 
   <header>
 
@@ -69,6 +126,10 @@
     <h1 class="title">
       GES Promotion Aptitude Test Pasco
     </h1>
+
+    <button id="logoutBtn" class="iconBtn" aria-label="Log out" title="Log out">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
 
     <a
       href="./faq.html"
@@ -369,7 +430,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
 
-<script src="./app.js"></script>
+<!-- Firebase SDK (compat build keeps this static PWA simple) -->
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+<script src="./auth.js"></script>
 <script src="./install.js"></script>
 
 </body>
