@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.1";
+const APP_VERSION = "1.0.2";
 
 const versionEl =
   document.getElementById(
@@ -403,6 +403,11 @@ function saveBookmark() {
     )
   );
 
+  // Local bookmark is authoritative immediately; cloud sync runs separately.
+  if (window.gesPascoReaderSync) {
+    window.gesPascoReaderSync.syncBookmarks(bookmarks);
+  }
+
   loadBookmarks();
 
   /* Switch sidebar to Bookmarks tab */
@@ -532,6 +537,10 @@ function loadBookmarks() {
             BOOKMARKS_KEY,
             JSON.stringify(all)
           );
+
+          if (window.gesPascoReaderSync) {
+            window.gesPascoReaderSync.syncBookmarks(all);
+          }
 
           loadBookmarks();
 
@@ -1585,6 +1594,13 @@ document.querySelectorAll(
 ).forEach(btn => {
   btn.addEventListener("click", () => {
     applyTheme(btn.dataset.theme);
+    if (window.gesPascoReaderSync) {
+      window.gesPascoReaderSync.queuePreferences({
+        theme: btn.dataset.theme,
+        fontSize: fontSize,
+        fontFamily: fontFamily
+      });
+    }
     closeThemePicker();
   });
 });
@@ -2021,6 +2037,13 @@ document.querySelectorAll(".fontOption")
   .forEach(btn => {
     btn.addEventListener("click", () => {
       applyFont(btn.dataset.font);
+      if (window.gesPascoReaderSync) {
+        window.gesPascoReaderSync.queuePreferences({
+          theme: localStorage.getItem("theme-v2") || "dark",
+          fontSize: fontSize,
+          fontFamily: fontFamily
+        });
+      }
       closeFontPicker();
     });
   });
@@ -2087,6 +2110,14 @@ bottomDecreaseFont.addEventListener(
       fontSize
     );
 
+    if (window.gesPascoReaderSync) {
+      window.gesPascoReaderSync.queuePreferences({
+        theme: localStorage.getItem("theme-v2") || "dark",
+        fontSize: fontSize,
+        fontFamily: fontFamily
+      });
+    }
+
   }
 );
 
@@ -2104,6 +2135,14 @@ bottomIncreaseFont.addEventListener(
       "fontSize",
       fontSize
     );
+
+    if (window.gesPascoReaderSync) {
+      window.gesPascoReaderSync.queuePreferences({
+        theme: localStorage.getItem("theme-v2") || "dark",
+        fontSize: fontSize,
+        fontFamily: fontFamily
+      });
+    }
 
   }
 );

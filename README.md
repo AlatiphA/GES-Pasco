@@ -98,6 +98,6 @@ MIT License. See `LICENSE`.
 Abdul-Latif Ahmed [AlatiphA]
 
 
-## v1.0.1 Reading Position Synchronization
+## v1.0.2 Reading Position Synchronization
 
 Reading position remains local-first in `localStorage` and synchronizes to `users/{uid}/readerData/default` in Cloud Firestore. On authenticated startup, the newest copy by `lastRead` is selected. Page changes save locally immediately and cloud writes are debounced. Offline reading continues normally and pending position data retries when connectivity returns.
