@@ -261,7 +261,7 @@
       <div class="aboutDeveloper">Developed by Abdul-Latif Ahmed [AlatiphA]</div>
 
       <div class="aboutFaqRow">
-        <button type="button" id="faqOpenBtn" class="aboutFaqLink" aria-label="Open Frequently Asked Questions">FAQ</button>
+        <button type="button" id="faqOpenBtn" class="aboutFaqLink" aria-label="Open Frequently Asked Questions" onclick="window.GESPascoFAQ.open(event)">FAQ</button>
       </div>
 
     </div>
@@ -272,11 +272,11 @@
 
   <!-- In-app FAQ modal: keeps the reader and Firebase session alive -->
   <div id="faqModal" class="faqModal" hidden aria-hidden="true">
-    <div class="faqModalBackdrop" data-faq-close></div>
+    <div class="faqModalBackdrop" data-faq-close onclick="window.GESPascoFAQ.close(event)"></div>
     <section class="faqModalPanel" role="dialog" aria-modal="true" aria-labelledby="faqModalTitle">
       <div class="faqModalHeader">
         <strong id="faqModalTitle">Help & FAQ</strong>
-        <button type="button" id="faqCloseBtn" class="faqModalClose" aria-label="Close FAQ">
+        <button type="button" id="faqCloseBtn" class="faqModalClose" aria-label="Close FAQ" onclick="window.GESPascoFAQ.close(event)">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -476,49 +476,51 @@
 </div>
 
 <script>
-/* Application-shell FAQ controller. Independent of app.js / ePub.js. */
+/* FAQ belongs to the application shell, not app.js.
+   Inline button hooks call this global controller so it is independent
+   of reader initialization order and delegated reader click handlers. */
 (function () {
   "use strict";
 
-  function initFaqShell() {
-    const openBtn = document.getElementById("faqOpenBtn");
-    const modal = document.getElementById("faqModal");
-    const closeBtn = document.getElementById("faqCloseBtn");
-    const frame = document.getElementById("faqFrame");
-    if (!openBtn || !modal || !closeBtn || !frame) return;
+  function getParts() {
+    return {
+      modal: document.getElementById("faqModal"),
+      frame: document.getElementById("faqFrame"),
+      openBtn: document.getElementById("faqOpenBtn"),
+      closeBtn: document.getElementById("faqCloseBtn")
+    };
+  }
 
-    function openFaq(event) {
+  window.GESPascoFAQ = {
+    open: function (event) {
       if (event) { event.preventDefault(); event.stopPropagation(); }
-      if (!frame.src) frame.src = "./faq.html?embedded=1";
-      modal.hidden = false;
-      modal.setAttribute("aria-hidden", "false");
+      var p = getParts();
+      if (!p.modal || !p.frame) return false;
+      if (!p.frame.getAttribute("src")) p.frame.setAttribute("src", "./faq.html?embedded=1");
+      p.modal.removeAttribute("hidden");
+      p.modal.setAttribute("aria-hidden", "false");
       document.body.classList.add("faqModalOpen");
-      requestAnimationFrame(function () { closeBtn.focus(); });
-    }
-
-    function closeFaq(event) {
+      if (p.closeBtn) setTimeout(function () { p.closeBtn.focus(); }, 0);
+      return false;
+    },
+    close: function (event) {
       if (event) { event.preventDefault(); event.stopPropagation(); }
-      modal.hidden = true;
-      modal.setAttribute("aria-hidden", "true");
+      var p = getParts();
+      if (!p.modal) return false;
+      p.modal.setAttribute("hidden", "");
+      p.modal.setAttribute("aria-hidden", "true");
       document.body.classList.remove("faqModalOpen");
-      openBtn.focus();
+      if (p.openBtn) setTimeout(function () { p.openBtn.focus(); }, 0);
+      return false;
     }
+  };
 
-    openBtn.addEventListener("click", openFaq);
-    closeBtn.addEventListener("click", closeFaq);
-    modal.querySelectorAll("[data-faq-close]").forEach(function (el) {
-      el.addEventListener("click", closeFaq);
-    });
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && !modal.hidden) closeFaq(event);
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initFaqShell, { once: true });
-  } else {
-    initFaqShell();
-  }
+  document.addEventListener("keydown", function (event) {
+    var modal = document.getElementById("faqModal");
+    if (event.key === "Escape" && modal && !modal.hasAttribute("hidden")) {
+      window.GESPascoFAQ.close(event);
+    }
+  });
 })();
 </script>
 
