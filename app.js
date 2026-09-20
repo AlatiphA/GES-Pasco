@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.2";
+const APP_VERSION = "1.0.3";
 
 const versionEl =
   document.getElementById(
@@ -182,6 +182,38 @@ if (versionEl)
 
 const READER_DATA_KEY =
   "ges-pasco-data";
+
+/* =========================
+   PULL TO REFRESH
+   Conservative top-edge gesture for installed PWAs
+   whose fixed reader viewport blocks native refresh.
+   No touch event is cancelled, preserving existing
+   taps, horizontal swipes and controls.
+========================= */
+const PULL_REFRESH_START_Y = 90;
+const PULL_REFRESH_DISTANCE = 110;
+const PULL_REFRESH_MAX_X = 70;
+const PULL_REFRESH_MAX_TIME = 1800;
+
+function shouldPullRefresh(startX, startY, endX, endY, duration) {
+  if (startX == null || startY == null) return false;
+  if (typeof sidebarIsOpen === "function" && sidebarIsOpen()) return false;
+  if (document.body.classList.contains("faqModalOpen")) return false;
+  const dx = endX - startX;
+  const dy = endY - startY;
+  return startY <= PULL_REFRESH_START_Y &&
+    dy >= PULL_REFRESH_DISTANCE &&
+    Math.abs(dx) <= PULL_REFRESH_MAX_X &&
+    dy > Math.abs(dx) * 1.5 &&
+    duration <= PULL_REFRESH_MAX_TIME;
+}
+
+function runPullRefresh() {
+  try {
+    if (typeof saveReaderData === "function") saveReaderData();
+  } catch (_) {}
+  window.location.reload();
+}
 
 /* =========================
    SUPPORTER KEY SYSTEM
@@ -1040,6 +1072,14 @@ function startReader() {
 
     doc.addEventListener("touchend", e => {
       const t = e.changedTouches[0];
+
+      /* Pull down from the top edge and release to refresh. */
+      if (shouldPullRefresh(_tx, _ty, t.clientX, t.clientY,
+          _tt ? Date.now() - _tt : 0)) {
+        _tx = null;
+        runPullRefresh();
+        return;
+      }
 
       /* If footnote popup is open, close it and swallow tap */
       const existingPopup = document.getElementById("fnPopup");
@@ -2250,6 +2290,35 @@ document.querySelectorAll(".sidebarTab")
       if (target) target.classList.add("active");
     });
   });
+
+/* =========================
+   PULL TO REFRESH — APP SHELL
+   Covers touches outside the EPUB iframe. The EPUB
+   document uses the same test in its touch handler.
+========================= */
+let _refreshStartX = null;
+let _refreshStartY = null;
+let _refreshStartTime = null;
+
+document.addEventListener("touchstart", e => {
+  if (!e.touches || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  _refreshStartX = t.clientX;
+  _refreshStartY = t.clientY;
+  _refreshStartTime = Date.now();
+}, { passive: true, capture: true });
+
+document.addEventListener("touchend", e => {
+  if (_refreshStartX === null || !e.changedTouches || !e.changedTouches.length) return;
+  const t = e.changedTouches[0];
+  const startX = _refreshStartX;
+  const startY = _refreshStartY;
+  const duration = _refreshStartTime ? Date.now() - _refreshStartTime : 0;
+  _refreshStartX = _refreshStartY = _refreshStartTime = null;
+  if (shouldPullRefresh(startX, startY, t.clientX, t.clientY, duration)) {
+    runPullRefresh();
+  }
+}, { passive: true, capture: true });
 
 /* =========================
    SIDEBAR GESTURES

@@ -104,3 +104,7 @@ Reading position remains local-first in `localStorage` and synchronizes to `user
 
 ## Firestore security hardening
 The included `firestore.rules` now limits each authenticated user to their own profile, reading position, preferences, and bookmarks. User-controlled writes cannot change `role`, `accountStatus`, or `createdAt`, and synchronization documents are schema/type/range validated. Unknown collections and documents are denied by default.
+
+
+## v1.0.3 Pull to refresh
+Installed PWA users can refresh by pulling downward from the top edge of the reader and releasing. The gesture does not cancel touch events, so existing tap navigation, horizontal page swipes, sidebar gestures, bookmarks, synchronization, and reader controls retain their existing handlers. Reading state is saved locally before reload.
