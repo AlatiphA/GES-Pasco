@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 
 const versionEl =
   document.getElementById(
@@ -287,6 +287,12 @@ function saveReaderData(
       JSON.stringify(data)
 
     );
+
+    // Local storage is always written first. Firestore synchronization is
+    // queued separately so page turns remain instant and offline-safe.
+    if (window.gesPascoReaderSync) {
+      window.gesPascoReaderSync.queue(data);
+    }
 
   }
 

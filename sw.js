@@ -7,7 +7,7 @@
    get a "New version available" prompt on next visit.
 ===================================================== */
 
-const CACHE_VERSION = "v1.0.12";
+const CACHE_VERSION = "v1.0.13";
 const CACHE_NAME    = `alatipha-ges-pasco-${CACHE_VERSION}`;
 
 /* ====================
@@ -21,6 +21,7 @@ const FILES_TO_CACHE = [
   "./style.css",
   "./app.js",
   "./firebase-config.js",
+  "./firestore-data.js",
   "./auth.js",
   "./install.js",
   "./sw.js",

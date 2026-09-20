@@ -304,8 +304,15 @@
           console.error("Could not load user profile:", error);
           renderProfile({}, user);
         }
+
+        // Resolve the newest reading position before app.js starts. This lets
+        // another device resume from Firestore without changing EPUB startup.
+        if (window.gesPascoReaderSync) {
+          await window.gesPascoReaderSync.prepare(user);
+        }
         loadReaderOnce();
       } else {
+        if (window.gesPascoReaderSync) window.gesPascoReaderSync.clearUser();
         readerApp.hidden = true;
         authGate.hidden = false;
         showForm(loginForm);
