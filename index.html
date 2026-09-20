@@ -475,6 +475,53 @@
   </div>
 </div>
 
+<script>
+/* Application-shell FAQ controller. Independent of app.js / ePub.js. */
+(function () {
+  "use strict";
+
+  function initFaqShell() {
+    const openBtn = document.getElementById("faqOpenBtn");
+    const modal = document.getElementById("faqModal");
+    const closeBtn = document.getElementById("faqCloseBtn");
+    const frame = document.getElementById("faqFrame");
+    if (!openBtn || !modal || !closeBtn || !frame) return;
+
+    function openFaq(event) {
+      if (event) { event.preventDefault(); event.stopPropagation(); }
+      if (!frame.src) frame.src = "./faq.html?embedded=1";
+      modal.hidden = false;
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("faqModalOpen");
+      requestAnimationFrame(function () { closeBtn.focus(); });
+    }
+
+    function closeFaq(event) {
+      if (event) { event.preventDefault(); event.stopPropagation(); }
+      modal.hidden = true;
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("faqModalOpen");
+      openBtn.focus();
+    }
+
+    openBtn.addEventListener("click", openFaq);
+    closeBtn.addEventListener("click", closeFaq);
+    modal.querySelectorAll("[data-faq-close]").forEach(function (el) {
+      el.addEventListener("click", closeFaq);
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !modal.hidden) closeFaq(event);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFaqShell, { once: true });
+  } else {
+    initFaqShell();
+  }
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
 
 <!-- Firebase SDK (compat build keeps this static PWA simple) -->
