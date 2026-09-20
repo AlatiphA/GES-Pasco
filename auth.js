@@ -12,10 +12,90 @@
   const forgotForm = document.getElementById("forgotForm");
   const authMessage = document.getElementById("authMessage");
   const logoutBtn = document.getElementById("logoutBtn");
+  const profileBtn = document.getElementById("profileBtn");
+  const profileMenu = document.getElementById("profileMenu");
+  const profileBackdrop = document.getElementById("profileBackdrop");
+  const profileName = document.getElementById("profileName");
+  const profileEmail = document.getElementById("profileEmail");
+  const profileAccountType = document.getElementById("profileAccountType");
+  const profileInitials = document.getElementById("profileInitials");
+  const profileMenuInitials = document.getElementById("profileMenuInitials");
+  const profileAvatarImage = document.getElementById("profileAvatarImage");
+  const profileMenuAvatarImage = document.getElementById("profileMenuAvatarImage");
   let readerLoaded = false;
   let signupInProgress = false;
   const googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
+
+
+  function getInitials(name, email) {
+    const cleanName = (name || "").trim();
+    if (cleanName) {
+      const parts = cleanName.split(/\s+/).filter(Boolean);
+      return ((parts[0]?.[0] || "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase() || "U";
+    }
+    return ((email || "U").trim()[0] || "U").toUpperCase();
+  }
+
+  function setProfileMenu(open) {
+    profileMenu.hidden = !open;
+    profileBackdrop.hidden = !open;
+    profileBtn.setAttribute("aria-expanded", String(open));
+  }
+
+  function renderProfile(profile, user) {
+    const name = (profile && profile.displayName) || user.displayName || "GES Pasco User";
+    const email = (profile && profile.email) || user.email || "";
+    const initials = getInitials(name, email);
+    const photoURL = user.photoURL || "";
+    const providerIds = (user.providerData || []).map(item => item.providerId);
+
+    profileName.textContent = name;
+    profileEmail.textContent = email;
+    profileAccountType.textContent = providerIds.includes("google.com") ? "Google account" : "Email account";
+    profileInitials.textContent = initials;
+    profileMenuInitials.textContent = initials;
+
+    [profileAvatarImage, profileMenuAvatarImage].forEach(img => {
+      if (photoURL) {
+        img.src = photoURL;
+        img.hidden = false;
+      } else {
+        img.removeAttribute("src");
+        img.hidden = true;
+      }
+    });
+    profileInitials.hidden = Boolean(photoURL);
+    profileMenuInitials.hidden = Boolean(photoURL);
+  }
+
+  async function loadUserProfile(user) {
+    const ref = gesPascoDb.collection("users").doc(user.uid);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      const profile = {
+        displayName: user.displayName || "",
+        email: user.email || "",
+        role: "user",
+        accountStatus: "active",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastLoginAt: null
+      };
+      await ref.set(profile);
+      renderProfile(profile, user);
+      return;
+    }
+    renderProfile(snap.data() || {}, user);
+  }
+
+  profileBtn.addEventListener("click", event => {
+    event.stopPropagation();
+    setProfileMenu(profileMenu.hidden);
+  });
+  profileBackdrop.addEventListener("click", () => setProfileMenu(false));
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") setProfileMenu(false);
+  });
 
   function showMessage(message, type = "error") {
     authMessage.textContent = message;
@@ -93,14 +173,12 @@
     try {
       const credential = await gesPascoAuth.signInWithPopup(googleProvider);
       const user = credential.user;
-      await gesPascoDb.collection("users").doc(user.uid).set({
+      await loadUserProfile(user);
+      await gesPascoDb.collection("users").doc(user.uid).update({
         displayName: user.displayName || "",
         email: user.email || "",
-        role: "user",
-        accountStatus: "active",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      });
     } catch (error) {
       if (error.code !== "auth/popup-closed-by-user") showMessage(friendlyError(error));
     } finally {
@@ -188,6 +266,7 @@
   });
 
   logoutBtn.addEventListener("click", async () => {
+    setProfileMenu(false);
     try {
       await gesPascoAuth.signOut();
       location.reload();
@@ -199,7 +278,7 @@
   function startAuthObserver() {
     let initialAuthResolved = false;
 
-    gesPascoAuth.onAuthStateChanged(user => {
+    gesPascoAuth.onAuthStateChanged(async user => {
       // Firebase calls this observer only after it has restored the persisted
       // session. Until this first callback, show only the neutral startup gate.
       if (!initialAuthResolved) {
@@ -219,6 +298,12 @@
       if (user) {
         authGate.hidden = true;
         readerApp.hidden = false;
+        try {
+          await loadUserProfile(user);
+        } catch (error) {
+          console.error("Could not load user profile:", error);
+          renderProfile({}, user);
+        }
         loadReaderOnce();
       } else {
         readerApp.hidden = true;
