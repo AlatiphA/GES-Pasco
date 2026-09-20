@@ -1,326 +1,98 @@
 # AlatiphA GES Pasco
 
-A fast, lightweight, installable EPUB Reader PWA built with HTML, CSS, JavaScript, and epub.js.
+GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptitude Test study material. It supports offline reading, search, bookmarks, reading-position restore, themes, font controls, chapter navigation, touch gestures, and PWA installation.
 
-Designed for mobile-first reading with smooth navigation, offline support, multi-theme switching, bookmarks, search, chapter navigation, interactive footnotes and links, auto-hide controls, and touch gestures.
+## Current build
 
----
+- Reader build: **v3.4.6**
+- Firebase-enabled line: **v1.0.0 will begin with the Authentication + Cloud Firestore migration**
+- Firebase Storage: **not included at this stage**
+
+The service worker has its own cache version. Cache-only deployment changes should normally bump `CACHE_VERSION` in `sw.js`. The reader version in `app.js` should be changed only when reader/application logic changes.
 
 ## Features
 
-### Reading Experience
-- EPUB rendering using epub.js
-- Interactive links and footnotes — tap any link or superscript to navigate or view inline
-- Adjustable font sizes (A− / A+)
-- Reading progress bar with percentage tracking
-- Auto-restore last reading position per book
-- Auto-hide reading controls in reading mode
+- EPUB rendering with epub.js
+- Full-text EPUB search
+- Contents and bookmarks sidebar
+- Light, Dark, Sepia, and Night themes
+- Adjustable font family and font size
+- Reading progress and last-position restore
+- Touch, keyboard, and page-button navigation
+- Interactive EPUB links and footnotes
+- Offline PWA support
+- Install prompt for supported browsers
+- Local supporter-key feature
 
-### Themes
-- Four built-in themes: **Light**, **Dark**, **Sepia**, **Night (pure black)**
-- Theme picker panel — tap 🎨 to open a floating swatch selector
-- Theme preference saved automatically
-
-### Navigation
-- Chapter navigation via Table of Contents (with collapsible sub-chapters)
-- Tap left / right zones or footer buttons to turn pages
-- Keyboard navigation (desktop): Arrow keys
-- Touch swipe gestures (mobile)
-
-### Bookmarks
-- Save bookmarks at any reading position (tap 🔖)
-- Bookmarks panel with chapter name and progress percentage
-- Delete individual bookmarks with 🗑
-- Auto-switches sidebar to Bookmarks tab on save
-
-### Sidebar
-- Tabbed sidebar: **Contents** and **Bookmarks** in one panel
-- Swipe left on sidebar to close
-- Tap outside sidebar to close
-- Flush layout — sidebar starts exactly where header ends (no gap)
-- Fully functional on both mobile and desktop
-
-### Search
-- Full-text search inside the EPUB
-- Results jump directly to matching sections with highlight
-- Supports words, phrases, and partial matches
-
-### PWA & Offline
-- Installable Progressive Web App
-- Offline reading via Service Worker caching
-- Caches HTML, CSS, JavaScript, EPUB files, and icons after first load
-- Standalone app experience on Android, iOS, and Desktop
-
----
-
-## Screenshots
-
-### Home Screen
-
-<p align="center">
-  <img src="./screenshots/home.jpg" width="300">
-</p>
-
-### Contents
-
-<p align="center">
-  <img src="./screenshots/contents.jpg" width="300">
-</p>
-
-### Bookmarks
-
-<p align="center">
-  <img src="./screenshots/bookmarks.jpg" width="300">
-</p>
-
-### Search
-
-<p align="center">
-  <img src="./screenshots/search.jpg" width="300">
-</p>
-
-### Theme Picker
-
-<p align="center">
-  <img src="./screenshots/themes.jpg" width="300">
-</p>
-
-### Full Reading Mode
-
-<p align="center">
-  <img src="./screenshots/full-mode.jpg" width="300">
-</p>
-
----
-
-## Technologies Used
-
-| Technology | Purpose |
-|---|---|
-| HTML5 | App structure |
-| CSS3 | Styling and themes |
-| JavaScript (Vanilla JS) | App logic |
-| [epub.js](https://github.com/futurepress/epub.js) | EPUB parsing and rendering |
-| [JSZip](https://stuk.github.io/jszip/) | ZIP extraction (epub.js dependency) |
-| Service Workers | Offline caching |
-| Web App Manifest | PWA installability |
-| localStorage | Bookmarks, reading position, theme, font size |
-
----
-
-## Project Structure
+## Project structure
 
 ```text
 /
-├── index.html              # App shell and layout
-├── style.css               # All styles (themes, sidebar, footer, components)
-├── app.js                  # App logic (reader, bookmarks, search, themes)
-├── sw-beta.js              # Service Worker (offline caching)
-├── manifest-beta.json      # PWA manifest
+├── index.html
+├── faq.html
+├── style.css
+├── app.js
+├── install.js
+├── sw.js
+├── manifest.json
+├── icon-192.png
+├── icon-512.png
+├── fonts/
+│   └── OpenSans-VariableFont_wdth_wght.ttf
 ├── library/
-│   └── sample.epub         # Default EPUB file
-├── icons/
-│   ├── icon-beta-192.png
-│   └── icon-beta-512.png
+│   └── sample.epub
 └── screenshots/
 ```
 
----
+## Local data
 
-## Installation
+The current reader stores bookmarks, reading progress, theme, font preferences, supporter state, and install-prompt state in `localStorage`. The Clear App Data command removes only GES Pasco-owned keys and the app caches. It does not call `localStorage.clear()`.
 
-### Clone Repository
+In the Firebase v1.0.0 migration, local storage will remain useful for offline-first behavior while authenticated user data is synchronized with Cloud Firestore.
 
-```bash
-git clone https://github.com/AlatiphA/AlatiphA-EPUB-Beta.git
-cd AlatiphA-EPUB-Beta
-```
+## PWA and offline support
 
----
+`sw.js` precaches the core local app shell and the bundled EPUB. HTML, CSS, JavaScript, and JSON requests use a network-first strategy. Stable assets such as the EPUB, icons, and fonts use cache-first behavior.
 
-## Run Locally
+The app currently loads Font Awesome, JSZip, and epub.js from CDNs. They work with the service-worker runtime cache after successful online retrieval, but a future cleanup can vendor these dependencies locally for stronger first-install offline reliability.
 
-PWAs require a local server — do not open `index.html` directly.
+## Run locally
 
-### VS Code Live Server
+PWAs must be served over HTTP/HTTPS rather than opened directly from the file system.
 
-1. Install the **Live Server** extension
-2. Right-click `index.html`
-3. Select **Open with Live Server**
-
-### Python Server
+Using Python:
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open:
+Then open `http://localhost:8000`.
 
-```
-http://localhost:8000
-```
+VS Code Live Server can also be used.
 
----
+## Current Firebase migration plan
 
-## PWA Installation
+The first Firebase-enabled build will be **GES Pasco v1.0.0** and will initially use:
 
-### Android
-- Open in **Chrome**
-- Tap the browser menu → **Install App**
+- Firebase Authentication
+- Cloud Firestore
+- Login
+- Sign up
+- Password reset
+- User profile document
+- Auth-state protection
+- Later synchronization of reading progress, bookmarks, and preferences
 
-### iOS
-- Open in **Safari**
-- Tap Share → **Add to Home Screen**
+Firebase Storage is intentionally excluded for now.
 
-### Desktop
-- Open in **Chrome** or **Edge**
-- Click the **Install** icon in the address bar
+## Screenshots
 
----
-
-## EPUB Support
-
-Place EPUB files inside the `/library/` folder:
-
-```text
-/library/sample.epub
-```
-
-The app loads `sample.epub` by default. To use a different file, update the filename in `app.js`:
-
-```js
-await fetch("./library/your-book.epub")
-```
-
----
-
-## Touch Gestures
-
-| Gesture | Action |
-|---|---|
-| Tap Left zone | Previous page |
-| Tap Right zone | Next page |
-| Tap Center zone | Toggle controls |
-| Swipe left on sidebar | Close sidebar |
-| Tap outside sidebar | Close sidebar |
-
----
-
-## Keyboard Shortcuts (Desktop)
-
-| Key | Action |
-|---|---|
-| `→` / `↓` | Next page |
-| `←` / `↑` | Previous page |
-
----
-
-## Themes
-
-| Theme | Background | Best For |
-|---|---|---|
-| Light | `#f5f5f5` | Daytime reading |
-| Dark | `#111111` | Low light |
-| Sepia | `#f4ede0` | Comfortable long reads |
-| Night | `#000000` | Pure dark / AMOLED screens |
-
----
-
-## Bookmarks
-
-- Tap **🔖** while reading to save a bookmark
-- Sidebar automatically opens to the **Bookmarks** tab
-- Each bookmark shows the chapter name and reading progress (%)
-- Tap a bookmark to jump back to that position
-- Tap **🗑** to delete a bookmark
-
----
-
-## Search
-
-- Tap **🔍** to open the search modal
-- Type a word or phrase and press **Enter**
-- Tap any result to jump to that section (highlighted in yellow)
-- Supports partial matches across the full book
-
----
-
-## Offline Support
-
-After the first load, the Service Worker caches:
-- App shell (HTML, CSS, JS)
-- EPUB file
-- Icons and manifest
-
-The app works fully offline after the first visit.
-
----
-
-## Known Limitations
-
-- `window.close()` is restricted in installed PWAs
-- Some EPUBs may contain unsupported CSS or non-standard formatting
-- Very large EPUBs may search slower on low-end devices
-- Reading progress percentage requires location generation (runs in background on first load)
-
----
-
-## Changelog
-
-### Latest
-- Added **four-theme system**: Light, Dark, Sepia, Night
-- Added **theme picker panel** (floating swatch popup)
-- Added **Bookmarks** feature with save, navigate, and delete
-- Added **tabbed sidebar**: Contents and Bookmarks share one panel
-- Added **interactive footnotes and links** inside EPUB iframe
-- Added **swipe left** and **tap outside** to close sidebar
-- Fixed sidebar gap with header using CSS custom property `--header-height`
-- Fixed TOC dropdowns and sidebar on desktop (were mobile-only in CSS)
-- Fixed reading position restore on book open
-- Fixed progress calculation crash when locations not yet generated
-
----
+Available screenshots are stored in `/screenshots/` and currently include the home screen, contents, search, dark mode, and full reading mode.
 
 ## License
 
-This project is licensed under the **MIT License**.
-
-See the full license text here: [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)
-
-```
-MIT License
-
-Copyright (c) 2025 Abdul-Latif Ahmed (AlatiphA)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
----
-
-## Credits
-
-- [epub.js](https://github.com/futurepress/epub.js) — EPUB rendering engine
-- [JSZip](https://stuk.github.io/jszip/) — ZIP extraction
-
----
+MIT License. See `LICENSE`.
 
 ## Author
 
-**Abdul-Latif Ahmed [AlatiphA]**  
-GitHub: [github.com/AlatiphA](https://github.com/AlatiphA)
+Abdul-Latif Ahmed [AlatiphA]

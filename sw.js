@@ -2,13 +2,13 @@
    GES Pasco — Service Worker
    ─────────────────────────────────────────────────
    HOW TO UPDATE:
-   Bump APP_VERSION on every release (e.g. "1.0.1").
+   Bump CACHE_VERSION whenever cached assets change.
    The cache name updates automatically. Users will
    get a "New version available" prompt on next visit.
 ===================================================== */
 
-const APP_VERSION  = "v3.4.5";
-const CACHE_NAME   = `alatipha-ges-pasco-${APP_VERSION}`;
+const CACHE_VERSION = "v3.4.6";
+const CACHE_NAME    = `alatipha-ges-pasco-${CACHE_VERSION}`;
 
 /* ====================
    APP SHELL
@@ -20,6 +20,7 @@ const FILES_TO_CACHE = [
   "./faq.html",
   "./style.css",
   "./app.js",
+  "./install.js",
   "./sw.js",
   "./manifest.json",
   "./library/sample.epub",
@@ -146,7 +147,7 @@ self.addEventListener("fetch", event => {
 self.addEventListener("message", event => {
 
   if (event.data === "GET_VERSION") {
-    event.ports[0].postMessage(APP_VERSION);
+    event.ports[0].postMessage(CACHE_VERSION);
   }
 
 });

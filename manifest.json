@@ -1,15 +1,17 @@
 {
   "name": "AlatiphA GES Pasco",
   "short_name": "GES Pasco",
-  "description": "Offline EPUB reader for GES Promotion Aptitude Test — 2026 Edition",
-  "version": "1.0.1",
+  "description": "Offline EPUB reader for GES Promotion Aptitude Test \u2014 2026 Edition",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#111111",
   "theme_color": "#111111",
   "orientation": "any",
-  "categories": ["books", "education"],
+  "categories": [
+    "books",
+    "education"
+  ],
   "icons": [
     {
       "src": "./icon-192.png",

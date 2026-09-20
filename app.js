@@ -33,7 +33,18 @@ if (clearCacheBtn) {
 
     if (!confirm("Clear all app data?\n\nThis will reset bookmarks, themes, and cached files.")) return;
 
-    localStorage.clear();
+    // Clear only GES Pasco reader data. Do not wipe unrelated
+    // localStorage entries from the same origin.
+    [
+      "ges-pasco-data",
+      "ges-pasco-bookmarks",
+      "fontSize",
+      "fontFamily",
+      "theme-v2",
+      "reader-theme",
+      "isSupporter",
+      "gespasco_install_dismissed"
+    ].forEach(key => localStorage.removeItem(key));
 
     caches.keys().then(names => {
       names.forEach(name => caches.delete(name));
@@ -159,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "3.4.5";
+const APP_VERSION = "3.4.6";
 
 const versionEl =
   document.getElementById(
