@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 
 const versionEl =
   document.getElementById(
@@ -2288,6 +2288,40 @@ document.addEventListener("touchend", e => {
     toggleSidebar();
   }
 }, { passive: true, capture: true });
+
+
+/* =====================================================
+   IN-APP FAQ - keeps reader mounted and avoids auth recheck
+===================================================== */
+(function initInAppFaq() {
+  const openBtn = document.getElementById("faqOpenBtn");
+  const modal = document.getElementById("faqModal");
+  const closeBtn = document.getElementById("faqCloseBtn");
+  const frame = document.getElementById("faqFrame");
+  if (!openBtn || !modal || !closeBtn || !frame) return;
+
+  function openFaq() {
+    if (!frame.getAttribute("src")) frame.setAttribute("src", "./faq.html?embedded=1");
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("faqModalOpen");
+    closeBtn.focus();
+  }
+
+  function closeFaq() {
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("faqModalOpen");
+    openBtn.focus();
+  }
+
+  openBtn.addEventListener("click", openFaq);
+  closeBtn.addEventListener("click", closeFaq);
+  modal.querySelectorAll("[data-faq-close]").forEach(el => el.addEventListener("click", closeFaq));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !modal.hidden) closeFaq();
+  });
+})();
 
 loadBook();
 

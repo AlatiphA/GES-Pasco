@@ -261,7 +261,7 @@
       <div class="aboutDeveloper">Developed by Abdul-Latif Ahmed [AlatiphA]</div>
 
       <div class="aboutFaqRow">
-        <a href="./faq.html" class="aboutFaqLink" aria-label="Frequently Asked Questions">FAQ</a>
+        <button type="button" id="faqOpenBtn" class="aboutFaqLink" aria-label="Open Frequently Asked Questions">FAQ</button>
       </div>
 
     </div>
@@ -269,6 +269,20 @@
   </div>
 
   </aside>
+
+  <!-- In-app FAQ modal: keeps the reader and Firebase session alive -->
+  <div id="faqModal" class="faqModal" hidden aria-hidden="true">
+    <div class="faqModalBackdrop" data-faq-close></div>
+    <section class="faqModalPanel" role="dialog" aria-modal="true" aria-labelledby="faqModalTitle">
+      <div class="faqModalHeader">
+        <strong id="faqModalTitle">Help & FAQ</strong>
+        <button type="button" id="faqCloseBtn" class="faqModalClose" aria-label="Close FAQ">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <iframe id="faqFrame" class="faqModalFrame" title="GES Pasco Frequently Asked Questions" loading="lazy"></iframe>
+    </section>
+  </div>
 
   <main>
 

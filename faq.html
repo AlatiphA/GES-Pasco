@@ -245,9 +245,17 @@
       border-top: 1px solid var(--border);
     }
 
+  
+    html.embedded .faqHeader { display: none; }
+    html.embedded .faqHero { padding-top: 22px; }
   </style>
 
 </head>
+<script>
+    if (new URLSearchParams(location.search).get("embedded") === "1") {
+      document.documentElement.classList.add("embedded");
+    }
+  </script>
 <body>
 
   <!-- HEADER -->
