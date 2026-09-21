@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.5";
+const APP_VERSION = "1.0.6";
 
 const versionEl =
   document.getElementById(
@@ -1101,22 +1101,32 @@ function startReader() {
         return;
       }
 
-      /* If sidebar is open, any tap on the
-         reader area (inside iframe) closes it —
-         but ignore taps over the footer/header */
+      /* Convert iframe-relative touch coordinates to app-shell coordinates.
+         This is essential because header/footer controls live in the parent
+         document while t.clientX/clientY are relative to the EPUB iframe. */
+      const iframe = viewer.querySelector("iframe");
+      const iframeRect = iframe
+        ? iframe.getBoundingClientRect()
+        : { left: 0, top: 0, width: window.innerWidth };
+      const shellX = iframeRect.left + t.clientX;
+      const shellY = iframeRect.top + t.clientY;
+
+      /* Header/footer and every interactive control are gesture-exclusion
+         zones. A touch over them belongs to the real UI control only; it
+         must never become a reader middle-tap or page navigation gesture. */
+      const shellTarget = document.elementFromPoint(shellX, shellY);
+      const overAppControl = !!(
+        shellTarget && shellTarget.closest(
+          "header, footer, .bottomFooter, button, a, input, select, textarea, [role='button']"
+        )
+      );
+      if (overAppControl) {
+        _tx = null;
+        return;
+      }
+
+      /* If sidebar is open, a genuine tap in the reader area closes it. */
       if (sidebarIsOpen()) {
-        const footerEl = document.querySelector(".bottomFooter");
-        const headerEl = document.querySelector("header");
-        let overControl = false;
-        if (footerEl) {
-          const fr = footerEl.getBoundingClientRect();
-          if (t.clientY >= fr.top && t.clientY <= fr.bottom) overControl = true;
-        }
-        if (headerEl) {
-          const hr = headerEl.getBoundingClientRect();
-          if (t.clientY >= hr.top && t.clientY <= hr.bottom) overControl = true;
-        }
-        if (overControl) { _tx = null; return; }
         toggleSidebar();
         _tx = null;
         return;
@@ -1127,19 +1137,6 @@ function startReader() {
       const dy = t.clientY - _ty;
       const dt = Date.now() - _tt;
       _tx = null;
-
-      /* Ignore taps that land over the footer/header —
-         let the actual button handle it instead */
-      const footerEl = document.querySelector(".bottomFooter");
-      const headerEl = document.querySelector("header");
-      if (footerEl) {
-        const fr = footerEl.getBoundingClientRect();
-        if (t.clientY >= fr.top && t.clientY <= fr.bottom) return;
-      }
-      if (headerEl) {
-        const hr = headerEl.getBoundingClientRect();
-        if (t.clientY >= hr.top && t.clientY <= hr.bottom) return;
-      }
 
       /* Swipe navigation — horizontal swipe > 40px */
       if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
@@ -1155,11 +1152,7 @@ function startReader() {
       if (el && el.closest("a")) return;
       /* Use screen coords via getBoundingClientRect
          because iframe clientX is relative to iframe */
-      const iframe = viewer.querySelector("iframe");
-      const rect = iframe
-        ? iframe.getBoundingClientRect()
-        : { left: 0, width: window.innerWidth };
-      const screenX = rect.left + t.clientX;
+      const screenX = iframeRect.left + t.clientX;
       const W = window.innerWidth;
       if (screenX < W * 0.3) { pagePrev(); hideControls(); }
       else if (screenX > W * 0.7) { pageNext(); hideControls(); }
