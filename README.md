@@ -108,3 +108,10 @@ The included `firestore.rules` now limits each authenticated user to their own p
 
 ## v1.0.3 Pull to refresh
 Installed PWA users can refresh by pulling downward from the top edge of the reader and releasing. The gesture does not cancel touch events, so existing tap navigation, horizontal page swipes, sidebar gestures, bookmarks, synchronization, and reader controls retain their existing handlers. Reading state is saved locally before reload.
+
+
+## v1.0.5 gesture compatibility fix
+- Restored the EPUB touch gesture timer used by swipe/tap navigation.
+- Pull-to-refresh remains enabled.
+- Previous/next horizontal swipes and middle-tap header/footer toggle are preserved.
+- Service worker cache version: v1.0.17.
