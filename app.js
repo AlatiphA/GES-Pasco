@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.4";
+const APP_VERSION = "1.0.3";
 
 const versionEl =
   document.getElementById(
@@ -190,11 +190,12 @@ const READER_DATA_KEY =
    No touch event is cancelled, preserving existing
    taps, horizontal swipes and controls.
 ========================= */
-const PULL_REFRESH_START_Y = 120;
-const PULL_REFRESH_DISTANCE = 90;
-const PULL_REFRESH_MAX_X = 90;
+const PULL_REFRESH_START_Y = 90;
+const PULL_REFRESH_DISTANCE = 110;
+const PULL_REFRESH_MAX_X = 70;
+const PULL_REFRESH_MAX_TIME = 1800;
 
-function shouldPullRefresh(startX, startY, endX, endY) {
+function shouldPullRefresh(startX, startY, endX, endY, duration) {
   if (startX == null || startY == null) return false;
   if (typeof sidebarIsOpen === "function" && sidebarIsOpen()) return false;
   if (document.body.classList.contains("faqModalOpen")) return false;
@@ -203,7 +204,8 @@ function shouldPullRefresh(startX, startY, endX, endY) {
   return startY <= PULL_REFRESH_START_Y &&
     dy >= PULL_REFRESH_DISTANCE &&
     Math.abs(dx) <= PULL_REFRESH_MAX_X &&
-    dy > Math.abs(dx) * 1.25;
+    dy > Math.abs(dx) * 1.5 &&
+    duration <= PULL_REFRESH_MAX_TIME;
 }
 
 function runPullRefresh() {
@@ -1060,33 +1062,20 @@ function startReader() {
 
     /* Touch navigation inside iframe
        so taps reach links naturally */
-    let _tx = null, _ty = null, _pullRefreshFired = false;
+    let _tx = null, _ty = null, _tt = null;
 
     doc.addEventListener("touchstart", e => {
-      if (!e.touches || e.touches.length !== 1) return;
       _tx = e.touches[0].clientX;
       _ty = e.touches[0].clientY;
-      _pullRefreshFired = false;
-    }, { passive: true });
-
-    /* Android standalone PWAs can turn a vertical pull into touchcancel
-       before touchend. Detect the threshold during touchmove instead. */
-    doc.addEventListener("touchmove", e => {
-      if (_pullRefreshFired || _tx === null || !e.touches || !e.touches.length) return;
-      const t = e.touches[0];
-      if (shouldPullRefresh(_tx, _ty, t.clientX, t.clientY)) {
-        _pullRefreshFired = true;
-        _tx = null;
-        runPullRefresh();
-      }
+      _tt = Date.now();
     }, { passive: true });
 
     doc.addEventListener("touchend", e => {
-      if (_pullRefreshFired) return;
       const t = e.changedTouches[0];
 
-      /* Fallback for browsers that report the full pull only at touchend. */
-      if (shouldPullRefresh(_tx, _ty, t.clientX, t.clientY)) {
+      /* Pull down from the top edge and release to refresh. */
+      if (shouldPullRefresh(_tx, _ty, t.clientX, t.clientY,
+          _tt ? Date.now() - _tt : 0)) {
         _tx = null;
         runPullRefresh();
         return;
@@ -2309,40 +2298,26 @@ document.querySelectorAll(".sidebarTab")
 ========================= */
 let _refreshStartX = null;
 let _refreshStartY = null;
-let _refreshFired = false;
+let _refreshStartTime = null;
 
 document.addEventListener("touchstart", e => {
   if (!e.touches || e.touches.length !== 1) return;
   const t = e.touches[0];
   _refreshStartX = t.clientX;
   _refreshStartY = t.clientY;
-  _refreshFired = false;
-}, { passive: true, capture: true });
-
-document.addEventListener("touchmove", e => {
-  if (_refreshFired || _refreshStartX === null || !e.touches || !e.touches.length) return;
-  const t = e.touches[0];
-  if (shouldPullRefresh(_refreshStartX, _refreshStartY, t.clientX, t.clientY)) {
-    _refreshFired = true;
-    _refreshStartX = _refreshStartY = null;
-    runPullRefresh();
-  }
+  _refreshStartTime = Date.now();
 }, { passive: true, capture: true });
 
 document.addEventListener("touchend", e => {
-  if (_refreshFired || _refreshStartX === null || !e.changedTouches || !e.changedTouches.length) return;
+  if (_refreshStartX === null || !e.changedTouches || !e.changedTouches.length) return;
   const t = e.changedTouches[0];
   const startX = _refreshStartX;
   const startY = _refreshStartY;
-  _refreshStartX = _refreshStartY = null;
-  if (shouldPullRefresh(startX, startY, t.clientX, t.clientY)) {
+  const duration = _refreshStartTime ? Date.now() - _refreshStartTime : 0;
+  _refreshStartX = _refreshStartY = _refreshStartTime = null;
+  if (shouldPullRefresh(startX, startY, t.clientX, t.clientY, duration)) {
     runPullRefresh();
   }
-}, { passive: true, capture: true });
-
-document.addEventListener("touchcancel", () => {
-  _refreshStartX = _refreshStartY = null;
-  _refreshFired = false;
 }, { passive: true, capture: true });
 
 /* =========================
