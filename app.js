@@ -170,7 +170,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.6";
+const APP_VERSION = "1.0.7";
 
 const versionEl =
   document.getElementById(
@@ -1062,8 +1062,52 @@ function startReader() {
        so taps reach links naturally */
     let _tx = null, _ty = null, _tt = 0, _pullRefreshFired = false;
 
+    /* Pinch-to-text zoom. Two-finger gestures inside the EPUB change the
+       same reader fontSize used by A+/A-, instead of zooming the browser
+       viewport. One-finger swipe/tap handling remains unchanged. */
+    let _pinchActive = false;
+    let _pinchStartDistance = 0;
+    let _pinchStartFontSize = fontSize;
+    let _pinchLastFontSize = fontSize;
+
+    const pinchDistance = touches => {
+      if (!touches || touches.length < 2) return 0;
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.hypot(dx, dy);
+    };
+
+    const clampReaderFontSize = value =>
+      Math.max(70, Math.min(200, Math.round(value / 10) * 10));
+
+    const applyPinchFontSize = value => {
+      const nextSize = clampReaderFontSize(value);
+      if (nextSize === _pinchLastFontSize) return;
+      fontSize = nextSize;
+      _pinchLastFontSize = nextSize;
+      rendition.themes.fontSize(fontSize + "%");
+      localStorage.setItem("fontSize", fontSize);
+    };
+
     doc.addEventListener("touchstart", e => {
-      if (!e.touches || e.touches.length !== 1) return;
+      if (!e.touches) return;
+
+      if (e.touches.length === 2) {
+        _pinchActive = true;
+        _pinchStartDistance = pinchDistance(e.touches);
+        _pinchStartFontSize = fontSize;
+        _pinchLastFontSize = fontSize;
+        /* Clear one-finger gesture state so a pinch can never become a
+           page swipe, middle tap or pull-to-refresh on release. */
+        _tx = _ty = null;
+        _pullRefreshFired = false;
+        return;
+      }
+
+      if (e.touches.length !== 1) {
+        _tx = _ty = null;
+        return;
+      }
       _tx = e.touches[0].clientX;
       _ty = e.touches[0].clientY;
       _tt = Date.now();
@@ -1073,6 +1117,17 @@ function startReader() {
     /* Android standalone PWAs can turn a vertical pull into touchcancel
        before touchend. Detect the threshold during touchmove instead. */
     doc.addEventListener("touchmove", e => {
+      if (_pinchActive && e.touches && e.touches.length >= 2) {
+        /* This is the only touch path we cancel: it prevents browser/page
+           magnification while leaving every one-finger gesture untouched. */
+        e.preventDefault();
+        const distance = pinchDistance(e.touches);
+        if (_pinchStartDistance > 0 && distance > 0) {
+          applyPinchFontSize(_pinchStartFontSize * (distance / _pinchStartDistance));
+        }
+        return;
+      }
+
       if (_pullRefreshFired || _tx === null || !e.touches || !e.touches.length) return;
       const t = e.touches[0];
       if (shouldPullRefresh(_tx, _ty, t.clientX, t.clientY)) {
@@ -1080,10 +1135,27 @@ function startReader() {
         _tx = null;
         runPullRefresh();
       }
-    }, { passive: true });
+    }, { passive: false });
 
     doc.addEventListener("touchend", e => {
+      if (_pinchActive) {
+        /* Keep swallowing the gesture until both fingers are up. */
+        if (e.touches && e.touches.length > 0) return;
+        _pinchActive = false;
+        _tx = _ty = null;
+        localStorage.setItem("fontSize", fontSize);
+        if (window.gesPascoReaderSync) {
+          window.gesPascoReaderSync.queuePreferences({
+            theme: localStorage.getItem("theme-v2") || "dark",
+            fontSize: fontSize,
+            fontFamily: fontFamily
+          });
+        }
+        return;
+      }
+
       if (_pullRefreshFired) return;
+      if (!e.changedTouches || !e.changedTouches.length) return;
       const t = e.changedTouches[0];
 
       /* Fallback for browsers that report the full pull only at touchend. */
