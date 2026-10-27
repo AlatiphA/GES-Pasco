@@ -80,9 +80,11 @@ service cloud.firestore {
                'cfi', 'chapter', 'progress', 'date', 'updatedAt', 'deleted'
              ])
              && request.resource.data.keys().hasAll([
-               'cfi', 'chapter', 'progress', 'date', 'updatedAt', 'deleted'
+               'cfi', 'chapter', 'progress', 'date', 'updatedAt'
              ])
-             && request.resource.data.deleted is bool
+             // v1.0.7 omits deleted; v1.0.8 includes a boolean tombstone flag.
+             && (!('deleted' in request.resource.data)
+                 || request.resource.data.deleted is bool)
              && request.resource.data.cfi is string
              && request.resource.data.cfi.size() > 0
              && request.resource.data.cfi.size() <= 10000
