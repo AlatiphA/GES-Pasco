@@ -1598,3 +1598,17 @@ html[data-ui-theme] .searchItem,html[data-ui-theme] .bookmarkRow,html[data-ui-th
 .themeOption,.fontOption {min-height:44px;}
 .appAppearance {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .appAppearance select {min-height:44px;padding:8px 12px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+
+/* Reader controls must follow the interface palette in both appearance modes. */
+html[data-ui-theme] .bottomBtn,
+html[data-ui-theme] .navBtn,
+html[data-ui-theme] .title { color:var(--ui-text); }
+html[data-ui-theme] #progressText { color:var(--ui-muted); }
+html[data-ui-theme] .progressBar { background:var(--ui-border); }
+html[data-ui-theme] .progressFill { background:var(--ui-accent); }
+html[data-ui-theme] .bottomBtn:hover,
+html[data-ui-theme] .navBtn:hover,
+html[data-ui-theme] .iconBtn:hover { background:var(--ui-selected); }
+html[data-ui-theme] .bottomBtn:focus-visible,
+html[data-ui-theme] .navBtn:focus-visible,
+html[data-ui-theme] .iconBtn:focus-visible { outline:2px solid var(--ui-accent); outline-offset:2px; }
