@@ -170,9 +170,9 @@ let fontFamily =
 
 /* =========================
    APP VERSION
-   Change this on every release
+   Shared release number from version.js
 ========================= */
-const APP_VERSION = "1.0.8";
+const APP_VERSION = globalThis.GES_PASCO_VERSION;
 
 const versionEl =
   document.getElementById(
@@ -2320,34 +2320,7 @@ searchInput.addEventListener(
    SERVICE WORKER
 ================ */
 
-if (
-  "serviceWorker" in navigator
-) {
-
-  window.addEventListener(
-    "load",
-    async () => {
-
-      try {
-
-        await navigator
-          .serviceWorker
-          .register(
-            "./sw.js"
-          );
-
-      }
-
-      catch (error) {
-
-        console.error(error);
-
-      }
-
-    }
-  );
-
-}
+// Registration and explicit update controls are handled by updates.js.
 
 /* =========================
    SIDEBAR TAB SWITCHING

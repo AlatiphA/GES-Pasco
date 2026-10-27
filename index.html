@@ -171,6 +171,7 @@
       <div><strong>Account</strong><span id="profileAccountType">Signed in</span></div>
     </div>
     <div class="profileAccountRow"><div><strong>Cloud sync</strong><span id="syncStatus" role="status" aria-live="polite">Saved on this device</span><button id="syncRetry" type="button">Retry sync</button></div></div>
+    <div class="profileAccountRow"><div><strong>App updates</strong><span id="updateStatus" role="status" aria-live="polite">Checking update support…</span><button id="checkUpdatesBtn" type="button">Check for updates</button> <button id="installUpdateBtn" type="button" hidden>Install update</button></div></div>
     <button id="logoutBtn" class="profileLogout" type="button">
       <i class="fa-solid fa-right-from-bracket"></i>
       <span>Log out</span>
@@ -260,7 +261,7 @@
 
       <br>
 
-      ©️ All Rights Reserved | Cache Version · <span id="appVersion"> v0.0.0</span>
+      ©️ All Rights Reserved | App version · <span id="appVersion"> v0.0.0</span>
 
       <br>
 
@@ -555,6 +556,8 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="./version.js"></script>
+<script src="./updates.js"></script>
 <script src="./firebase-config.js"></script>
 <script src="./firestore-data.js"></script>
 <script src="./auth.js"></script>

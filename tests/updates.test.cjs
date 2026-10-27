@@ -1,0 +1,16 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');
+test('worker version and cache use the shared release and activate only on request',()=>{
+ const handlers={};let skipped=0,reported;const context={console,URL,Request,Promise,self:{addEventListener:(n,f)=>handlers[n]=f,skipWaiting:()=>skipped++}};
+ context.importScripts=p=>vm.runInContext(fs.readFileSync(p.replace('./',''),'utf8'),context);vm.createContext(context);vm.runInContext(fs.readFileSync('sw.js','utf8'),context);
+ handlers.message({data:'GET_VERSION',ports:[{postMessage:v=>reported=v}]});assert.equal(reported,'v'+context.GES_PASCO_VERSION);assert.equal(vm.runInContext('CACHE_NAME',context),'alatipha-ges-pasco-'+reported);assert.equal(skipped,0);handlers.message({data:'SKIP_WAITING',ports:[]});assert.equal(skipped,1);
+ const html=fs.readFileSync('index.html','utf8');assert.ok(html.indexOf('./version.js')<html.indexOf('./auth.js'));assert.ok(fs.readFileSync('app.js','utf8').includes('const APP_VERSION = globalThis.GES_PASCO_VERSION;'));
+});
+function setup(waiting=null){
+ const elements=Object.fromEntries(['checkUpdatesBtn','installUpdateBtn','updateStatus'].map(id=>[id,{addEventListener(n,fn){this[n]=fn;}}]));const handlers={};let reloads=0,checks=0;
+ const registration={waiting,installing:null,addEventListener(){},async update(){checks++;}};
+ const context={console,navigator:{onLine:true,serviceWorker:{addEventListener:(n,f)=>handlers[n]=f,async register(url,options){assert.equal(options.updateViaCache,'none');return registration;}}},document:{getElementById:id=>elements[id]},location:{reload:()=>reloads++},setTimeout:()=>1,Promise,GES_PASCO_VERSION:'1.0.9'};context.window=context;vm.runInNewContext(fs.readFileSync('updates.js','utf8'),context);
+ return {elements,handlers,registration,context,get reloads(){return reloads;},get checks(){return checks;}};
+}
+test('checking offline avoids network and reports connection requirement',async()=>{const s=setup();await Promise.resolve();s.context.navigator.onLine=false;await s.elements.checkUpdatesBtn.click();assert.equal(s.checks,0);assert.match(s.elements.updateStatus.textContent,/Connect/);});
+test('install button activates waiting worker then reloads on controller change',async()=>{const messages=[];const s=setup({postMessage:m=>messages.push(m)});await Promise.resolve();assert.equal(s.elements.installUpdateBtn.hidden,false);await s.elements.installUpdateBtn.click();assert.deepEqual(messages,['SKIP_WAITING']);assert.equal(s.reloads,0);s.handlers.controllerchange();s.handlers.controllerchange();assert.equal(s.reloads,1);});
+test('missing required files prevents update activation',async()=>{const handlers={};const context={console:{warn(){}},Request,Promise,caches:{open:async()=>({add:async request=>{if(request.url.endsWith('/app.js'))throw Error('failed download');}})},self:{addEventListener:(n,f)=>handlers[n]=f}};context.Request=class{constructor(url){this.url='https://example.test/'+url.replace('./','');}};context.importScripts=()=>context.GES_PASCO_VERSION='1.0.9';vm.runInNewContext(fs.readFileSync('sw.js','utf8'),context);let install;handlers.install({waitUntil:p=>install=p});await assert.rejects(install,/Required app files/);});

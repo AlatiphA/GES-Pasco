@@ -1,14 +1,7 @@
-/* =====================================================
-   GES Pasco — Service Worker
-   ─────────────────────────────────────────────────
-   HOW TO UPDATE:
-   Bump CACHE_VERSION whenever cached assets change.
-   The cache name updates automatically. Users will
-   get a "New version available" prompt on next visit.
-===================================================== */
-
-const CACHE_VERSION = "v1.0.20";
-const CACHE_NAME    = `alatipha-ges-pasco-${CACHE_VERSION}`;
+/* GES Pasco: reader and cache share the release in version.js. */
+importScripts("./version.js");
+const CACHE_VERSION = "v" + globalThis.GES_PASCO_VERSION;
+const CACHE_NAME = `alatipha-ges-pasco-${CACHE_VERSION}`;
 
 /* ====================
    APP SHELL
@@ -20,6 +13,8 @@ const FILES_TO_CACHE = [
   "./faq.html",
   "./style.css",
   "./app.js",
+  "./version.js",
+  "./updates.js",
   "./firebase-config.js",
   "./firestore-data.js",
   "./auth.js",
@@ -43,15 +38,15 @@ self.addEventListener("install", event => {
     caches.open(CACHE_NAME)
       .then(async cache => {
 
-        // Cache each file independently so one missing/
-        // failing file (wrong path, renamed asset, CORS
-        // hiccup on the CDN link) can't sink the entire
-        // precache and leave the app with ZERO offline
-        // support.
+        // Local app files must finish caching before this release is ready.
+        // A failure on the optional CDN stylesheet does not block installation.
         const results = await Promise.allSettled(
-          FILES_TO_CACHE.map(url => cache.add(url))
+          FILES_TO_CACHE.map(url => cache.add(new Request(url, {cache: "reload"})))
         );
 
+        if (results.some((result, i) => result.status === "rejected" && FILES_TO_CACHE[i].startsWith("./"))) {
+          throw new Error("Required app files could not be cached; keeping the current release.");
+        }
         results.forEach((result, i) => {
           if (result.status === "rejected") {
             console.warn(
@@ -62,7 +57,6 @@ self.addEventListener("install", event => {
           }
         });
       })
-      .then(() => self.skipWaiting())
   );
 
 });
@@ -78,7 +72,7 @@ self.addEventListener("activate", event => {
       .then(cacheNames =>
         Promise.all(
           cacheNames
-            .filter(name => name !== CACHE_NAME)
+            .filter(name => name.startsWith("alatipha-ges-pasco-") && name !== CACHE_NAME)
             .map(name => caches.delete(name))
         )
       )
@@ -149,7 +143,10 @@ self.addEventListener("fetch", event => {
 
 self.addEventListener("message", event => {
 
-  if (event.data === "GET_VERSION") {
+  if (event.data === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+  if (event.data === "GET_VERSION" && event.ports[0]) {
     event.ports[0].postMessage(CACHE_VERSION);
   }
 
