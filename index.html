@@ -170,8 +170,19 @@
       <i class="fa-regular fa-user"></i>
       <div><strong>Account</strong><span id="profileAccountType">Signed in</span></div>
     </div>
-    <div class="profileAccountRow"><div><strong>Cloud sync</strong><span id="syncStatus" role="status" aria-live="polite">Saved on this device</span><button id="syncRetry" type="button">Retry sync</button></div></div>
-    <div class="profileAccountRow"><div><strong>App updates</strong><span id="updateStatus" role="status" aria-live="polite">Checking update support…</span><button id="checkUpdatesBtn" type="button">Check for updates</button> <button id="installUpdateBtn" type="button" hidden>Install update</button></div></div>
+    <div class="profileSetting">
+      <div class="profileSettingHeading"><i class="fa-solid fa-cloud" aria-hidden="true"></i><strong>Cloud sync</strong></div>
+      <span id="syncStatus" class="profileSettingStatus" role="status" aria-live="polite">Saved on this device</span>
+      <div class="profileSettingActions"><button id="syncRetry" class="profileAction" type="button">Retry sync</button></div>
+    </div>
+    <div class="profileSetting">
+      <div class="profileSettingHeading"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i><strong>App updates</strong></div>
+      <span id="updateStatus" class="profileSettingStatus" role="status" aria-live="polite">Checking update support…</span>
+      <div class="profileSettingActions">
+        <button id="checkUpdatesBtn" class="profileAction" type="button">Check for updates</button>
+        <button id="installUpdateBtn" class="profileAction profileActionPrimary" type="button" hidden>Install update</button>
+      </div>
+    </div>
     <button id="logoutBtn" class="profileLogout" type="button">
       <i class="fa-solid fa-right-from-bracket"></i>
       <span>Log out</span>

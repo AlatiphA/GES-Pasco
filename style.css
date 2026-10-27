@@ -1531,3 +1531,68 @@ body.sepia .faqModalFrame { background: #f4ede0; }
 body.night .faqModalPanel, body.night .faqModalHeader { background: #000000; color: #bbbbbb; }
 body.night .faqModalHeader { border-bottom-color: #2a2a2a; }
 body.night .faqModalFrame { background: #000000; }
+
+/* Account sheet: consistent spacing, theme colors and touch-sized actions. */
+.profileMenu {
+  --account-bg: #fff;
+  --account-text: #28231e;
+  --account-muted: #746b62;
+  --account-line: #e9e2d9;
+  --account-card: #faf8f5;
+  --account-accent: #805329;
+  background: var(--account-bg);
+  color: var(--account-text);
+  width: min(360px, calc(100vw - 24px));
+  max-height: calc(100dvh - var(--header-height) - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  padding: 20px;
+  border-color: var(--account-line);
+}
+body.sepia .profileMenu {
+  --account-bg: #f4ede0; --account-text: #30251b; --account-muted: #75644f;
+  --account-line: #dfd2bc; --account-card: #eee4d2; --account-accent: #805329;
+}
+body.dark .profileMenu, body.night .profileMenu {
+  --account-bg: #1b1b1b; --account-text: #f1ece6; --account-muted: #bcb4aa;
+  --account-line: #3c3732; --account-card: #25221f; --account-accent: #e3b582;
+}
+body.night .profileMenu { --account-bg: #080808; --account-card: #171513; }
+.profileMenu .profileIdentity { padding: 4px 0 12px; gap: 13px; }
+.profileMenu .profileIdentityText strong { font-size: 15px; }
+.profileMenu .profileIdentityText span { color: var(--account-muted); font-size: 12px; }
+.profileMenu .profileDivider { background: var(--account-line); margin: 0 0 10px; }
+.profileMenu .profileAccountRow { padding: 8px 0 14px; gap: 12px; }
+.profileMenu .profileAccountRow span { color: var(--account-muted); font-size: 12px; }
+.profileMenu .profileAccountRow > i { color: var(--account-accent); }
+.profileSetting {
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--account-line);
+  border-radius: 12px;
+  background: var(--account-card);
+}
+.profileSettingHeading { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+.profileSettingHeading i { color: var(--account-accent); font-size: 13px; width: 16px; text-align: center; }
+.profileSettingStatus { display: block; color: var(--account-muted); font-size: 12px; line-height: 1.5; margin-top: 6px; overflow-wrap: anywhere; }
+.profileSettingActions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.profileAction {
+  appearance: none; border: 1px solid var(--account-line); border-radius: 8px;
+  background: var(--account-bg); color: var(--account-text);
+  min-height: 40px; padding: 9px 13px; font: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer; line-height: 1.3; touch-action: manipulation;
+}
+.profileAction:hover:not(:disabled) { border-color: var(--account-accent); color: var(--account-accent); }
+.profileAction:focus-visible, .profileLogout:focus-visible { outline: 2px solid var(--account-accent); outline-offset: 3px; }
+.profileAction:disabled { opacity: .5; cursor: default; }
+.profileActionPrimary { background: #956433; border-color: #956433; color: #fff; }
+.profileActionPrimary:hover:not(:disabled) { background: #794b24; border-color: #794b24; color: #fff; }
+.profileAction[hidden] { display: none; }
+.profileMenu .profileLogout { margin-top: 14px; border-top: 1px solid var(--account-line); border-radius: 0; padding: 14px 0 4px; color: var(--account-text); min-height: 44px; }
+.profileMenu .profileLogout > i { color: var(--account-accent); }
+@media (max-width: 600px) {
+  #readerApp > .profileMenu { max-height: 85dvh; padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .profileMenu .profileHandle { background: var(--account-line); margin-bottom: 16px; }
+  .profileSetting { padding: 14px 16px; }
+}
