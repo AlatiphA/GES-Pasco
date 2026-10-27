@@ -165,7 +165,18 @@
     <div class="profileBody" tabindex="0" role="region" aria-label="Account settings">
       <div class="profileSettings">
         <details name="profile-settings"><summary><svg class="profileSettingIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Account</span><svg class="profileSettingChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary>
-          <div class="profileSettingContent"><strong>Cloud sync</strong><span id="syncStatus" class="profileSettingStatus" role="status" aria-live="polite">Saved on this device</span><div class="profileSettingActions"><button id="syncRetry" class="profileAction" type="button">Retry sync</button></div></div>
+          <div class="profileSettingContent">
+            <p id="accountSettingsStatus" role="status" aria-live="polite"></p>
+            <form id="accountNameForm" class="accountSettingsForm"><label for="accountDisplayName">Profile name</label><input id="accountDisplayName" maxlength="120" autocomplete="nickname" required><button class="profileAction" type="submit">Save name</button></form>
+            <details class="accountSecuritySection"><summary>Login and security</summary>
+              <p id="accountGoogleHint" hidden>Manage your Google account email and password through Google.</p>
+              <div id="accountPasswordControls">
+                <form id="accountPasswordForm" class="accountSettingsForm"><strong>Change password</strong><label for="accountCurrentPassword">Current password</label><input id="accountCurrentPassword" type="password" autocomplete="current-password" required><label for="accountNewPassword">New password</label><input id="accountNewPassword" type="password" minlength="6" autocomplete="new-password" required><label for="accountConfirmPassword">Confirm new password</label><input id="accountConfirmPassword" type="password" minlength="6" autocomplete="new-password" required><button class="profileAction" type="submit">Change password</button></form>
+                <form id="accountEmailForm" class="accountSettingsForm"><strong>Change login email</strong><label for="accountNewEmail">New email</label><input id="accountNewEmail" type="email" maxlength="254" autocomplete="email" required><label for="accountEmailPassword">Current password</label><input id="accountEmailPassword" type="password" autocomplete="current-password" required><button class="profileAction" type="submit">Send verification link</button><p>The login email changes only after you verify the new address. If asked to sign in again, use the verified address.</p></form>
+              </div>
+              <button id="accountRefreshEmail" class="profileAction" type="button">Refresh verified email</button>
+            </details>
+            <strong>Cloud sync</strong><span id="syncStatus" class="profileSettingStatus" role="status" aria-live="polite">Saved on this device</span><div class="profileSettingActions"><button id="syncRetry" class="profileAction" type="button">Retry sync</button></div></div>
         </details>
         <details name="profile-settings" id="offlineReadingSection"><summary><svg class="profileSettingIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>Offline reading</span><svg class="profileSettingChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary><div class="profileSettingContent"><strong>Read without internet</strong><p id="offlineStatus" role="status" aria-live="polite">Checking saved reader files…</p><div class="profileSettingActions"><button id="offlineCheck" class="profileAction" type="button">Check readiness</button><button id="offlineDownload" class="profileAction profileActionPrimary" type="button">Download / repair</button></div><p>Sign in online first and keep this device signed in. Once ready, reopen the app without internet. Bookmarks and reading progress save on this device and sync when you reconnect.</p><p>Downloads use this browser’s storage. Clearing browser data removes them.</p></div></details>
         <details name="profile-settings"><summary><svg class="profileSettingIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg><span>Appearance</span><svg class="profileSettingChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary><div class="profileSettingContent"><label class="appAppearance">App appearance<select data-ui-theme-choice aria-label="App appearance"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><p>Reading themes can be changed using the palette button in the reader.</p></div></details>
@@ -560,6 +571,7 @@
 <script src="./firebase-config.js"></script>
 <script src="./firestore-data.js"></script>
 <script src="./auth.js"></script>
+<script src="./account-settings.js"></script>
 <script src="./install.js"></script>
 <script src="./offline-reader.js"></script>
 

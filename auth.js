@@ -49,7 +49,7 @@
 
   function renderProfile(profile, user) {
     const name = (profile && profile.displayName) || user.displayName || "GES Pasco User";
-    const email = (profile && profile.email) || user.email || "";
+    const email = user.email || "";
     const initials = getInitials(name, email);
     const photoURL = user.photoURL || "";
     const providerIds = (user.providerData || []).map(item => item.providerId);
@@ -89,7 +89,12 @@
       renderProfile(profile, user);
       return;
     }
-    renderProfile(snap.data() || {}, user);
+    const profile = snap.data() || {};
+    if (profile.email !== user.email) {
+      await ref.update({email:user.email || ""});
+      profile.email = user.email || "";
+    }
+    renderProfile(profile, user);
   }
 
   profileBtn.addEventListener("click", event => {
@@ -102,7 +107,7 @@
     if (profileMenu.hidden) return;
     if (event.key === "Escape") setProfileMenu(false);
     if (event.key === "Tab") {
-      const controls = Array.from(profileMenu.querySelectorAll('button:not([disabled]), summary, [tabindex="0"]'))
+      const controls = Array.from(profileMenu.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), summary, [tabindex="0"]'))
         .filter(el => el.getClientRects().length);
       const first = controls[0], last = controls[controls.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }

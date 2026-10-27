@@ -22,7 +22,7 @@
     if(!registration||checking||installing)return;
     if(!navigator.onLine){say('Connect to the internet to check for updates.');return;}
     checking=true;say('Checking for updates…');render();
-    try{await registration.update();if(registration.waiting){checking=false;ready();}else if(registration.installing){say('Downloading update…');watch(registration.installing);}else{checking=false;say('You are up to date — v'+globalThis.GES_PASCO_VERSION+'.');}}
+    try{await registration.update();if(registration.waiting){checking=false;ready();}else if(registration.installing){say('Downloading update…');watch(registration.installing);}else{checking=false;say('You are up to date.');}}
     catch(e){checking=false;say('Could not check for updates. Please retry.');console.warn('Update check failed:',e);}
     render();
   }
@@ -45,7 +45,7 @@
   navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(value=>{
     registration=value;
     registration.addEventListener('updatefound',()=>{say('Downloading update…');watch(registration.installing);});
-    if(registration.waiting)ready();else if(registration.installing){say('Preparing app files…');watch(registration.installing);}else say('Current app: v'+globalThis.GES_PASCO_VERSION+'.');
+    if(registration.waiting)ready();else if(registration.installing){say('Preparing app files…');watch(registration.installing);}else say('Check for a newer release.');
     render();
   }).catch(e=>{say('Update service unavailable. Reopen the app online and retry.');console.warn('Service worker registration failed:',e);});
 })();

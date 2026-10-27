@@ -20,6 +20,7 @@ const FILES_TO_CACHE = [
   "./firebase-config.js",
   "./firestore-data.js",
   "./auth.js",
+  "./account-settings.js",
   "./install.js",
   "./sw.js",
   "./manifest.json",

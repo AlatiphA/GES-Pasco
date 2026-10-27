@@ -1619,3 +1619,12 @@ html[data-ui-theme] #readingInfo {
   height:26px;padding:0 16px;letter-spacing:.01em;
 }
 html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:42px;}
+
+.accountSettingsForm {display:grid;gap:8px;padding:12px 0;}
+.accountSettingsForm label {font-size:13px;font-weight:500;}
+.accountSettingsForm input {box-sizing:border-box;width:100%;min-width:0;min-height:44px;border:1px solid var(--ui-border);border-radius:8px;padding:10px 12px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+.accountSettingsForm button {justify-self:start;}
+.accountSettingsForm p {color:var(--ui-muted);font-size:12px;}
+.accountSecuritySection {margin:8px 0 18px;padding:10px 0;border-top:1px solid var(--ui-border);border-bottom:1px solid var(--ui-border);}
+.accountSecuritySection > summary {min-height:44px;cursor:pointer;font-weight:600;}
+#accountSettingsStatus:empty {display:none;}
