@@ -4,7 +4,7 @@ GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptit
 
 ## Current build
 
-- Unified release: **v1.0.16** (reader and service-worker cache).
+- Unified release: **v1.0.17** (reader and service-worker cache).
 - Single version source: `version.js`. Change its value for every release, including cache-only updates.
 - Account menu: **Check for updates** finds a waiting release; **Install update** activates it and reloads the app. Local reading data is preserved.
 - Firebase Authentication and Firestore synchronization are included; Firebase Storage is not initialized.
@@ -125,8 +125,15 @@ Deploy the included firestore.rules together with this app. The rules accept leg
 Validation: node --test tests/sync.test.cjs. Tests use an in-memory Firestore substitute; they do not replace Firebase emulator or mobile browser testing. Before release, test two accounts on one browser, two devices adding/deleting bookmarks offline, airplane-mode restart, and pinch/swipe/footer/pull-to-refresh on a phone.
 
 
-## Offline reader (v1.0.16)
+## Offline reader (v1.0.17)
 
 Account → Offline reading checks that the EPUB, app files, icon fonts, EPUB libraries and Firebase SDKs are saved in the active release cache. Download / repair fetches a complete set before replacing cached files; it never clears account data, bookmarks or reading progress. Sign in online first and keep the browser signed in. Signing in or resetting a password still requires internet. Browser storage eviction can remove downloads; check readiness before travelling.
 
 Verification includes simulated cache/network failure tests and checks of the external dependency URLs. Physical-device airplane-mode startup remains a release smoke test.
+
+
+## Practice tests (v1.0.17)
+
+Open Practice tests from the sidebar or account panel. The bundled bank contains 662 multiple-choice questions across 15 Section A exam sets from the bundled GES Pasco EPUB. Only questions with exactly one clear bold-marked answer were imported; ambiguous markings and other question formats are excluded. Scoring follows the historical book, not an independent review of current policy. Source exam and question references appear in answer review. Rebuild the bank with `python tools/build-practice-bank.py`.
+
+Choose a question count and optional time limit (0 is untimed). Question and option order are randomized. Attempts save per account on this browser; a timed attempt keeps its deadline while closed. Results include unanswered questions, source references and mistake revision. Up to 20 result summaries remain locally; no results are uploaded to Firestore. Offline caching includes the bank and practice scripts. Clearing browser data removes these attempts and results.

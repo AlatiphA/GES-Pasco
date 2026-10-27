@@ -1628,3 +1628,33 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .accountSecuritySection {margin:8px 0 18px;padding:10px 0;border-top:1px solid var(--ui-border);border-bottom:1px solid var(--ui-border);}
 .accountSecuritySection > summary {min-height:44px;cursor:pointer;font-weight:600;}
 #accountSettingsStatus:empty {display:none;}
+
+/* Practice tests use the same interface palette as the account panel. */
+.practiceEntry {display:block;width:100%;min-height:48px;padding:12px 14px;border:1px solid var(--ui-border);border-radius:10px;background:var(--ui-surface);color:var(--ui-text);font:inherit;font-size:14px;text-align:left;cursor:pointer;}
+.sidebar > .practiceEntry {margin-bottom:12px;flex-shrink:0;}
+.practiceAccountEntry {border-bottom:1px solid var(--ui-border);}
+.practiceAccountEntry .practiceEntry {border:0;border-radius:0;min-height:56px;}
+#practiceDialog {position:fixed;inset:0;margin:auto;width:min(740px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:0;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface,#fff);color:var(--ui-text,#222);overflow-y:auto;overscroll-behavior:contain;}
+#practiceDialog::backdrop {background:rgba(0,0,0,.58);}
+.practiceHeader {position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--ui-border);background:var(--ui-surface);}
+.practiceHeader h2 {font-size:18px;}
+#practiceClose {width:44px;height:44px;flex-shrink:0;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+#practiceBody {padding:18px;}
+#practiceStatus:not(:empty) {padding:12px 18px;color:var(--ui-accent);}
+.practiceMuted {font-size:13px;line-height:1.6;color:var(--ui-muted);margin:10px 0;}
+.practiceToolbar {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:16px 0;}
+.practicePrompt {font-size:17px;line-height:1.6;font-weight:600;margin:16px 0;white-space:pre-line;}
+#practiceBody fieldset {border:0;padding:0;margin:0 0 16px;display:grid;gap:10px;}
+.practiceOption {display:flex;align-items:flex-start;gap:12px;min-height:48px;border:1px solid var(--ui-border);border-radius:10px;padding:14px;line-height:1.5;cursor:pointer;}
+.practiceOption.selected {border-color:var(--ui-accent);background:var(--ui-selected);}
+.practiceOption input {width:20px;height:20px;margin-top:2px;flex-shrink:0;accent-color:var(--ui-accent);}
+.practiceSetup {display:grid;gap:16px;margin:18px 0;}
+.practiceSetup label {display:grid;gap:8px;font-size:14px;}
+.practiceSetup select,.practiceSetup input {width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+.practiceSetup button {justify-self:start;}
+.practiceReview {border:1px solid var(--ui-border);border-radius:10px;margin-top:12px;overflow:hidden;}
+.practiceReview summary {padding:14px;cursor:pointer;line-height:1.6;white-space:pre-line;}
+.practiceReview > div {padding:0 14px 14px;background:var(--ui-raised);}
+.practiceReview p {margin:10px 0;line-height:1.6;}
+.practiceSrOnly {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
+#practiceDialog button:focus-visible,.practiceOption:focus-within {outline:2px solid var(--ui-accent);outline-offset:2px;}

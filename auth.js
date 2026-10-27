@@ -104,7 +104,7 @@
   document.getElementById("profileClose").addEventListener("click", () => setProfileMenu(false));
   profileBackdrop.addEventListener("click", () => setProfileMenu(false));
   document.addEventListener("keydown", event => {
-    if (profileMenu.hidden) return;
+    if (profileMenu.hidden || document.querySelector("dialog[open]")) return;
     if (event.key === "Escape") setProfileMenu(false);
     if (event.key === "Tab") {
       const controls = Array.from(profileMenu.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), summary, [tabindex="0"]'))

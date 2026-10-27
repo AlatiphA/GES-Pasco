@@ -199,7 +199,7 @@ const PULL_REFRESH_MAX_X = 90;
 function shouldPullRefresh(startX, startY, endX, endY) {
   if (startX == null || startY == null) return false;
   if (typeof sidebarIsOpen === "function" && sidebarIsOpen()) return false;
-  if (document.body.classList.contains("faqModalOpen")) return false;
+  if (document.body.classList.contains("faqModalOpen") || document.querySelector("dialog[open]")) return false;
   const dx = endX - startX;
   const dy = endY - startY;
   return startY <= PULL_REFRESH_START_Y &&
@@ -1614,7 +1614,7 @@ function setupNavigationZones() {
 
   /* Keyboard (desktop) */
   document.addEventListener("keydown", e => {
-    if (!rendition) return;
+    if (!rendition || document.querySelector("dialog[open]")) return;
     if (document.activeElement?.closest("input, select, textarea, button, summary, [contenteditable], .profileMenu, .themePicker, .fontPicker") || !document.getElementById("profileMenu").hidden) return;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault(); pageNext();
@@ -2404,7 +2404,7 @@ document.addEventListener("click", e => {
     sidebar.classList.contains("active") &&
     !sidebar.contains(e.target) &&
     !bottomMenuBtn.contains(e.target) &&
-    !e.target.closest("footer, .bottomFooter, .themePicker, .fontPicker, .profileMenu") &&
+    !e.target.closest("footer, .bottomFooter, .themePicker, .fontPicker, .profileMenu, #practiceDialog, .practiceEntry") &&
     !e.target.closest("header")
   ) {
     toggleSidebar();
@@ -2471,7 +2471,7 @@ document.addEventListener("touchend", e => {
     !bottomMenuBtn.contains(el) &&
     !el.closest("#clearCacheBtn") &&
     !el.closest("#faqBtn") &&
-    !el.closest("header, footer, .bottomFooter, .themePicker, .fontPicker, .profileMenu")
+    !el.closest("header, footer, .bottomFooter, .themePicker, .fontPicker, .profileMenu, #practiceDialog, .practiceEntry")
   ) {
     toggleSidebar();
   }
