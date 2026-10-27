@@ -937,7 +937,26 @@ function pagePrev() {
    START READER
 ================= */
 
+function updateReadingLocationDisplay(location, locationsReady) {
+  const saved = loadReaderData();
+  let percent = saved.progress != null && Number.isFinite(Number(saved.progress)) ? Math.max(0, Math.min(100, Math.floor(Number(saved.progress)))) : null;
+  if (locationsReady && location?.start?.cfi) {
+    const value = book.locations.percentageFromCfi(location.start.cfi);
+    if (Number.isFinite(value) && value >= 0 && value <= 1) percent = Math.floor(value * 100);
+  }
+  const label = percent === null ? "Calculating…" : percent + "%";
+  progressText.textContent = label;
+  progressFill.style.width = (percent === null ? 0 : percent) + "%";
+  const href = location?.start?.href || saved.chapter || "";
+  const chapter = href ? getCurrentChapter(href) : "";
+  const info = document.getElementById("readingInfo");
+  if (info) info.textContent = chapter ? chapter + " • " + label : label;
+  return percent;
+}
+
 function startReader() {
+  let locationsReady = false;
+  updateReadingLocationDisplay(null, false);
 
   rendition =
     book.renderTo(
@@ -1011,6 +1030,12 @@ function startReader() {
     /* Generate locations in background — progress works once ready */
     book.locations
       .generate(1000)
+      .then(() => {
+        locationsReady = true;
+        const percent = updateReadingLocationDisplay(currentLocation, true);
+        const saved = loadReaderData();
+        if (saved.location && percent !== null) saveReaderData({...saved, progress:percent});
+      })
       .catch(err => console.warn("Locations:", err));
 
   });
@@ -1424,20 +1449,7 @@ function startReader() {
       currentLocation =
         location;
 
-      /* =========================
-         CALCULATE PROGRESS
-      ========================= */
-
-      const percentage =
-        book.locations
-          .percentageFromCfi(
-            location.start.cfi
-          );
-
-      const percent =
-        Math.floor(
-          percentage * 100
-        );
+      const percent = updateReadingLocationDisplay(location, locationsReady);
 
       /* =========================
          SAVE READER DATA
@@ -1449,7 +1461,7 @@ function startReader() {
           location.start.cfi,
 
         progress:
-          percent,
+          percent ?? 0,
 
         lastRead:
           new Date()
@@ -1463,36 +1475,6 @@ function startReader() {
       saveReaderData(
         readerData
       );
-
-      /* =========================
-         UPDATE UI
-      ========================= */
-
-      progressText.textContent =
-        percent + "%";
-
-      progressFill.style.width =
-        percent + "%";
-      
-      const readingInfo =
-        document.getElementById(
-        "readingInfo"
-      );
-
-      if (readingInfo) {
-
-      const chapterName =
-        getCurrentChapter(
-        location.start.href
-      );
-
-      readingInfo.textContent =
-        chapterName +
-        " • " +
-        percent +
-        "%";
-
-    }
 
       highlightActiveTOC(location.start.href);
 
