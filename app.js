@@ -1027,6 +1027,8 @@ function startReader() {
       view?.iframe?.contentDocument;
 
     if (!doc || !doc.body) return;
+    if (doc.documentElement.dataset.gesPascoGestures === "ready") return;
+    doc.documentElement.dataset.gesPascoGestures = "ready";
 
     /* Detect if this page is a notes/endnotes page */
     const pageTitle = (doc.title || "").toLowerCase();
@@ -1232,6 +1234,25 @@ function startReader() {
       else if (screenX > W * 0.7) { pageNext(); hideControls(); }
       else { toggleControls(); }
     }, { passive: true });
+
+    /* Desktop content clicks: links stay with the existing link handler.
+       Touch navigation remains in touchend; ignore its synthetic click. */
+    doc.addEventListener("click", e => {
+      if (!window.matchMedia("(pointer: fine)").matches || e.detail === 0) return;
+      if (e.sourceCapabilities?.firesTouchEvents || (_tt !== null && Date.now() - _tt < 800)) return;
+      const target = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+      if (!target || target.closest("a[href], button, input, select, textarea, [contenteditable], [role='button']")) return;
+      const popup = document.getElementById("fnPopup");
+      if (popup) { popup.remove(); return; }
+      if (sidebarIsOpen()) { toggleSidebar(); return; }
+      const frame = doc.defaultView?.frameElement;
+      if (!frame) return;
+      const screenX = frame.getBoundingClientRect().left + e.clientX;
+      const W = window.innerWidth;
+      if (screenX < W * 0.3) { pagePrev(); hideControls(); }
+      else if (screenX > W * 0.7) { pageNext(); hideControls(); }
+      else { toggleControls(); }
+    });
 
     /* Use document-level capture listener so it fires BEFORE
        epub.js's own link handler, preventing page navigation */
@@ -1612,7 +1633,7 @@ function setupNavigationZones() {
   /* Keyboard (desktop) */
   document.addEventListener("keydown", e => {
     if (!rendition) return;
-    if (document.activeElement === searchInput) return;
+    if (document.activeElement?.closest("input, select, textarea, button, summary, [contenteditable], .profileMenu, .themePicker, .fontPicker") || !document.getElementById("profileMenu").hidden) return;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault(); pageNext();
     }
@@ -1978,9 +1999,8 @@ function updateMenuButtons() {
 
   bottomMenuBtn.textContent =
     icon;
-
-  bottomMenuBtn.textContent =
-    icon;
+  bottomMenuBtn.setAttribute("aria-expanded", String(isOpen));
+  bottomMenuBtn.setAttribute("aria-label", isOpen ? "Close chapters" : "Chapters");
 
 }
 
@@ -2039,10 +2059,13 @@ function closeSidebar() {
 
 /* MENU EVENTS */
 
-bottomMenuBtn.addEventListener(
-  "click",
-  toggleSidebar
-);
+function handleSidebarButtonClick(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  toggleSidebar();
+  showControls();
+}
+bottomMenuBtn.addEventListener("click", handleSidebarButtonClick);
 
 
 /* ==========
@@ -2069,6 +2092,7 @@ themeBtn.addEventListener(
   e => {
     e.stopPropagation();
     toggleThemePicker();
+    showControls();
   }
 );
 
@@ -2137,6 +2161,7 @@ function applyFont(font) {
 }
 
 function toggleFontPicker() {
+  showControls();
   fontPicker.classList.toggle("open");
   closeThemePicker();
 }
@@ -2244,7 +2269,7 @@ bottomIncreaseFont.addEventListener(
   "click",
   () => {
 
-    fontSize += 10;
+    fontSize = Math.min(200, fontSize + 10);
 
     rendition.themes.fontSize(
       fontSize + "%"
@@ -2396,7 +2421,8 @@ document.addEventListener("click", e => {
   if (
     sidebar.classList.contains("active") &&
     !sidebar.contains(e.target) &&
-    e.target !== bottomMenuBtn &&
+    !bottomMenuBtn.contains(e.target) &&
+    !e.target.closest("footer, .bottomFooter, .themePicker, .fontPicker, .profileMenu") &&
     !e.target.closest("header")
   ) {
     toggleSidebar();
@@ -2463,7 +2489,7 @@ document.addEventListener("touchend", e => {
     !bottomMenuBtn.contains(el) &&
     !el.closest("#clearCacheBtn") &&
     !el.closest("#faqBtn") &&
-    !el.closest("header")
+    !el.closest("header, footer, .bottomFooter, .themePicker, .fontPicker, .profileMenu")
   ) {
     toggleSidebar();
   }

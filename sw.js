@@ -15,6 +15,7 @@ const FILES_TO_CACHE = [
   "./app.js",
   "./version.js",
   "./updates.js",
+  "./ui-theme.js",
   "./firebase-config.js",
   "./firestore-data.js",
   "./auth.js",

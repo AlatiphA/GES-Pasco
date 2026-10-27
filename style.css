@@ -481,10 +481,7 @@ footer.hideControls {
 #centerZone { width: 40%; }
 #rightZone  { width: 30%; }
 
-/* Desktop mouse only — zones active */
-@media (pointer: fine) {
-  .navZone { pointer-events: all; cursor: pointer; }
-}
+/* PromoHub handles desktop navigation inside EPUB content so links remain clickable. */
 
 button {
   touch-action: manipulation;
@@ -1582,3 +1579,22 @@ body.night .profileMenu {--account-bg:#080808;--account-raised:#171b1c;}
 .profileMenu button:focus-visible,.profileSettings summary:focus-visible,.profileBody:focus-visible {outline:2px solid var(--account-accent);outline-offset:-3px;}
 @media(max-width:600px) {#readerApp > .profileMenu {inset:12px 12px auto;width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:14px;padding:0;}.profileSummary {padding:12px;gap:3px 10px;}.profileBody {padding:12px;}}
 @media(max-height:420px) {.profileSummary {padding:8px 12px;}.profileSummary #profileName {font-size:16px;}.profileBody {padding:10px 12px;}}
+
+/* PromoHub interface palette. EPUB theme colors remain inside the reader. */
+html[data-ui-theme] {--ui-bg:#f4f2ed;--ui-surface:#fff;--ui-raised:#faf8f4;--ui-text:#242b29;--ui-muted:#606b66;--ui-border:#d4d9d4;--ui-accent:#805025;--ui-selected:#f4e9dc;}
+html[data-ui-theme="dark"] {--ui-bg:#151a1c;--ui-surface:#20282a;--ui-raised:#293335;--ui-text:#f0f3f0;--ui-muted:#b5c1bc;--ui-border:#47534f;--ui-accent:#e1b583;--ui-selected:#3d332a;}
+html[data-ui-theme] header,html[data-ui-theme] footer,html[data-ui-theme] .bottomFooter,html[data-ui-theme] .sidebar,html[data-ui-theme] .sidebarTabs,html[data-ui-theme] .themePickerInner,html[data-ui-theme] .fontPickerInner,html[data-ui-theme] .searchBox {background:var(--ui-surface);color:var(--ui-text);border-color:var(--ui-border);}
+html[data-ui-theme] .profileMenu {--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-muted:var(--ui-muted);--account-line:var(--ui-border);--account-raised:var(--ui-raised);--account-accent:var(--ui-accent);}
+html[data-ui-theme] .sidebarTabs {border-bottom:1px solid var(--ui-border);}
+html[data-ui-theme] .sidebarTab,html[data-ui-theme] .themeOption,html[data-ui-theme] .fontOption {color:var(--ui-muted);}
+html[data-ui-theme] .sidebarTab.active,html[data-ui-theme] .themeOption.active,html[data-ui-theme] .fontOption.active {color:var(--ui-accent);}
+html[data-ui-theme] #toc a,html[data-ui-theme] #bookmarksList a {color:var(--ui-text);border-color:var(--ui-border);}
+html[data-ui-theme] #toc a.active,html[data-ui-theme] #toc a:hover {background:var(--ui-selected);}
+html[data-ui-theme] .iconBtn {color:var(--ui-text);}
+html[data-ui-theme] .themePickerLabel,html[data-ui-theme] .fontPickerLabel {color:var(--ui-muted);}
+html[data-ui-theme] #searchInput,html[data-ui-theme] #searchResults,html[data-ui-theme] #closeSearch {background:var(--ui-surface);color:var(--ui-text);border-color:var(--ui-border);}
+html[data-ui-theme] .searchItem,html[data-ui-theme] .bookmarkRow,html[data-ui-theme] .momoSection {border-color:var(--ui-border);}
+.themePickerInner,.fontPickerInner {border-radius:14px;padding:12px;}
+.themeOption,.fontOption {min-height:44px;}
+.appAppearance {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.appAppearance select {min-height:44px;padding:8px 12px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
