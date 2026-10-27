@@ -4,6 +4,7 @@
   const check=document.getElementById('checkUpdatesBtn');
   const install=document.getElementById('installUpdateBtn');
   const status=document.getElementById('updateStatus');
+  document.querySelectorAll('[data-profile-version]').forEach(el=>el.textContent='v'+globalThis.GES_PASCO_VERSION);
   let registration=null,checking=false,installing=false,reloadRequested=false;
   const say=text=>{status.textContent=text;};
   function render(){check.disabled=checking||installing||!registration;install.hidden=!registration?.waiting;install.disabled=installing;}

@@ -8,7 +8,7 @@ test('worker version and cache use the shared release and activate only on reque
 function setup(waiting=null){
  const elements=Object.fromEntries(['checkUpdatesBtn','installUpdateBtn','updateStatus'].map(id=>[id,{addEventListener(n,fn){this[n]=fn;}}]));const handlers={};let reloads=0,checks=0;
  const registration={waiting,installing:null,addEventListener(){},async update(){checks++;}};
- const context={console,navigator:{onLine:true,serviceWorker:{addEventListener:(n,f)=>handlers[n]=f,async register(url,options){assert.equal(options.updateViaCache,'none');return registration;}}},document:{getElementById:id=>elements[id]},location:{reload:()=>reloads++},setTimeout:()=>1,Promise,GES_PASCO_VERSION:'1.0.9'};context.window=context;vm.runInNewContext(fs.readFileSync('updates.js','utf8'),context);
+ const context={console,navigator:{onLine:true,serviceWorker:{addEventListener:(n,f)=>handlers[n]=f,async register(url,options){assert.equal(options.updateViaCache,'none');return registration;}}},document:{getElementById:id=>elements[id],querySelectorAll:()=>[]},location:{reload:()=>reloads++},setTimeout:()=>1,Promise,GES_PASCO_VERSION:'1.0.9'};context.window=context;vm.runInNewContext(fs.readFileSync('updates.js','utf8'),context);
  return {elements,handlers,registration,context,get reloads(){return reloads;},get checks(){return checks;}};
 }
 test('checking offline avoids network and reports connection requirement',async()=>{const s=setup();await Promise.resolve();s.context.navigator.onLine=false;await s.elements.checkUpdatesBtn.click();assert.equal(s.checks,0);assert.match(s.elements.updateStatus.textContent,/Connect/);});

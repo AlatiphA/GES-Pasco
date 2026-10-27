@@ -43,6 +43,8 @@
     profileMenu.hidden = !open;
     profileBackdrop.hidden = !open;
     profileBtn.setAttribute("aria-expanded", String(open));
+    if (open) document.getElementById("profileClose").focus();
+    else profileBtn.focus();
   }
 
   function renderProfile(profile, user) {
@@ -94,9 +96,18 @@
     event.stopPropagation();
     setProfileMenu(profileMenu.hidden);
   });
+  document.getElementById("profileClose").addEventListener("click", () => setProfileMenu(false));
   profileBackdrop.addEventListener("click", () => setProfileMenu(false));
   document.addEventListener("keydown", event => {
+    if (profileMenu.hidden) return;
     if (event.key === "Escape") setProfileMenu(false);
+    if (event.key === "Tab") {
+      const controls = Array.from(profileMenu.querySelectorAll('button:not([disabled]), summary, [tabindex="0"]'))
+        .filter(el => el.getClientRects().length);
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
   });
 
   function showMessage(message, type = "error") {

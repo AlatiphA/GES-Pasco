@@ -4,7 +4,7 @@ GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptit
 
 ## Current build
 
-- Unified release: **v1.0.10** (reader and service-worker cache).
+- Unified release: **v1.0.11** (reader and service-worker cache).
 - Single version source: `version.js`. Change its value for every release, including cache-only updates.
 - Account menu: **Check for updates** finds a waiting release; **Install update** activates it and reloads the app. Local reading data is preserved.
 - Firebase Authentication and Firestore synchronization are included; Firebase Storage is not initialized.
