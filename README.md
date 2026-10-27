@@ -115,3 +115,12 @@ Installed PWA users can refresh by pulling downward from the top edge of the rea
 - Pull-to-refresh remains enabled.
 - Previous/next horizontal swipes and middle-tap header/footer toggle are preserved.
 - Service worker cache version: v1.0.17.
+
+
+## v1.0.8 account isolation and durable sync (cache v1.0.20)
+
+Reading position, bookmarks, and reader preferences are now stored separately per Firebase account. Existing unassigned data is retained; the app asks before importing it into an account. Cancel leaves that data unassigned. Sync status and Retry are available in the account menu. Pending changes survive a restart and retry on reconnection; bookmark deletions use durable tombstones instead of deleting whole remote sets.
+
+Deploy the included firestore.rules together with this app. The rules accept legacy bookmark writes without deleted and validate deleted as a boolean when present. Publish these transition rules before releasing the reader. Existing records remain readable. Refresh all devices to v1.0.8 after release: older readers do not understand tombstones and can show or reintroduce deleted bookmarks. Do not roll back the reader without also reviewing these rules. No Firebase project configuration changes are required.
+
+Validation: node --test tests/sync.test.cjs. Tests use an in-memory Firestore substitute; they do not replace Firebase emulator or mobile browser testing. Before release, test two accounts on one browser, two devices adding/deleting bookmarks offline, airplane-mode restart, and pinch/swipe/footer/pull-to-refresh on a phone.

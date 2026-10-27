@@ -23,6 +23,8 @@
   const profileAvatarImage = document.getElementById("profileAvatarImage");
   const profileMenuAvatarImage = document.getElementById("profileMenuAvatarImage");
   let readerLoaded = false;
+  let loadedUid = null;
+  let authEpoch = 0;
   let signupInProgress = false;
   const googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
@@ -279,6 +281,8 @@
     let initialAuthResolved = false;
 
     gesPascoAuth.onAuthStateChanged(async user => {
+      const epoch = ++authEpoch;
+      if (readerLoaded && loadedUid !== (user?.uid || null)) { window.gesPascoReaderSync.clearUser(); location.reload(); return; }
       // Firebase calls this observer only after it has restored the persisted
       // session. Until this first callback, show only the neutral startup gate.
       if (!initialAuthResolved) {
@@ -307,9 +311,12 @@
 
         // Resolve the newest reading position before app.js starts. This lets
         // another device resume from Firestore without changing EPUB startup.
+        if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
         if (window.gesPascoReaderSync) {
           await window.gesPascoReaderSync.prepare(user);
         }
+        if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
+        loadedUid = user.uid;
         loadReaderOnce();
       } else {
         if (window.gesPascoReaderSync) window.gesPascoReaderSync.clearUser();
