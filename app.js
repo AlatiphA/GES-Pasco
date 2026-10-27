@@ -44,10 +44,12 @@ if (clearCacheBtn) {
       "reader-theme",
       "isSupporter",
       "gespasco_install_dismissed"
-    ].forEach(key => localStorage.removeItem(key));
+    ].forEach(key => window.gesPascoStorage.removeItem(key));
+
+    window.gesPascoReaderSync.resetLocal();
 
     caches.keys().then(names => {
-      names.forEach(name => caches.delete(name));
+      names.filter(name => name.startsWith("alatipha-ges-pasco-")).forEach(name => caches.delete(name));
     });
 
     alert("App data cleared. The app will now reload.");
@@ -156,13 +158,13 @@ let controlsVisible =
 
 let fontSize =
   Number(
-    localStorage.getItem(
+    window.gesPascoStorage.getItem(
       "fontSize"
     )
   ) || 100;
 
 let fontFamily =
-  localStorage.getItem("fontFamily") ||
+  window.gesPascoStorage.getItem("fontFamily") ||
   "serif";
 
 
@@ -170,7 +172,7 @@ let fontFamily =
    APP VERSION
    Change this on every release
 ========================= */
-const APP_VERSION = "1.0.7";
+const APP_VERSION = "1.0.8";
 
 const versionEl =
   document.getElementById(
@@ -241,7 +243,7 @@ function isValidSupporterKey(key) {
 }
 
 function isSupporter() {
-  return localStorage.getItem("isSupporter") === "true";
+  return window.gesPascoStorage.getItem("isSupporter") === "true";
 }
 
 function applySupporterUI() {
@@ -284,7 +286,7 @@ if (supporterKeySubmit) {
   supporterKeySubmit.addEventListener("click", () => {
     const key = supporterKeyInput.value;
     if (isValidSupporterKey(key)) {
-      localStorage.setItem("isSupporter", "true");
+      window.gesPascoStorage.setItem("isSupporter", "true");
       supporterKeyModal.classList.remove("open");
       applySupporterUI();
     } else {
@@ -310,7 +312,7 @@ function saveReaderData(
 
   try {
 
-    localStorage.setItem(
+    window.gesPascoStorage.setItem(
 
       READER_DATA_KEY,
 
@@ -345,7 +347,7 @@ function loadReaderData() {
   try {
 
     const saved =
-      localStorage.getItem(
+      window.gesPascoStorage.getItem(
         READER_DATA_KEY
       );
 
@@ -389,7 +391,7 @@ function saveBookmark() {
 
   const bookmarks =
     JSON.parse(
-      localStorage.getItem(
+      window.gesPascoStorage.getItem(
         BOOKMARKS_KEY
       ) || "[]"
     );
@@ -426,7 +428,7 @@ function saveBookmark() {
 
   });
 
-  localStorage.setItem(
+  window.gesPascoStorage.setItem(
     BOOKMARKS_KEY,
     JSON.stringify(
       bookmarks
@@ -477,7 +479,7 @@ function loadBookmarks() {
 
   const bookmarks =
     JSON.parse(
-      localStorage.getItem(
+      window.gesPascoStorage.getItem(
         BOOKMARKS_KEY
       ) || "[]"
     );
@@ -556,14 +558,14 @@ function loadBookmarks() {
 
           const all =
             JSON.parse(
-              localStorage.getItem(
+              window.gesPascoStorage.getItem(
                 BOOKMARKS_KEY
               ) || "[]"
             );
 
           all.splice(index, 1);
 
-          localStorage.setItem(
+          window.gesPascoStorage.setItem(
             BOOKMARKS_KEY,
             JSON.stringify(all)
           );
@@ -1086,7 +1088,7 @@ function startReader() {
       fontSize = nextSize;
       _pinchLastFontSize = nextSize;
       rendition.themes.fontSize(fontSize + "%");
-      localStorage.setItem("fontSize", fontSize);
+      window.gesPascoStorage.setItem("fontSize", fontSize);
     };
 
     doc.addEventListener("touchstart", e => {
@@ -1143,10 +1145,10 @@ function startReader() {
         if (e.touches && e.touches.length > 0) return;
         _pinchActive = false;
         _tx = _ty = null;
-        localStorage.setItem("fontSize", fontSize);
+        window.gesPascoStorage.setItem("fontSize", fontSize);
         if (window.gesPascoReaderSync) {
           window.gesPascoReaderSync.queuePreferences({
-            theme: localStorage.getItem("theme-v2") || "dark",
+            theme: window.gesPascoStorage.getItem("theme-v2") || "dark",
             fontSize: fontSize,
             fontFamily: fontFamily
           });
@@ -1652,12 +1654,12 @@ const THEMES = {
 function applyTheme(theme) {
 
   if (!theme) {
-    theme = localStorage.getItem(
+    theme = window.gesPascoStorage.getItem(
       "theme-v2"
     ) || "dark";
   }
 
-  localStorage.setItem(
+  window.gesPascoStorage.setItem(
     "theme-v2", theme
   );
 
@@ -2093,7 +2095,7 @@ const fontPickerBtn =
 
 function applyFont(font) {
   fontFamily = font;
-  localStorage.setItem("fontFamily", font);
+  window.gesPascoStorage.setItem("fontFamily", font);
 
   /* Mark active button */
   document.querySelectorAll(".fontOption")
@@ -2156,7 +2158,7 @@ document.querySelectorAll(".fontOption")
       applyFont(btn.dataset.font);
       if (window.gesPascoReaderSync) {
         window.gesPascoReaderSync.queuePreferences({
-          theme: localStorage.getItem("theme-v2") || "dark",
+          theme: window.gesPascoStorage.getItem("theme-v2") || "dark",
           fontSize: fontSize,
           fontFamily: fontFamily
         });
@@ -2222,14 +2224,14 @@ bottomDecreaseFont.addEventListener(
       fontSize + "%"
     );
 
-    localStorage.setItem(
+    window.gesPascoStorage.setItem(
       "fontSize",
       fontSize
     );
 
     if (window.gesPascoReaderSync) {
       window.gesPascoReaderSync.queuePreferences({
-        theme: localStorage.getItem("theme-v2") || "dark",
+        theme: window.gesPascoStorage.getItem("theme-v2") || "dark",
         fontSize: fontSize,
         fontFamily: fontFamily
       });
@@ -2248,14 +2250,14 @@ bottomIncreaseFont.addEventListener(
       fontSize + "%"
     );
 
-    localStorage.setItem(
+    window.gesPascoStorage.setItem(
       "fontSize",
       fontSize
     );
 
     if (window.gesPascoReaderSync) {
       window.gesPascoReaderSync.queuePreferences({
-        theme: localStorage.getItem("theme-v2") || "dark",
+        theme: window.gesPascoStorage.getItem("theme-v2") || "dark",
         fontSize: fontSize,
         fontFamily: fontFamily
       });
@@ -2496,3 +2498,5 @@ document.addEventListener("touchend", e => {
 
 loadBook();
 
+
+window.addEventListener("ges-pasco-bookmarks-updated", loadBookmarks);
