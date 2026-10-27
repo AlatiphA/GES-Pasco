@@ -314,7 +314,8 @@
         authGate.hidden = true;
         readerApp.hidden = false;
         try {
-          await loadUserProfile(user);
+          if (navigator.onLine === false) renderProfile({}, user);
+          else await loadUserProfile(user);
         } catch (error) {
           console.error("Could not load user profile:", error);
           renderProfile({}, user);

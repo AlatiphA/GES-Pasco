@@ -16,6 +16,7 @@ const FILES_TO_CACHE = [
   "./version.js",
   "./updates.js",
   "./ui-theme.js",
+  "./offline-reader.js",
   "./firebase-config.js",
   "./firestore-data.js",
   "./auth.js",
@@ -27,7 +28,47 @@ const FILES_TO_CACHE = [
   "./icon-512.png",
   "./fonts/OpenSans-VariableFont_wdth_wght.ttf",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/webfonts/fa-solid-900.woff2",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
+  "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
+  "https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js",
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js",
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js",
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js",
 ];
+
+// Keep working copies until each replacement has downloaded successfully.
+let offlineJob = null;
+async function validBook(response) {
+  if (!response || !response.ok) return false;
+  const bytes = new Uint8Array(await response.clone().arrayBuffer());
+  return bytes.length > 100 && bytes[0] === 80 && bytes[1] === 75 && bytes[2] === 3 && bytes[3] === 4;
+}
+async function offlineStatus() {
+  const cache = await caches.open(CACHE_NAME);
+  const missing = [];
+  for (const url of FILES_TO_CACHE) {
+    const response = await cache.match(url);
+    if (!response || !response.ok || (url.endsWith('.epub') && !await validBook(response))) missing.push(url);
+  }
+  return {version:CACHE_VERSION, ready:missing.length === 0, missing:missing.length, total:FILES_TO_CACHE.length};
+}
+function prepareOffline() {
+  if (offlineJob) return offlineJob;
+  offlineJob = (async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const results = await Promise.allSettled(FILES_TO_CACHE.map(async url => {
+      const response = await fetch(new Request(url, {cache:'reload'}));
+      if (!response.ok || (url.endsWith('.epub') && !await validBook(response))) throw new Error('Incomplete download: '+url);
+      if (url === './version.js' && !(await response.clone().text()).includes('"'+globalThis.GES_PASCO_VERSION+'"')) throw new Error('A newer release is available. Install the app update before repairing downloads.');
+      return {url,response};
+    }));
+    if (results.some(result => result.status === 'rejected')) throw new Error('Required app files could not be cached. Connect and retry; existing copies are retained.');
+    for (const result of results) await cache.put(result.value.url, result.value.response);
+    return offlineStatus();
+  })().finally(() => {offlineJob = null;});
+  return offlineJob;
+}
 
 /* =========================
    INSTALL — cache app shell
@@ -35,30 +76,7 @@ const FILES_TO_CACHE = [
 
 self.addEventListener("install", event => {
 
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(async cache => {
-
-        // Local app files must finish caching before this release is ready.
-        // A failure on the optional CDN stylesheet does not block installation.
-        const results = await Promise.allSettled(
-          FILES_TO_CACHE.map(url => cache.add(new Request(url, {cache: "reload"})))
-        );
-
-        if (results.some((result, i) => result.status === "rejected" && FILES_TO_CACHE[i].startsWith("./"))) {
-          throw new Error("Required app files could not be cached; keeping the current release.");
-        }
-        results.forEach((result, i) => {
-          if (result.status === "rejected") {
-            console.warn(
-              "Precache failed for:",
-              FILES_TO_CACHE[i],
-              result.reason
-            );
-          }
-        });
-      })
-  );
+  event.waitUntil(prepareOffline());
 
 });
 
@@ -108,6 +126,7 @@ self.addEventListener("fetch", event => {
     event.respondWith(
       fetch(event.request)
         .then(networkResponse => {
+          if (!networkResponse.ok) throw new Error('Download unavailable');
           const clone = networkResponse.clone();
           caches.open(CACHE_NAME)
             .then(cache => cache.put(event.request, clone));
@@ -125,13 +144,14 @@ self.addEventListener("fetch", event => {
           if (cached) return cached;
           return fetch(event.request)
             .then(networkResponse => {
-              const clone = networkResponse.clone();
+              if (!networkResponse.ok) throw new Error('Download unavailable');
+          const clone = networkResponse.clone();
               caches.open(CACHE_NAME)
                 .then(cache => cache.put(event.request, clone));
               return networkResponse;
             });
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(async () => event.request.mode === "navigate" ? (await caches.match("./index.html")) || Response.error() : Response.error())
     );
 
   }
@@ -144,6 +164,13 @@ self.addEventListener("fetch", event => {
 
 self.addEventListener("message", event => {
 
+  if (['OFFLINE_STATUS','PREPARE_OFFLINE'].includes(event.data) && event.ports[0]) {
+    const port = event.ports[0];
+    event.waitUntil((async () => {
+      try { port.postMessage(await (event.data === 'PREPARE_OFFLINE' ? prepareOffline() : offlineStatus())); }
+      catch (error) { port.postMessage({error:error.message}); }
+    })());
+  }
   if (event.data === "SKIP_WAITING") {
     self.skipWaiting();
   }

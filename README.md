@@ -4,7 +4,7 @@ GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptit
 
 ## Current build
 
-- Unified release: **v1.0.14** (reader and service-worker cache).
+- Unified release: **v1.0.15** (reader and service-worker cache).
 - Single version source: `version.js`. Change its value for every release, including cache-only updates.
 - Account menu: **Check for updates** finds a waiting release; **Install update** activates it and reloads the app. Local reading data is preserved.
 - Firebase Authentication and Firestore synchronization are included; Firebase Storage is not initialized.
@@ -123,3 +123,10 @@ Reading position, bookmarks, and reader preferences are now stored separately pe
 Deploy the included firestore.rules together with this app. The rules accept legacy bookmark writes without deleted and validate deleted as a boolean when present. Publish these transition rules before releasing the reader. Existing records remain readable. Refresh all devices to v1.0.8 after release: older readers do not understand tombstones and can show or reintroduce deleted bookmarks. Do not roll back the reader without also reviewing these rules. No Firebase project configuration changes are required.
 
 Validation: node --test tests/sync.test.cjs. Tests use an in-memory Firestore substitute; they do not replace Firebase emulator or mobile browser testing. Before release, test two accounts on one browser, two devices adding/deleting bookmarks offline, airplane-mode restart, and pinch/swipe/footer/pull-to-refresh on a phone.
+
+
+## Offline reader (v1.0.15)
+
+Account → Offline reading checks that the EPUB, app files, icon fonts, EPUB libraries and Firebase SDKs are saved in the active release cache. Download / repair fetches a complete set before replacing cached files; it never clears account data, bookmarks or reading progress. Sign in online first and keep the browser signed in. Signing in or resetting a password still requires internet. Browser storage eviction can remove downloads; check readiness before travelling.
+
+Verification includes simulated cache/network failure tests and checks of the external dependency URLs. Physical-device airplane-mode startup remains a release smoke test.
