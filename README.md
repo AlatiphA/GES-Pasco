@@ -4,7 +4,7 @@ GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptit
 
 ## Current build
 
-- Unified release: **v1.0.17** (reader and service-worker cache).
+- Unified release: **v1.0.18** (reader and service-worker cache).
 - Single version source: `version.js`. Change its value for every release, including cache-only updates.
 - Account menu: **Check for updates** finds a waiting release; **Install update** activates it and reloads the app. Local reading data is preserved.
 - Firebase Authentication and Firestore synchronization are included; Firebase Storage is not initialized.
@@ -113,7 +113,7 @@ Installed PWA users can refresh by pulling downward from the top edge of the rea
 - Restored the EPUB touch gesture timer used by swipe/tap navigation.
 - Pull-to-refresh remains enabled.
 - Previous/next horizontal swipes and middle-tap header/footer toggle are preserved.
-- Service worker cache version: v1.0.17.
+- Service worker cache version: v1.0.18.
 
 
 ## v1.0.8 account isolation and durable sync (cache v1.0.20)
@@ -125,15 +125,22 @@ Deploy the included firestore.rules together with this app. The rules accept leg
 Validation: node --test tests/sync.test.cjs. Tests use an in-memory Firestore substitute; they do not replace Firebase emulator or mobile browser testing. Before release, test two accounts on one browser, two devices adding/deleting bookmarks offline, airplane-mode restart, and pinch/swipe/footer/pull-to-refresh on a phone.
 
 
-## Offline reader (v1.0.17)
+## Offline reader (v1.0.18)
 
 Account → Offline reading checks that the EPUB, app files, icon fonts, EPUB libraries and Firebase SDKs are saved in the active release cache. Download / repair fetches a complete set before replacing cached files; it never clears account data, bookmarks or reading progress. Sign in online first and keep the browser signed in. Signing in or resetting a password still requires internet. Browser storage eviction can remove downloads; check readiness before travelling.
 
 Verification includes simulated cache/network failure tests and checks of the external dependency URLs. Physical-device airplane-mode startup remains a release smoke test.
 
 
-## Practice tests (v1.0.17)
+## Practice tests (introduced v1.0.17)
 
 Open Practice tests from the sidebar or account panel. The bundled bank contains 662 multiple-choice questions across 15 Section A exam sets from the bundled GES Pasco EPUB. Only questions with exactly one clear bold-marked answer were imported; ambiguous markings and other question formats are excluded. Scoring follows the historical book, not an independent review of current policy. Source exam and question references appear in answer review. Rebuild the bank with `python tools/build-practice-bank.py`.
 
 Choose a question count and optional time limit (0 is untimed). Question and option order are randomized. Attempts save per account on this browser; a timed attempt keeps its deadline while closed. Results include unanswered questions, source references and mistake revision. Up to 20 result summaries remain locally; no results are uploaded to Firestore. Offline caching includes the bank and practice scripts. Clearing browser data removes these attempts and results.
+
+
+## Revision dashboard (v1.0.18)
+
+Open Revision dashboard from the sidebar, account panel, practice setup or results. It shows weighted accuracy, completed attempts, recent score trends and per-exam-set performance from up to 20 completed results on this browser. Unanswered questions count as incorrect. Comparisons use equally sized groups of up to 3 recent tests; repeated questions and mistake revision count again. The book has no detailed topic labels, so results are grouped by exam set rather than inferred subjects.
+
+New result records include question IDs and outcomes. The latest saved completed attempt can upgrade its old summary without double counting; older score-only summaries remain in totals. Missed-question practice uses the latest recorded outcome per question, so later correct answers remove a question from the mistake list. Practice and revision stay isolated by signed-in account and remain local; no Firestore schema or rules changes are required.

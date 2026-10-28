@@ -1658,3 +1658,24 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .practiceReview p {margin:10px 0;line-height:1.6;}
 .practiceSrOnly {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
 #practiceDialog button:focus-visible,.practiceOption:focus-within {outline:2px solid var(--ui-accent);outline-offset:2px;}
+
+/* Revision dashboard: readable summaries across mobile and desktop. */
+.revisionFilter {display:grid;gap:8px;font-size:14px;margin:18px 0;}
+.revisionFilter select {min-width:0;width:100%;min-height:44px;padding:10px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+.revisionStats {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 24px;}
+.revisionStat {padding:14px;background:var(--ui-raised);border:1px solid var(--ui-border);border-radius:12px;}
+.revisionStat span {display:block;font-size:12px;color:var(--ui-muted);line-height:1.5;}
+.revisionStat strong {display:block;font-size:24px;margin-top:8px;}
+.revisionGroup {padding:14px;border:1px solid var(--ui-border);border-radius:12px;margin:12px 0;}
+.revisionGroup h4 {font-size:14px;line-height:1.6;}
+.revisionGroup p {font-size:13px;margin:8px 0;}
+.revisionGroup progress {display:block;width:100%;height:8px;margin-top:12px;accent-color:var(--ui-accent);}
+.revisionTrend {list-style:none;padding:0;margin:14px 0 24px;display:grid;gap:8px;}
+.revisionTrend li {display:grid;grid-template-columns:44px minmax(30px,1fr) 90px;align-items:center;gap:12px;font-size:12px;}
+.revisionTrend progress {width:100%;height:8px;accent-color:var(--ui-accent);}
+.revisionTrend small {text-align:right;color:var(--ui-muted);}
+.revisionHistory {list-style:none;padding:0;display:grid;gap:10px;margin:14px 0;}
+.revisionHistory li {display:grid;gap:5px;padding:12px;border-bottom:1px solid var(--ui-border);font-size:13px;}
+.revisionHistory small {color:var(--ui-muted);}
+#practiceBody > h3 {margin-top:20px;font-size:17px;}
+@media(max-width:480px){.revisionStats {grid-template-columns:1fr;}.revisionStat {display:flex;justify-content:space-between;align-items:center;gap:12px;}.revisionStat strong {margin:0;font-size:22px;}}

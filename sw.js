@@ -23,6 +23,7 @@ const FILES_TO_CACHE = [
   "./account-settings.js",
   "./quiz-core.js",
   "./practice-tests.js",
+  "./revision-core.js",
   "./practice-bank.json",
   "./install.js",
   "./sw.js",
