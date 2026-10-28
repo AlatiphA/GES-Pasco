@@ -1679,3 +1679,12 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .revisionHistory small {color:var(--ui-muted);}
 #practiceBody > h3 {margin-top:20px;font-size:17px;}
 @media(max-width:480px){.revisionStats {grid-template-columns:1fr;}.revisionStat {display:flex;justify-content:space-between;align-items:center;gap:12px;}.revisionStat strong {margin:0;font-size:22px;}}
+
+/* Practice and revision entries align with the other account settings rows. */
+.practiceEntry {display:flex;align-items:center;gap:12px;}
+.practiceEntry > span {flex:1;text-align:left;}
+.practiceEntry > svg {color:inherit;}
+.practiceAccountEntry .practiceEntry {padding:12px 14px;font-size:15px;font-weight:500;line-height:1.4;}
+.practiceAccountEntry .practiceEntry + .practiceEntry {border-top:1px solid var(--ui-border);}
+.practiceEntry:hover {background:var(--ui-raised);}
+.practiceEntry:focus-visible {outline:2px solid var(--ui-accent);outline-offset:-3px;}

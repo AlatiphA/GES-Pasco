@@ -116,6 +116,11 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
+  // A release check must never fall back to a cached version file.
+  if (url.pathname.endsWith('/version.js') && url.searchParams.has('release-check')) {
+    event.respondWith(fetch(new Request(event.request, {cache:'no-store'})));
+    return;
+  }
   const isAppShell =
     url.pathname.endsWith(".html") ||
     url.pathname.endsWith(".css")  ||
