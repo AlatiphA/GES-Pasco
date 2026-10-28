@@ -1688,3 +1688,9 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .practiceAccountEntry .practiceEntry + .practiceEntry {border-top:1px solid var(--ui-border);}
 .practiceEntry:hover {background:var(--ui-raised);}
 .practiceEntry:focus-visible {outline:2px solid var(--ui-accent);outline-offset:-3px;}
+
+/* Original tests and current revision progress have distinct labels and totals. */
+.revisionStats {grid-template-columns:repeat(2,minmax(0,1fr));}
+.revisionStat small {display:block;font-size:12px;line-height:1.5;margin-top:8px;color:var(--ui-muted);}
+.revisionExplanation {padding:14px;border-left:3px solid var(--ui-accent);background:var(--ui-raised);font-size:13px;line-height:1.6;}
+@media(max-width:480px){.revisionStats {grid-template-columns:1fr;}.revisionStat {display:grid;grid-template-columns:minmax(0,1fr) auto;}.revisionStat small {grid-column:1 / -1;margin:0;}}

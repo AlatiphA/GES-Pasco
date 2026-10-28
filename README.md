@@ -4,7 +4,7 @@ GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptit
 
 ## Current build
 
-- Unified release: **v1.0.20** (reader and service-worker cache).
+- Unified release: **v1.0.21** (reader and service-worker cache).
 - Single version source: `version.js`. Change its value for every release, including cache-only updates.
 - Account menu: **Check for updates** finds a waiting release; **Install update** activates it and reloads the app. Local reading data is preserved.
 - Firebase Authentication and Firestore synchronization are included; Firebase Storage is not initialized.
@@ -149,3 +149,10 @@ New result records include question IDs and outcomes. The latest saved completed
 ## Update verification and menu icons (v1.0.20)
 
 Check for updates now fetches fresh release metadata from version.js with a unique query and no-store request. The service worker never serves a cached release-check response. The UI compares the running page, active worker and published release before saying up to date. An older page with newer active files offers Reload app; a waiting worker offers Install update. Failed verification does not claim the page is current. Practice tests and Revision dashboard use the same inline outline icon and chevron layout as the account settings rows.
+
+
+## Clear revision scoring (v1.0.21)
+
+The dashboard separates original test scores from revision sessions. Currently correct counts each unique question once, using its latest retained detailed outcome. Mistakes corrected counts questions that were previously incorrect/unanswered and are now correct. Original test accuracy and score trends exclude mistake-revision sessions; legacy revision attempts are identified by their existing title suffix. All original results and retry sessions remain in separate history lists.
+
+Example: a 9/10 test followed by a correct retry of its missed question shows 10/10 currently correct, 1 mistake corrected, 0 to revisit, and the unchanged original test score of 9/10 (90%). Legacy score-only results remain in test history but are not used to invent unique-question progress.
