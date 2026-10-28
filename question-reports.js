@@ -1,0 +1,42 @@
+/* Reports never change the practice bank or scores. Firestore rules enforce reviewer access. */
+(()=>{
+ const core=window.GESPascoReportsCore,db=firebase.firestore(),dialog=document.getElementById('reportsDialog'),body=document.getElementById('reportsBody'),status=document.getElementById('reportsStatus'),title=document.getElementById('reportsTitle');
+ let epoch=0,admin=false,cursor=null,mode='mine',loaded=[],busy=false;
+ const uid=()=>gesPascoAuth.currentUser?.uid||'';
+ const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
+ const button=(text,fn)=>{const b=node('button',text,'profileAction');b.type='button';b.onclick=fn;return b;};
+ const stamp=()=>firebase.firestore.FieldValue.serverTimestamp();
+ const outbox=core.outbox({storage:localStorage,currentUid:uid,send:async(row,stillOwner)=>{
+  const ref=db.collection('questionReports').doc(row.id),existing=await ref.get({source:'server'});if(!stillOwner())throw Error('Account changed.');
+  if(existing.exists){if(existing.data().reporterUid!==row.reporterUid)throw Error('Report ID conflict.');return;}
+  const {id,...data}=row;await ref.set({...data,status:'new',createdAt:stamp(),updatedAt:stamp(),reviewNote:'',reviewedBy:'',reviewedAt:null});
+ }});
+ function pendingMessage(){return navigator.onLine?'Pending on this device. Submission failed; check your connection or reporting setup and retry.':'Pending on this device. It will be submitted when you reconnect with this account.';}
+ async function flush(){if(!uid()||!navigator.onLine)return;try{await outbox.flush();}catch{/* Keep the durable outbox until the server acknowledges it. */}}
+ function show(heading){epoch++;title.textContent=heading;status.textContent='';body.replaceChildren();if(!dialog.open)dialog.showModal();}
+ function questionCard(q){const box=node('section',undefined,'reportCard');box.append(node('strong',q.bankTitle),node('p',q.prompt));const opts=node('ol');for(const option of q.options)opts.append(node('li',option));box.append(opts,node('p','Book answer: '+q.options[q.answerIndex]),node('small',q.source));return box;}
+ function field(form,label,input){const wrap=node('label',label);wrap.append(input);form.append(wrap);return input;}
+ function open(question){if(!uid())return;const owner=uid(),q=JSON.parse(JSON.stringify(question));if(!core.validQuestion(q))return;show('Report a question');const token=epoch;body.append(questionCard(q),node('p','Tell us what needs checking. Reporting does not change the book answer or your score.','practiceMuted'));
+  const form=node('form',undefined,'reportForm'),category=node('select');for(const [value,label] of Object.entries(core.categories)){const option=node('option',label);option.value=value;category.append(option);}field(form,'Issue',category);
+  const description=field(form,'What needs checking?',node('textarea'));description.required=true;description.maxLength=2000;description.rows=4;
+  const suggestion=field(form,'Suggested correction (optional)',node('textarea'));suggestion.maxLength=2000;suggestion.rows=3;
+  const submit=node('button','Submit report','profileAction profileActionPrimary');submit.type='submit';form.append(submit);body.append(form);
+  form.onsubmit=async e=>{e.preventDefault();if(submit.disabled||uid()!==owner)return;try{const row=core.create(owner,q,category.value,description.value,suggestion.value,globalThis.GES_PASCO_VERSION,crypto.randomUUID());outbox.enqueue(row);submit.disabled=true;body.replaceChildren(node('p','Saved on this device. Submitting…'));await flush();if(epoch!==token||uid()!==owner)return;status.textContent=outbox.list(owner).some(r=>r.id===row.id)?pendingMessage():'Submitted. A reviewer will check this question.';body.replaceChildren(button('My question reports',()=>list('mine')));}catch(error){if(epoch===token)status.textContent=error.message;}};
+ }
+ function render(){body.replaceChildren();if(mode==='mine'){let pending=[];try{pending=outbox.list(uid());}catch(e){status.textContent=e.message;}if(pending.length){body.append(node('h3','Pending on this device'),node('p','These reports have not reached a reviewer yet. Keep this browser data until they are submitted.','practiceMuted'),button('Retry pending reports',async()=>{if(busy)return;busy=true;await flush();busy=false;list('mine');}));for(const r of pending)body.append(node('p',core.categories[r.category]+' — '+r.question.prompt));}}
+  body.append(node('p',mode==='review'?'Review saved reports. Responses below are visible to the reporter. Mark Corrected only after the correction has been published.':'Submitted reports and reviewer responses appear below.','practiceMuted'));
+  for(const row of loaded){const r=row.data,card=node('details',undefined,'reportCard');card.append(node('summary',(core.statuses[r.status]||r.status)+' — '+r.question.prompt));card.append(questionCard(r.question),node('p','Issue: '+core.categories[r.category]),node('p',r.description));if(r.suggestion)card.append(node('p','Suggested correction: '+r.suggestion));if(r.reviewNote)card.append(node('p','Reviewer response: '+r.reviewNote));if(mode==='review'){
+   const form=node('form',undefined,'reportForm'),select=node('select');for(const [value,label] of Object.entries(core.statuses)){const option=node('option',label);option.value=value;select.append(option);}select.value=r.status;field(form,'Review status',select);const note=field(form,'Response to reporter',node('textarea'));note.value=r.reviewNote||'';note.maxLength=2000;note.rows=3;const save=node('button','Save review','profileAction');save.type='submit';form.append(save);const owner=uid(),token=epoch;
+   form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{if(!admin||owner!==uid())throw Error('Reviewer session changed.');await db.collection('questionReports').doc(row.id).update({status:select.value,reviewNote:note.value.trim(),reviewedBy:owner,reviewedAt:stamp(),updatedAt:stamp()});if(token===epoch){status.textContent='Review saved.';r.status=select.value;r.reviewNote=note.value.trim();render();}}catch{if(token===epoch){status.textContent='Review could not be saved. Check your connection and reviewer access.';save.disabled=false;}}};card.append(form);
+  }body.append(card);}
+  if(!loaded.length)body.append(node('p','No submitted reports loaded.'));if(cursor)body.append(button('Load more reports',()=>fetchPage(false)));
+ }
+ async function fetchPage(first){const token=epoch,owner=uid();if(busy)return;busy=true;status.textContent='Loading reports…';try{let query=db.collection('questionReports');if(mode!=='review')query=query.where('reporterUid','==',owner);query=query.limit(50);if(!first&&cursor)query=query.startAfter(cursor);const snap=await query.get({source:'server'});if(token!==epoch||uid()!==owner)return;cursor=snap.size===50?snap.docs[snap.docs.length-1]:null;loaded.push(...snap.docs.map(d=>({id:d.id,data:d.data()})));status.textContent='Showing '+loaded.length+' submitted report(s).'+(cursor?' Load more to see additional reports.':'');render();}catch{if(token===epoch){status.textContent='Submitted reports are unavailable. Connect to the internet and check reporting access.';render();}}finally{if(token===epoch)busy=false;}}
+ function list(view='mine'){if(!uid()||(view==='review'&&!admin))return;mode=view;cursor=null;loaded=[];show(view==='review'?'Review question reports':'My question reports');busy=false;render();fetchPage(true);}
+ window.GESPascoReports={open,list};
+ document.querySelectorAll('[data-open-reports]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();list('mine');}));
+ document.getElementById('reviewReportsEntry').onclick=e=>{e.preventDefault();e.stopPropagation();list('review');};
+ function close(){epoch++;dialog.close();}document.getElementById('reportsClose').onclick=close;dialog.addEventListener('cancel',e=>{e.preventDefault();e.stopPropagation();close();});
+ gesPascoAuth.onAuthStateChanged(async user=>{epoch++;admin=false;document.getElementById('reviewReportsEntry').hidden=true;if(dialog.open)dialog.close();if(!user)return;flush();try{const doc=await db.collection('reportAdmins').doc(user.uid).get({source:'server'});if(uid()!==user.uid)return;admin=doc.exists&&doc.data().active===true;document.getElementById('reviewReportsEntry').hidden=!admin;}catch{/* No reviewer access while offline or before rules are installed. */}});
+ window.addEventListener('online',flush);
+})();

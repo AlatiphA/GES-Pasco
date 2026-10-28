@@ -98,6 +98,63 @@ service cloud.firestore {
              && request.resource.data.updatedAt is timestamp;
     }
 
+    // Reviewer access is granted only through the trusted Firebase Console/Admin SDK.
+    function isReportAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/reportAdmins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/reportAdmins/$(request.auth.uid)).data.active == true;
+    }
+    function reportText(value, maximum) { return value is string && value.size() <= maximum; }
+    function validQuestionSnapshot(q) {
+      return q is map
+        && q.keys().hasOnly(['id','bankId','bankTitle','prompt','options','answerIndex','source'])
+        && q.keys().hasAll(['id','bankId','bankTitle','prompt','options','answerIndex','source'])
+        && reportText(q.id,180) && q.id.size() > 0
+        && reportText(q.bankId,100) && q.bankId.size() > 0
+        && reportText(q.bankTitle,200) && q.bankTitle.size() > 0
+        && reportText(q.prompt,6000) && q.prompt.size() > 0
+        && reportText(q.source,1000) && q.source.size() > 0
+        && q.options is list && q.options.size() >= 2 && q.options.size() <= 6
+        && reportText(q.options[0],1500) && reportText(q.options[1],1500)
+        && (q.options.size() < 3 || reportText(q.options[2],1500))
+        && (q.options.size() < 4 || reportText(q.options[3],1500))
+        && (q.options.size() < 5 || reportText(q.options[4],1500))
+        && (q.options.size() < 6 || reportText(q.options[5],1500))
+        && q.answerIndex is int && q.answerIndex >= 0 && q.answerIndex < q.options.size();
+    }
+    function validQuestionReport() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['reporterUid','question','category','description','suggestion','status','createdAt','updatedAt','reviewNote','reviewedBy','reviewedAt','appVersion','queuedAtMs'])
+        && d.keys().hasAll(['reporterUid','question','category','description','suggestion','status','createdAt','updatedAt','reviewNote','reviewedBy','reviewedAt','appVersion','queuedAtMs'])
+        && d.reporterUid == request.auth.uid && validQuestionSnapshot(d.question)
+        && d.category in ['wrong_answer','unclear','typo','missing_content','other']
+        && reportText(d.description,2000) && d.description.size() > 0
+        && reportText(d.suggestion,2000) && d.status == 'new'
+        && d.createdAt == request.time && d.updatedAt == request.time
+        && d.reviewNote == '' && d.reviewedBy == '' && d.reviewedAt == null
+        && reportText(d.appVersion,40)
+        && d.queuedAtMs is int && d.queuedAtMs > 0 && d.queuedAtMs < 1000000000000000;
+    }
+    match /reportAdmins/{adminUid} {
+      allow get: if isOwner(adminUid);
+      allow list, create, update, delete: if false;
+    }
+    match /questionReports/{reportId} {
+      allow create: if signedIn() && validQuestionReport();
+      // An absent random-ID document contains no private data; clients check it for retry idempotency.
+      allow get: if signedIn() && (!exists(/databases/$(database)/documents/questionReports/$(reportId))
+        || isReportAdmin() || resource.data.reporterUid == request.auth.uid);
+      allow list: if signedIn() && (isReportAdmin() || resource.data.reporterUid == request.auth.uid);
+      allow update: if isReportAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewNote','reviewedBy','reviewedAt','updatedAt'])
+        && request.resource.data.status in ['new','under_review','corrected','closed']
+        && reportText(request.resource.data.reviewNote,2000)
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.reviewedAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
     match /users/{userId} {
       allow create: if isOwner(userId) && validProfileShape();
       allow read: if isOwner(userId);

@@ -1694,3 +1694,14 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .revisionStat small {display:block;font-size:12px;line-height:1.5;margin-top:8px;color:var(--ui-muted);}
 .revisionExplanation {padding:14px;border-left:3px solid var(--ui-accent);background:var(--ui-raised);font-size:13px;line-height:1.6;}
 @media(max-width:480px){.revisionStats {grid-template-columns:1fr;}.revisionStat {display:grid;grid-template-columns:minmax(0,1fr) auto;}.revisionStat small {grid-column:1 / -1;margin:0;}}
+
+/* Question reporting shares the practice surfaces and controls. */
+#reportsDialog { width:min(720px,calc(100vw - 24px)); max-height:90dvh; overflow:auto; padding:24px; box-sizing:border-box; border:1px solid var(--ui-border); border-radius:18px; background:var(--ui-surface); color:var(--ui-text); }
+#reportsDialog::backdrop { background:rgba(0,0,0,.48); }
+.reportForm { display:grid; gap:16px; margin-top:16px; }
+.reportForm label { display:grid; gap:8px; }
+.reportForm :is(select,textarea) { width:100%; box-sizing:border-box; padding:12px; border:1px solid var(--ui-border); border-radius:8px; background:var(--ui-surface); color:var(--ui-text); font:inherit; }
+.reportCard { padding:16px; margin:12px 0; border:1px solid var(--ui-border); border-radius:12px; overflow-wrap:anywhere; }
+.reportCard summary { cursor:pointer; font-weight:600; }
+#reportsClose { background:none; border:0; color:inherit; font-size:28px; cursor:pointer; }
+#reviewReportsEntry[hidden] { display:none; }
