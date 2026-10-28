@@ -134,7 +134,7 @@ self.addEventListener("fetch", event => {
     /* Network-first: always try to get the freshest
        app shell, fall back to cache if offline */
     event.respondWith(
-      fetch(event.request)
+      fetch(new Request(event.request, {cache:'no-store'}))
         .then(networkResponse => {
           if (!networkResponse.ok) throw new Error('Download unavailable');
           const clone = networkResponse.clone();

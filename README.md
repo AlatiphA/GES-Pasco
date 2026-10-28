@@ -4,7 +4,7 @@ GES Pasco is a mobile-first, installable EPUB reader PWA for GES Promotion Aptit
 
 ## Current build
 
-- Unified release: **v1.0.19** (reader and service-worker cache).
+- Unified release: **v1.0.20** (reader and service-worker cache).
 - Single version source: `version.js`. Change its value for every release, including cache-only updates.
 - Account menu: **Check for updates** finds a waiting release; **Install update** activates it and reloads the app. Local reading data is preserved.
 - Firebase Authentication and Firestore synchronization are included; Firebase Storage is not initialized.
@@ -146,6 +146,6 @@ Open Revision dashboard from the sidebar, account panel, practice setup or resul
 New result records include question IDs and outcomes. The latest saved completed attempt can upgrade its old summary without double counting; older score-only summaries remain in totals. Missed-question practice uses the latest recorded outcome per question, so later correct answers remove a question from the mistake list. Practice and revision stay isolated by signed-in account and remain local; no Firestore schema or rules changes are required.
 
 
-## Update verification and menu icons (v1.0.19)
+## Update verification and menu icons (v1.0.20)
 
 Check for updates now fetches fresh release metadata from version.js with a unique query and no-store request. The service worker never serves a cached release-check response. The UI compares the running page, active worker and published release before saying up to date. An older page with newer active files offers Reload app; a waiting worker offers Install update. Failed verification does not claim the page is current. Practice tests and Revision dashboard use the same inline outline icon and chevron layout as the account settings rows.
