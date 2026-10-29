@@ -1848,3 +1848,13 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .authSupport strong {color:#2a211a;}
 .authPageFooter .authCopyright {margin-top:22px;font-size:12px;color:#776d64;}
 @media(max-width:720px){.authGate {gap:16px;}.authGate .authShell {margin-top:0;}.authPageFooter {padding:8px 20px 28px;}}
+
+/* A more compact mobile sign-in banner leaves room for the form and footer. */
+@media(max-width:720px){
+ .authGate .authShell {min-height:0;}
+ .authGate .authHero {min-height:145px;padding:18px 20px;}
+ .authGate .authLogo {width:56px;height:56px;border-radius:15px;}
+ .authGate .authHeroText {margin-top:10px;}
+ .authGate .authHero h1 {font-size:1.4rem;}
+ .authGate .authHero p {font-size:.8rem;}
+}
