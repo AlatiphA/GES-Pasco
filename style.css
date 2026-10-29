@@ -1832,3 +1832,19 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .profileMenu .profileLogout {background:var(--account-raised);border-color:var(--account-line);color:var(--account-text);}
 .profileMenu .profileLogout:hover {background:var(--ui-selected);color:var(--account-text);}
 @media(max-width:600px){.profileMenu .profileBody {padding:12px;}.profileSettings > details > summary,.profileSettings > .practiceEntry {padding:13px 14px;}}
+
+/* Keep the sign-in palette and controls; centre only the requested introduction. */
+#loginForm .authHeading {text-align:center;}
+.authGate {position:fixed;inset:0;z-index:10000;height:100dvh;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;align-items:center;gap:24px;}
+.authGate .authShell {flex-shrink:0;margin-top:auto;}
+.authPageFooter {flex-shrink:0;max-width:900px;width:100%;padding:8px 24px 28px;margin-bottom:auto;text-align:center;color:#4b4138;font-size:14px;line-height:1.7;}
+.authPageFooter > strong {font-size:17px;color:#2a211a;}
+.authPageFooter > p {margin-top:10px;}
+.authPageFooter nav {display:flex;justify-content:center;flex-wrap:wrap;gap:12px 22px;margin:22px 0;}
+.authPageFooter a {color:#776d64;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;}
+.authPageFooter a:hover {color:#956433;}
+.authPageFooter a:focus-visible {outline:2px solid #956433;outline-offset:4px;}
+.authSupport {display:grid;justify-items:center;gap:8px;}
+.authSupport strong {color:#2a211a;}
+.authPageFooter .authCopyright {margin-top:22px;font-size:12px;color:#776d64;}
+@media(max-width:720px){.authGate {gap:16px;}.authGate .authShell {margin-top:0;}.authPageFooter {padding:8px 20px 28px;}}
