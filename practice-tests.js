@@ -6,7 +6,7 @@
  const key=type=>'ges-pasco-practice-'+owner+'-'+type;
  function read(type,fallback){try{return JSON.parse(localStorage.getItem(key(type)))??fallback;}catch{return fallback;}}
  function write(type,value){try{localStorage.setItem(key(type),JSON.stringify(value));return true;}catch{storageProblem=true;status.textContent='Device storage is full or unavailable. This attempt cannot be saved until space is available.';return false;}}
- function persist(){if(attempt&&owner&&gesPascoAuth.currentUser?.uid===owner)write('attempt',attempt);}
+ function persist(){if(window.GESPascoDataAccounts?.operationFor(owner))return;if(attempt&&owner&&gesPascoAuth.currentUser?.uid===owner)write('attempt',attempt);}
  function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
  function button(text,action,cls='profileAction'){const b=node('button',text,cls);b.type='button';b.onclick=action;return b;}
  function resetBody(){body.replaceChildren();status.textContent=storageProblem?'Device storage is unavailable. This attempt is not saved.':'';}

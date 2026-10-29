@@ -23,41 +23,6 @@ const sidebar =
     "sidebar"
   );
 
-const clearCacheBtn =
-  document.getElementById(
-    "clearCacheBtn"
-  );
-
-if (clearCacheBtn) {
-  clearCacheBtn.addEventListener("click", () => {
-
-    if (!confirm("Clear all app data?\n\nThis will reset bookmarks, themes, and cached files.")) return;
-
-    // Clear only GES Pasco reader data. Do not wipe unrelated
-    // localStorage entries from the same origin.
-    [
-      "ges-pasco-data",
-      "ges-pasco-bookmarks",
-      "fontSize",
-      "fontFamily",
-      "theme-v2",
-      "reader-theme",
-      "isSupporter",
-      "gespasco_install_dismissed"
-    ].forEach(key => window.gesPascoStorage.removeItem(key));
-
-    window.gesPascoReaderSync.resetLocal();
-
-    caches.keys().then(names => {
-      names.filter(name => name.startsWith("alatipha-ges-pasco-")).forEach(name => caches.delete(name));
-    });
-
-    alert("App data cleared. The app will now reload.");
-    location.reload();
-
-  });
-}
-
 const bookmarkBtn =
   document.getElementById(
     "bookmarkBtn"
@@ -309,6 +274,7 @@ const BOOKMARKS_KEY =
 function saveReaderData(
   data
 ) {
+  if(window.GESPascoDataAccounts?.operationFor(gesPascoAuth.currentUser?.uid))return;
 
   try {
 

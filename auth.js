@@ -298,7 +298,7 @@
 
     gesPascoAuth.onAuthStateChanged(async user => {
       const epoch = ++authEpoch;
-      if (readerLoaded && loadedUid !== (user?.uid || null)) { window.gesPascoReaderSync.clearUser(); location.reload(); return; }
+      if (readerLoaded && loadedUid !== (user?.uid || null)) { window.gesPascoReaderSync.clearUser(); if(user||!window.GESPascoDataAccounts?.operationFor(loadedUid))location.reload(); return; }
       // Firebase calls this observer only after it has restored the persisted
       // session. Until this first callback, show only the neutral startup gate.
       if (!initialAuthResolved) {
@@ -316,6 +316,10 @@
       }
 
       if (user) {
+        if(await window.GESPascoDataAccounts?.deleting(user)) {
+          if(epoch!==authEpoch||gesPascoAuth.currentUser?.uid!==user.uid)return;
+          authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);return;
+        }
         authGate.hidden = true;
         readerApp.hidden = false;
         try {

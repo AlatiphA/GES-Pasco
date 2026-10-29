@@ -3,11 +3,28 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() {
-      return request.auth != null;
+      return request.auth != null && !exists(/databases/$(database)/documents/accountDeletions/$(request.auth.uid));
     }
 
     function isOwner(userId) {
-      return signedIn() && request.auth.uid == userId;
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function deletingAccount() {
+      return request.auth != null && exists(/databases/$(database)/documents/accountDeletions/$(request.auth.uid));
+    }
+    match /accountDeletions/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.auth.token.keys().hasAll(['auth_time'])
+        && request.auth.token.auth_time is int
+        && request.auth.token.auth_time > request.time.toMillis() / 1000 - 300
+        && request.auth.token.auth_time <= request.time.toMillis() / 1000 + 60
+        && request.resource.data.keys().hasOnly(['uid','requestedAt'])
+        && request.resource.data.keys().hasAll(['uid','requestedAt'])
+        && request.resource.data.uid == userId
+        && request.resource.data.requestedAt == request.time;
+      allow list, update, delete: if false;
     }
 
     function validProfileShape() {
@@ -137,14 +154,15 @@ service cloud.firestore {
     }
     match /reportAdmins/{adminUid} {
       allow get: if isOwner(adminUid);
-      allow list, create, update, delete: if false;
+      allow delete: if isOwner(adminUid) && deletingAccount();
+      allow list, create, update: if false;
     }
     match /questionReports/{reportId} {
       allow create: if signedIn() && validQuestionReport();
       // An absent random-ID document contains no private data; clients check it for retry idempotency.
       allow get: if signedIn() && (!exists(/databases/$(database)/documents/questionReports/$(reportId))
         || isReportAdmin() || resource.data.reporterUid == request.auth.uid);
-      allow list: if signedIn() && (isReportAdmin() || resource.data.reporterUid == request.auth.uid);
+      allow list: if isReportAdmin() || isOwner(resource.data.reporterUid);
       allow update: if isReportAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewNote','reviewedBy','reviewedAt','updatedAt'])
         && request.resource.data.status in ['new','under_review','corrected','closed']
@@ -152,7 +170,7 @@ service cloud.firestore {
         && request.resource.data.reviewedBy == request.auth.uid
         && request.resource.data.reviewedAt == request.time
         && request.resource.data.updatedAt == request.time;
-      allow delete: if false;
+      allow delete: if deletingAccount() && isOwner(resource.data.reporterUid);
     }
 
     match /announcements/{noticeId} {
@@ -170,6 +188,7 @@ service cloud.firestore {
     match /users/{userId}/notifications/{reportId} {
       allow read: if isOwner(userId);
       allow create, update: if isReportAdmin()
+        && !exists(/databases/$(database)/documents/accountDeletions/$(userId))
         && request.resource.data.keys().hasOnly(['reportId','body','status','updatedAt'])
         && request.resource.data.keys().hasAll(['reportId','body','status','updatedAt'])
         && request.resource.data.reportId == reportId
@@ -179,16 +198,16 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.reviewedBy == request.auth.uid
         && request.resource.data.body == getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.reviewNote
         && request.resource.data.status == getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.status;
-      allow delete: if false;
+      allow delete: if isOwner(userId) && deletingAccount();
     }
     match /users/{userId}/inboxReads/{noticeId} {
       allow read: if isOwner(userId);
-      allow create, update: if isOwner(userId)
+      allow create, update: if signedIn() && isOwner(userId)
         && request.resource.data.keys().hasOnly(['seenVersion'])
         && request.resource.data.keys().hasAll(['seenVersion'])
         && request.resource.data.seenVersion is int
         && request.resource.data.seenVersion >= 0;
-      allow delete: if false;
+      allow delete: if isOwner(userId) && deletingAccount();
     }
 
     // Quiz editors are trusted reviewers. All published content is readable by signed-in users;
@@ -230,32 +249,32 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow create: if isOwner(userId) && validProfileShape();
+      allow create: if signedIn() && isOwner(userId) && validProfileShape();
       allow read: if isOwner(userId);
 
       // Ordinary users may refresh their own name/email/login timestamp,
       // but cannot change role, accountStatus or createdAt.
-      allow update: if isOwner(userId)
+      allow update: if signedIn() && isOwner(userId)
                     && validProfileShape()
                     && adminFieldsUnchanged();
 
-      allow delete: if false;
+      allow delete: if isOwner(userId) && deletingAccount();
 
       match /readerData/default {
         allow read: if isOwner(userId);
-        allow create, update: if isOwner(userId) && validPosition();
-        allow delete: if false;
+        allow create, update: if signedIn() && isOwner(userId) && validPosition();
+        allow delete: if isOwner(userId) && deletingAccount();
       }
 
       match /readerData/preferences {
         allow read: if isOwner(userId);
-        allow create, update: if isOwner(userId) && validPreferences();
-        allow delete: if false;
+        allow create, update: if signedIn() && isOwner(userId) && validPreferences();
+        allow delete: if isOwner(userId) && deletingAccount();
       }
 
       match /bookmarks/{bookmarkId} {
         allow read: if isOwner(userId);
-        allow create, update: if isOwner(userId) && validBookmark();
+        allow create, update: if signedIn() && isOwner(userId) && validBookmark();
         allow delete: if isOwner(userId);
       }
 

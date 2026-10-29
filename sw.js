@@ -23,6 +23,8 @@ const FILES_TO_CACHE = [
   "./firestore-data.js",
   "./auth.js",
   "./account-settings.js",
+  "./data-accounts-core.js",
+  "./data-accounts.js",
   "./quiz-core.js",
   "./quiz-admin-core.js",
   "./question-banks.js",
