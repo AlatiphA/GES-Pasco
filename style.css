@@ -1696,14 +1696,18 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 @media(max-width:480px){.revisionStats {grid-template-columns:1fr;}.revisionStat {display:grid;grid-template-columns:minmax(0,1fr) auto;}.revisionStat small {grid-column:1 / -1;margin:0;}}
 
 /* Question reporting shares the practice surfaces and controls. */
-#reportsDialog { width:min(720px,calc(100vw - 24px)); max-height:90dvh; overflow:auto; padding:24px; box-sizing:border-box; border:1px solid var(--ui-border); border-radius:18px; background:var(--ui-surface); color:var(--ui-text); }
+#reportsDialog {position:fixed;inset:0;margin:auto;width:min(740px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;padding:0;box-sizing:border-box;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);box-shadow:0 24px 80px #0004;--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
 #reportsDialog::backdrop { background:rgba(0,0,0,.48); }
 .reportForm { display:grid; gap:16px; margin-top:16px; }
 .reportForm label { display:grid; gap:8px; }
 .reportForm :is(select,textarea) { width:100%; box-sizing:border-box; padding:12px; border:1px solid var(--ui-border); border-radius:8px; background:var(--ui-surface); color:var(--ui-text); font:inherit; }
 .reportCard { padding:16px; margin:12px 0; border:1px solid var(--ui-border); border-radius:12px; overflow-wrap:anywhere; }
 .reportCard summary { cursor:pointer; font-weight:600; }
-#reportsClose { background:none; border:0; color:inherit; font-size:28px; cursor:pointer; }
+#reportsClose {width:44px;height:44px;flex-shrink:0;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+#reportsBody {padding:18px;}
+#reportsStatus:not(:empty) {padding:12px 18px 0;font-size:13px;line-height:1.6;color:var(--ui-muted);}
+#reportsDialog button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+#reportsClose:hover {background:var(--ui-raised);}
 #reviewReportsEntry[hidden] { display:none; }
 
 #inboxDialog {position:fixed;inset:0;margin:auto;width:min(600px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:0;border:1px solid var(--ui-border);border-radius:20px;background:var(--ui-surface);color:var(--ui-text);box-shadow:0 24px 80px rgba(0,0,0,.24);--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
