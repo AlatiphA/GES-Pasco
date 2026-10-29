@@ -1777,3 +1777,17 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .readerRecoveryBody {padding:20px;line-height:1.65;}
 #readerRecoveryStatus {font-size:13px;color:var(--ui-accent);}
 #readerRecoveryDialog button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+
+#userGuideDialog {position:fixed;inset:0;margin:auto;width:min(740px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:0;overflow:auto;overscroll-behavior:contain;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);}
+#userGuideDialog::backdrop {background:#0008;}
+#userGuideClose {width:44px;height:44px;flex-shrink:0;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+.guideSearch {padding:18px 20px 0;}
+.guideSearch label {display:block;font-size:14px;margin-bottom:8px;}
+#userGuideSearch {width:100%;padding:12px;border:1px solid var(--ui-border);border-radius:10px;background:var(--ui-raised);color:var(--ui-text);font:inherit;font-size:14px;}
+#userGuideStatus {margin-top:10px;font-size:13px;line-height:1.6;color:var(--ui-muted);}
+#userGuideBody {padding:16px 20px 20px;line-height:1.65;}
+.guideTopic {border:1px solid var(--ui-border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.guideTopic summary {padding:14px 16px;font-size:15px;font-weight:600;cursor:pointer;background:var(--ui-raised);}
+.guideTopic > div {padding:0 16px 14px;}
+.guideTopic p {margin-top:14px;font-size:14px;overflow-wrap:anywhere;}
+#userGuideDialog :is(button,input,summary):focus-visible {outline:2px solid var(--ui-accent);outline-offset:2px;}
