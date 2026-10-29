@@ -26,6 +26,7 @@ const FILES_TO_CACHE = [
   "./question-reports-core.js",
   "./question-reports.js",
   "./notifications.js",
+  "./reading-dashboard.js",
   "./revision-core.js",
   "./practice-bank.json",
   "./install.js",

@@ -1737,3 +1737,19 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 #inboxBody .inboxMessage small {display:block;font-size:12px;line-height:1.6;color:var(--ui-muted);margin:12px 0;}
 #inboxBody .inboxMessage .profileAction {margin:4px 8px 0 0;}
 @media(max-width:420px) {#inboxDialog .practiceHeader {padding:12px 16px;}#inboxStatus {padding:14px 16px 0;}#inboxBody {padding:0 16px 16px;}#inboxBody .practiceToolbar .profileActionPrimary {margin-inline-start:0;}.inboxEmpty {padding:24px 8px;}}
+
+/* Reading overview shares the centered, theme-aware account surfaces. */
+#readingDashboard {position:fixed;inset:0;margin:auto;width:min(620px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;padding:0;border:1px solid var(--ui-border);border-radius:20px;background:var(--ui-surface);color:var(--ui-text);box-shadow:0 24px 80px #0004;--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
+#readingDashboard::backdrop {background:#0008;}
+#readingDashboardClose {width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+#readingDashboardStatus {padding:16px 20px 0;font-size:13px;line-height:1.6;color:var(--ui-muted);}
+#readingDashboardBody {padding:20px;}
+.readingContinue {display:grid;gap:12px;padding:20px;margin-bottom:24px;border:1px solid var(--ui-border);border-radius:14px;background:var(--ui-raised);}
+.readingContinue h3 {font-size:20px;line-height:1.5;}
+.readingContinue .practiceMuted {margin:0;}
+.readingContinue progress {width:100%;height:8px;accent-color:var(--ui-accent);}
+.readingBookmarkList {list-style:none;display:grid;gap:10px;margin-top:14px;}
+.readingBookmarkList .profileAction {width:100%;text-align:start;font-size:14px;}
+.readingBookmarkList small {display:block;margin-top:6px;color:var(--ui-muted);font-size:12px;}
+.readingEmpty {padding:20px;border:1px dashed var(--ui-border);border-radius:12px;font-size:14px;line-height:1.6;color:var(--ui-muted);}
+#readingDashboard button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}

@@ -324,6 +324,7 @@ function saveReaderData(
     // queued separately so page turns remain instant and offline-safe.
     if (window.gesPascoReaderSync) {
       window.gesPascoReaderSync.queue(data);
+      window.dispatchEvent(new Event("ges-pasco-reading-updated"));
     }
 
   }
@@ -2481,3 +2482,23 @@ loadBook();
 
 
 window.addEventListener("ges-pasco-bookmarks-updated", loadBookmarks);
+
+/* Safe dashboard navigation into the existing reader, without a second reader instance. */
+window.GESPascoReading = {
+ async openLocation(uid,cfi) {
+  if(gesPascoAuth.currentUser?.uid!==uid)throw Error('Your account changed. Reopen the reading dashboard.');
+  if(!rendition || typeof cfi!=='string' || !cfi.startsWith('epubcfi('))throw Error('The reader is still loading. Try again in a moment.');
+  await rendition.display(cfi);
+  if(gesPascoAuth.currentUser?.uid===uid)this.showReader();
+ },
+ showReader() {
+  if(!document.getElementById('profileMenu').hidden)document.getElementById('profileClose').click();
+  closeSidebar();hideControls();
+ },
+ chapterTitle(href) {
+  if(typeof href!=='string'||!href)return '';
+  function find(items){for(const item of items||[]){if(item.href===href||item.href?.split('#')[0]===href.split('#')[0])return item.label?.trim()||'';const child=find(item.subitems);if(child)return child;}return '';}
+  return find(book?.navigation?.toc);
+ }
+};
+window.dispatchEvent(new Event('ges-pasco-reader-ready'));
