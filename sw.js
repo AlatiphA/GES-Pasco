@@ -185,7 +185,8 @@ self.addEventListener("message", event => {
     })());
   }
   if (event.data === "SKIP_WAITING") {
-    self.skipWaiting();
+    const activation = self.skipWaiting();
+    if (event.waitUntil) event.waitUntil(Promise.resolve(activation));
   }
   if (event.data === "GET_VERSION" && event.ports[0]) {
     event.ports[0].postMessage(CACHE_VERSION);
