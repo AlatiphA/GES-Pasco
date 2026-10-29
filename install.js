@@ -134,10 +134,27 @@
   document.head.appendChild(style);
 
   const INSTALL_KEY = "gespasco_install_dismissed";
-  const dismissed =
-    localStorage.getItem(INSTALL_KEY);
-
-  if (dismissed) return;
+  const aboutButton=document.getElementById('aboutInstallApp');
+  const aboutStatus=document.getElementById('appInstallStatus');
+  let installingApp=false,installedThisSession=false;
+  function dismissed(){try{return localStorage.getItem(INSTALL_KEY)==='1';}catch{return false;}}
+  function rememberDismissal(){try{localStorage.setItem(INSTALL_KEY,'1');}catch{}}
+  function standalone(){return navigator.standalone===true||window.matchMedia?.('(display-mode: standalone)').matches===true;}
+  function renderAbout(message){if(!aboutButton)return;const installed=standalone()||installedThisSession;aboutButton.disabled=installingApp||installed;aboutButton.textContent=installed?'App installed':installingApp?'Opening installer...':'Install app';aboutStatus.textContent=message||(installed?'GES Pasco is installed. Open it from your home screen or app launcher.':deferredPrompt?'Install GES Pasco on this device for quick access.':'Add GES Pasco to your home screen or app launcher.');}
+  async function installApp(){
+    if(installingApp||standalone()||installedThisSession)return;
+    if(!deferredPrompt){
+      const apple=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+      renderAbout(apple?'In Safari, tap Share, then Add to Home Screen and Add. If offered, leave Open as Web App on.':/android/i.test(navigator.userAgent)?'Open the browser menu and choose Install app or Add to Home screen. If unavailable here, open GES Pasco in Chrome.':/Chrome|Edg/i.test(navigator.userAgent)?'Use the install icon in the address bar, or the browser menu. In Chrome: Cast, save, and share → Install page as app.':'Open GES Pasco in Chrome or Edge to install it, or use your browser’s Add to Home Screen option.');return;
+    }
+    const prompt=deferredPrompt;deferredPrompt=null;installingApp=true;renderAbout('Choose Install in your browser’s confirmation.');
+    document.getElementById('installBanner')?.remove();
+    try{await prompt.prompt();const result=await prompt.userChoice;if(result.outcome==='accepted'){rememberDismissal();renderAbout('Installation accepted. Complete any remaining browser steps.');}else renderAbout('Installation cancelled. You can use Install app again when ready.');}
+    catch{renderAbout('The browser could not open the installer. Use its menu to install GES Pasco.');}
+    finally{installingApp=false;const message=aboutStatus?.textContent;renderAbout(message);}
+  }
+  aboutButton?.addEventListener('click',installApp);
+  window.addEventListener('appinstalled',()=>{installedThisSession=true;deferredPrompt=null;rememberDismissal();document.getElementById('installBanner')?.remove();document.getElementById('iosBanner')?.remove();renderAbout();});
 
   /* ── ANDROID / DESKTOP (Chrome) ── */
   let deferredPrompt = null;
@@ -148,12 +165,14 @@
       e.preventDefault();
       deferredPrompt = e;
 
-      /* Show after 4 seconds of reading */
-      setTimeout(() => showInstallBanner(), 4000);
+      renderAbout();
+      /* Dismissing the banner does not disable installation from About. */
+      if(!dismissed()&&!standalone())setTimeout(() => showInstallBanner(), 4000);
     }
   );
 
   function showInstallBanner() {
+    if(!deferredPrompt||dismissed()||standalone()||document.getElementById("installBanner"))return;
 
     const banner =
       document.createElement("div");
@@ -179,26 +198,12 @@
     });
 
     document.getElementById("ibInstall")
-      .addEventListener("click", async () => {
-        banner.classList.remove("show");
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const result =
-            await deferredPrompt.userChoice;
-          if (result.outcome === "accepted") {
-            localStorage.setItem(
-              INSTALL_KEY, "1"
-            );
-          }
-          deferredPrompt = null;
-        }
-        setTimeout(() => banner.remove(), 400);
-      });
+      .addEventListener("click", installApp);
 
     document.getElementById("ibDismiss")
       .addEventListener("click", () => {
         banner.classList.remove("show");
-        localStorage.setItem(INSTALL_KEY, "1");
+        rememberDismissal();
         setTimeout(() => banner.remove(), 400);
       });
 
@@ -216,7 +221,7 @@
       "(display-mode: standalone)"
     ).matches;
 
-  if (isIOS && !isInStandalone) {
+  if (isIOS && !isInStandalone && !dismissed()) {
 
     setTimeout(() => {
 
@@ -244,7 +249,7 @@
       document.getElementById("iosClose")
         .addEventListener("click", () => {
           banner.classList.remove("show");
-          localStorage.setItem(INSTALL_KEY, "1");
+          rememberDismissal();
           setTimeout(() => banner.remove(), 400);
         });
 
@@ -252,4 +257,6 @@
 
   }
 
+  renderAbout();
+  window.matchMedia?.("(display-mode: standalone)").addEventListener?.("change",()=>renderAbout());
 })();

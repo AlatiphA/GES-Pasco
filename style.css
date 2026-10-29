@@ -1892,3 +1892,6 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 
 .accountPanelContent .accountProfileCard {padding:14px;}
 .accountPanelContent #accountPasswordForm > .profileAction,.accountPanelContent #accountEmailForm > .profileAction {width:100%;justify-self:stretch;}
+
+.aboutInstallCard > strong {font-size:13px;font-weight:600;}
+.aboutInstallCard .profileSettingStatus {margin-top:8px;font-size:13px;line-height:1.6;}
