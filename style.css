@@ -1706,7 +1706,7 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 #reportsClose { background:none; border:0; color:inherit; font-size:28px; cursor:pointer; }
 #reviewReportsEntry[hidden] { display:none; }
 
-#inboxDialog {width:min(720px,calc(100vw - 24px));max-height:90dvh;overflow:auto;box-sizing:border-box;padding:24px;border:1px solid var(--ui-border);border-radius:18px;background:var(--ui-surface);color:var(--ui-text);}
+#inboxDialog {position:fixed;inset:0;margin:auto;width:min(600px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:0;border:1px solid var(--ui-border);border-radius:20px;background:var(--ui-surface);color:var(--ui-text);box-shadow:0 24px 80px rgba(0,0,0,.24);--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
 #inboxDialog::backdrop {background:rgba(0,0,0,.48);}
 #inboxClose {background:none;border:0;color:inherit;font-size:28px;cursor:pointer;}
 .inboxMessage {padding:16px;margin:12px 0;border:1px solid var(--ui-border);border-radius:12px;overflow-wrap:anywhere;}
@@ -1714,3 +1714,26 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .inboxMessage p {white-space:pre-wrap;}
 [data-inbox-badge] {display:inline-block;background:var(--ui-accent);color:var(--ui-surface);padding:2px 7px;border-radius:999px;font-size:12px;}
 [data-inbox-badge][hidden] {display:none;}
+
+#inboxDialog .practiceHeader {padding:14px 22px;}
+#inboxDialog .practiceHeader h2 {font-size:19px;line-height:1.4;}
+#inboxClose {display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:10px;}
+#inboxClose:hover {background:var(--ui-raised);}
+#inboxStatus {padding:16px 22px 0;font-size:13px;line-height:1.6;color:var(--ui-muted);}
+#inboxBody {padding:0 22px 22px;}
+#inboxBody .practiceToolbar {justify-content:flex-start;gap:8px;margin:16px 0;}
+#inboxBody .profileAction {min-height:42px;font-size:13px;}
+#inboxBody .profileActionPrimary {margin-inline-start:auto;}
+#inboxBody :is(button,input,textarea):focus-visible,#inboxClose:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+#inboxBody .reportForm input {width:100%;padding:12px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+#inboxBody .reportForm .profileActionPrimary {margin-inline-start:0;}
+.inboxEmpty {display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:32px 16px 38px;}
+.inboxEmptyIcon {display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--ui-selected);color:var(--ui-accent);margin-bottom:4px;}
+.inboxEmptyIcon svg {width:26px;height:26px;}
+.inboxEmpty h3 {font-size:17px;line-height:1.4;}
+.inboxEmpty p {max-width:310px;font-size:14px;line-height:1.6;color:var(--ui-muted);}
+#inboxBody .inboxMessage h3 {font-size:16px;line-height:1.5;margin-bottom:8px;}
+#inboxBody .inboxMessage p {font-size:14px;line-height:1.65;margin:8px 0;}
+#inboxBody .inboxMessage small {display:block;font-size:12px;line-height:1.6;color:var(--ui-muted);margin:12px 0;}
+#inboxBody .inboxMessage .profileAction {margin:4px 8px 0 0;}
+@media(max-width:420px) {#inboxDialog .practiceHeader {padding:12px 16px;}#inboxStatus {padding:14px 16px 0;}#inboxBody {padding:0 16px 16px;}#inboxBody .practiceToolbar .profileActionPrimary {margin-inline-start:0;}.inboxEmpty {padding:24px 8px;}}
