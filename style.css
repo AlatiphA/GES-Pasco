@@ -1858,3 +1858,37 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
  .authGate .authHero h1 {font-size:1.4rem;}
  .authGate .authHero p {font-size:.8rem;}
 }
+
+/* Compact, structured Account and About content beneath the existing menu rows. */
+.accountPanelContent,.aboutPanelContent {display:grid;gap:12px;padding:16px;}
+.accountPanelContent #accountSettingsStatus:empty {display:none;}
+.settingsCard {border:1px solid var(--account-line);border-radius:12px;background:var(--account-bg);padding:14px;}
+.accountPanelContent .accountSettingsForm {padding:0;gap:10px;}
+.accountPanelContent label {font-size:13px;color:var(--account-muted);}
+.accountProfileCard .profileAction {width:100%;justify-self:stretch;}
+.accountPanelContent .accountSecuritySection {padding:0;margin:0;border:1px solid var(--account-line);border-radius:12px;background:var(--account-bg);overflow:hidden;}
+.accountPanelContent .accountSecuritySection > summary {display:grid;grid-template-columns:20px minmax(0,1fr) 16px;gap:10px;min-height:48px;padding:12px 14px;font-size:14px;font-weight:500;}
+.settingsSmallIcon {width:20px;height:20px;flex-shrink:0;}
+.settingsSmallChevron {width:16px;height:16px;justify-self:end;}
+.accountSecuritySection[open] > summary .settingsSmallChevron {transform:rotate(90deg);}
+.accountPanelContent #accountPasswordControls {padding:0 14px;}
+.accountPanelContent #accountPasswordForm,.accountPanelContent #accountEmailForm {padding:14px 0;}
+.accountPanelContent #accountEmailForm {border-top:1px solid var(--account-line);}
+.accountPanelContent #accountRefreshEmail {margin:0 14px 14px;}
+.accountPanelContent #accountGoogleHint {padding:0 14px;}
+.accountSyncCard {display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.accountSyncCard strong,.aboutUpdatesCard > strong {font-size:13px;font-weight:600;}
+.accountSyncCard .profileSettingStatus {margin-top:4px;font-size:12px;}
+.accountSyncCard .profileAction {flex-shrink:0;min-height:40px;padding:8px 12px;font-size:12px;}
+.aboutIdentity {display:flex;align-items:center;gap:12px;padding:2px 0 4px;}
+.aboutIdentity img {width:44px;height:44px;border-radius:10px;}
+.aboutIdentity strong {display:block;font-size:16px;line-height:1.5;}
+.aboutPanelContent .aboutIdentity p {margin:2px 0 0;color:var(--account-muted);font-size:12px;}
+.aboutGuideAction {display:grid;grid-template-columns:20px minmax(0,1fr) 16px;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 14px;font-size:14px;}
+.aboutUpdatesCard .profileSettingStatus {margin-top:8px;font-size:13px;line-height:1.6;}
+.aboutUpdateActions {display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px;}
+.aboutUpdateActions .profileAction {width:100%;font-size:13px;}
+@media(max-width:380px){.accountPanelContent,.aboutPanelContent {padding:12px;}.accountSyncCard {align-items:flex-start;flex-wrap:wrap;}}
+
+.accountPanelContent .accountProfileCard {padding:14px;}
+.accountPanelContent #accountPasswordForm > .profileAction,.accountPanelContent #accountEmailForm > .profileAction {width:100%;justify-self:stretch;}
