@@ -1564,7 +1564,7 @@ body.night .profileMenu {--account-bg:#080808;--account-raised:#171b1c;}
 .profileSettings summary:hover {background:var(--account-raised);}
 .profileSettingIcon {width:22px;height:22px;flex:0 0 22px;}
 .profileSettingChevron {width:18px;height:18px;flex:0 0 18px;margin-left:auto;}
-.profileSettings details[open] .profileSettingChevron {transform:rotate(90deg);}
+.profileSettings > details[open] > summary > .profileSettingChevron {transform:rotate(90deg);}
 .profileSettingContent {padding:14px;border-top:1px solid var(--account-line);background:var(--account-raised);font-size:13px;}
 .profileSettingContent p {margin:10px 0;line-height:1.6;}
 .profileSettingStatus {display:block;margin-top:6px;font-size:13px;line-height:1.5;color:var(--account-muted);overflow-wrap:anywhere;}
@@ -1806,3 +1806,29 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 #dataAccountsStatus {color:var(--ui-accent);}
 #dataAccountsDialog .dataDanger {color:#fff;background:#a52929;border-color:#a52929;}
 #dataAccountsDialog :is(button,input):focus-visible {outline:2px solid var(--ui-accent);outline-offset:2px;}
+
+/* One row layout for every main account action, matching PromoHub's alignment. */
+.profileSettings > details > summary,.profileSettings > .practiceEntry {
+ display:grid;grid-template-columns:22px minmax(0,1fr) 18px;align-items:center;column-gap:12px;
+ min-height:56px;width:100%;padding:14px 16px;border:0;border-radius:0;
+ background:var(--account-bg);color:var(--account-text);font:inherit;font-size:15px;font-weight:600;line-height:1.4;text-align:left;
+}
+.profileSettings > :not(:last-child) {border-bottom:1px solid var(--account-line);}
+.profileSettings > details:last-child {border-bottom:0;}
+.profileSettings > .practiceEntry > span,.profileSettings > details > summary > span {min-width:0;overflow-wrap:anywhere;}
+.profileSettings .profileSettingIcon {width:22px;height:22px;stroke-width:1.8;}
+.profileSettings .profileSettingChevron {width:18px;height:18px;margin:0;justify-self:end;}
+.profileSettings > .practiceEntry:hover,.profileSettings > details > summary:hover {background:var(--account-raised);}
+.profileSubmenu {padding:0;background:var(--account-raised);}
+.profileSubmenu .practiceEntry,#offlineReadingSection .profileSettingContent > .practiceEntry {
+ display:grid;grid-template-columns:22px minmax(0,1fr) 18px;align-items:center;gap:12px;
+ min-height:50px;border:0;border-radius:0;padding:12px 14px;background:var(--account-raised);font-size:14px;font-weight:400;line-height:1.4;
+}
+.profileSubmenu .practiceEntry + .practiceEntry {border-top:1px solid var(--account-line);}
+#offlineReadingSection .profileSettingContent > .practiceEntry {margin-bottom:14px;border:1px solid var(--account-line);border-radius:10px;}
+#profileAdministration[hidden] {display:none;}
+#profileClose {border:1px solid var(--account-line);border-radius:50%;background:var(--account-bg);}
+.profileMenu .profileBody {padding:16px;}
+.profileMenu .profileLogout {background:var(--account-raised);border-color:var(--account-line);color:var(--account-text);}
+.profileMenu .profileLogout:hover {background:var(--ui-selected);color:var(--account-text);}
+@media(max-width:600px){.profileMenu .profileBody {padding:12px;}.profileSettings > details > summary,.profileSettings > .practiceEntry {padding:13px 14px;}}
