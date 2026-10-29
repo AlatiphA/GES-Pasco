@@ -30,7 +30,6 @@ const FILES_TO_CACHE = [
   "./revision-core.js",
   "./practice-bank.json",
   "./install.js",
-  "./sw.js",
   "./manifest.json",
   "./library/sample.epub",
   "./icon-192.png",
@@ -80,7 +79,7 @@ function prepareOffline() {
 }
 
 /* =========================
-   INSTALL — cache app shell
+   INSTALL â€” cache app shell
 ========================= */
 
 self.addEventListener("install", event => {
@@ -90,27 +89,22 @@ self.addEventListener("install", event => {
 });
 
 /* =========================
-   ACTIVATE — clean old caches
+   ACTIVATE â€” clean old caches
 ========================= */
 
 self.addEventListener("activate", event => {
 
-  event.waitUntil(
-    caches.keys()
-      .then(cacheNames =>
-        Promise.all(
-          cacheNames
-            .filter(name => name.startsWith("alatipha-ges-pasco-") && name !== CACHE_NAME)
-            .map(name => caches.delete(name))
-        )
-      )
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    // Hand the new worker to open clients before optional old-cache cleanup.
+    await self.clients.claim();
+    const names = await caches.keys();
+    await Promise.allSettled(names.filter(name => name.startsWith("alatipha-ges-pasco-") && name !== CACHE_NAME).map(name => caches.delete(name)));
+  })());
 
 });
 
 /* =========================
-   FETCH — network-first for
+   FETCH â€” network-first for
    HTML/JS/CSS, cache-first
    for EPUB and icons
 ========================= */
@@ -120,6 +114,12 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
+  // Never proxy/cache Firebase's live channels or unrelated third-party requests.
+  const origin = self.location?.origin || url.origin;
+  if (url.origin !== origin && !FILES_TO_CACHE.includes(url.href)) return;
+  const knownAsset = FILES_TO_CACHE.some(path => new URL(path, self.location?.href || url.origin + '/').href === url.href);
+  if (url.origin === origin && !knownAsset && !/\.(?:html|css|js|json)$/.test(url.pathname) && !url.pathname.endsWith('/')) return;
+
   // A release check must never fall back to a cached version file.
   if (url.pathname.endsWith('/version.js') && url.searchParams.has('release-check')) {
     event.respondWith(fetch(new Request(event.request, {cache:'no-store'})));
@@ -151,7 +151,7 @@ self.addEventListener("fetch", event => {
 
   } else {
 
-    /* Cache-first: EPUB, icons, fonts — stable assets */
+    /* Cache-first: EPUB, icons, fonts â€” stable assets */
     event.respondWith(
       caches.match(event.request)
         .then(cached => {
@@ -173,7 +173,7 @@ self.addEventListener("fetch", event => {
 });
 
 /* =========================
-   MESSAGE — version check
+   MESSAGE â€” version check
 ========================= */
 
 self.addEventListener("message", event => {
@@ -187,6 +187,9 @@ self.addEventListener("message", event => {
   }
   if (event.data === "SKIP_WAITING") {
     const activation = self.skipWaiting();
+    // Acknowledge the handover request before waiting for old pages/live requests.
+    // The client can now navigate once, releasing those old connections.
+    if (event.ports[0]) event.ports[0].postMessage({activationRequested:true,version:CACHE_VERSION});
     if (event.waitUntil) event.waitUntil(Promise.resolve(activation));
   }
   if (event.data === "GET_VERSION" && event.ports[0]) {
