@@ -1705,3 +1705,12 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .reportCard summary { cursor:pointer; font-weight:600; }
 #reportsClose { background:none; border:0; color:inherit; font-size:28px; cursor:pointer; }
 #reviewReportsEntry[hidden] { display:none; }
+
+#inboxDialog {width:min(720px,calc(100vw - 24px));max-height:90dvh;overflow:auto;box-sizing:border-box;padding:24px;border:1px solid var(--ui-border);border-radius:18px;background:var(--ui-surface);color:var(--ui-text);}
+#inboxDialog::backdrop {background:rgba(0,0,0,.48);}
+#inboxClose {background:none;border:0;color:inherit;font-size:28px;cursor:pointer;}
+.inboxMessage {padding:16px;margin:12px 0;border:1px solid var(--ui-border);border-radius:12px;overflow-wrap:anywhere;}
+.inboxMessage.unread {border-inline-start:4px solid var(--ui-accent);background:var(--ui-raised);}
+.inboxMessage p {white-space:pre-wrap;}
+[data-inbox-badge] {display:inline-block;background:var(--ui-accent);color:var(--ui-surface);padding:2px 7px;border-radius:999px;font-size:12px;}
+[data-inbox-badge][hidden] {display:none;}

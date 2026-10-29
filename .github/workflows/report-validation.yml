@@ -1,7 +1,7 @@
 name: Question reporting checks
 on:
   push:
-    branches: [main, release/v1.0.22-question-reports]
+    branches: [main, release/v1.0.23-notifications]
   pull_request:
 permissions:
   contents: read

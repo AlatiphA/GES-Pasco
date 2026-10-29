@@ -155,6 +155,42 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /announcements/{noticeId} {
+      allow read: if signedIn();
+      allow create: if isReportAdmin()
+        && request.resource.data.keys().hasOnly(['title','body','createdAt','authorUid'])
+        && request.resource.data.keys().hasAll(['title','body','createdAt','authorUid'])
+        && reportText(request.resource.data.title,120) && request.resource.data.title.size() > 0
+        && reportText(request.resource.data.body,2000) && request.resource.data.body.size() > 0
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.authorUid == request.auth.uid;
+      allow update: if false;
+      allow delete: if isReportAdmin();
+    }
+    match /users/{userId}/notifications/{reportId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isReportAdmin()
+        && request.resource.data.keys().hasOnly(['reportId','body','status','updatedAt'])
+        && request.resource.data.keys().hasAll(['reportId','body','status','updatedAt'])
+        && request.resource.data.reportId == reportId
+        && request.resource.data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.reporterUid == userId
+        && getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.reviewedBy == request.auth.uid
+        && request.resource.data.body == getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.reviewNote
+        && request.resource.data.status == getAfter(/databases/$(database)/documents/questionReports/$(reportId)).data.status;
+      allow delete: if false;
+    }
+    match /users/{userId}/inboxReads/{noticeId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['seenVersion'])
+        && request.resource.data.keys().hasAll(['seenVersion'])
+        && request.resource.data.seenVersion is int
+        && request.resource.data.seenVersion >= 0;
+      allow delete: if false;
+    }
+
     match /users/{userId} {
       allow create: if isOwner(userId) && validProfileShape();
       allow read: if isOwner(userId);
