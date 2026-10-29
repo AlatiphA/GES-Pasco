@@ -575,6 +575,8 @@
 <script src="./updates.js"></script>
 <script src="./firebase-config.js"></script>
 <script src="./firestore-data.js"></script>
+<dialog id="readerRecoveryDialog" aria-labelledby="readerRecoveryTitle"><div class="practiceHeader"><h2 id="readerRecoveryTitle">Open your reader</h2><button id="readerRecoveryClose" type="button" aria-label="Close reader recovery">×</button></div><div class="readerRecoveryBody"><p id="readerRecoveryMessage"></p><p class="practiceMuted">Retry and repair keep your bookmarks, settings and saved reading position. No account data is cleared.</p><p id="readerRecoveryStatus" role="status" aria-live="polite"></p><div class="practiceToolbar"><button id="readerRecoveryRetry" type="button" class="profileAction profileActionPrimary">Retry opening reader</button><button id="readerRecoveryRepair" type="button" class="profileAction">Download / repair</button><button id="readerRecoveryBeginning" type="button" class="profileAction" hidden>Open from beginning</button></div></div></dialog>
+<script src="./reader-recovery.js"></script>
 <script src="./auth.js"></script>
 <script src="./account-settings.js"></script>
 <dialog id="practiceDialog" aria-labelledby="practiceTitle"><div class="practiceHeader"><h2 id="practiceTitle">Practice tests</h2><button id="practiceClose" type="button" aria-label="Close practice tests">×</button></div><p id="practiceStatus" role="status" aria-live="polite"></p><div id="practiceBody"></div></dialog>

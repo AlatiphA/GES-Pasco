@@ -14,20 +14,22 @@
     worker.postMessage(message,[channel.port2]);
   });}
   async function run(repair=false){
-    if(busy)return;
-    if(!supported){status.textContent='Offline downloads are unavailable in this browser.';buttons();return;}
-    if(repair&&navigator.onLine===false){status.textContent='Connect to the internet to download or repair reader files.';return;}
+    if(busy)return {error:'A reader download is already running. Wait for it to finish.'};
+    if(!supported){status.textContent='Offline downloads are unavailable in this browser.';buttons();return {error:status.textContent};}
+    if(repair&&navigator.onLine===false){status.textContent='Connect to the internet to download or repair reader files.';return {error:status.textContent};}
     busy=true;buttons();status.textContent=repair?'Downloading the book and reader files… Keep this app open.':'Checking saved reader files…';
     try{
       const result=await ask(repair?'PREPARE_OFFLINE':'OFFLINE_STATUS');
       if(result.version!=='v'+globalThis.GES_PASCO_VERSION)throw Error('Install the latest app update and reopen it, then check again.');
       status.textContent=result.ready?'Ready for offline reading on this browser. Keep your account signed in.':result.missing+' reader file(s) missing. Connect and choose Download / repair.';
-    }catch(e){status.textContent=e.message||'Could not check offline storage. Please retry.';}
+      return result;
+    }catch(e){status.textContent=e.message||'Could not check offline storage. Please retry.';return {error:status.textContent};}
     finally{busy=false;buttons();}
   }
   check.addEventListener('click',()=>run());download.addEventListener('click',()=>run(true));
   document.getElementById('offlineReadingSection').addEventListener('toggle',e=>{if(e.target.open)run();});
   window.addEventListener('online',()=>{buttons();run();});window.addEventListener('offline',()=>{buttons();run();});
   navigator.serviceWorker?.addEventListener('controllerchange',()=>run());
+  window.GESPascoOffline={repair:()=>run(true),check:()=>run()};
   buttons();run();
 })();

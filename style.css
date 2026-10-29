@@ -1770,3 +1770,10 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .quizReviewCheck {display:flex!important;align-items:flex-start;gap:12px!important;font-size:14px;line-height:1.6;}
 .quizReviewCheck input {width:20px;height:20px;flex-shrink:0;accent-color:var(--ui-accent);}
 #quizAdminDialog button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+
+#readerRecoveryDialog {position:fixed;inset:0;margin:auto;width:min(560px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;padding:0;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
+#readerRecoveryDialog::backdrop {background:#0008;}
+#readerRecoveryClose {width:44px;height:44px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+.readerRecoveryBody {padding:20px;line-height:1.65;}
+#readerRecoveryStatus {font-size:13px;color:var(--ui-accent);}
+#readerRecoveryDialog button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}

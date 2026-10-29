@@ -162,7 +162,7 @@
     const script = document.createElement("script");
     script.src = "./app.js";
     script.defer = true;
-    script.onerror = () => showMessage("The reader could not be loaded. Please refresh and try again.");
+    script.onerror = () => { if (gesPascoAuth.currentUser?.uid !== loadedUid) return; if(window.GESPascoRecovery)window.GESPascoRecovery.show("app");else showMessage("The reader could not be loaded. Please refresh and try again."); };
     document.body.appendChild(script);
   }
 

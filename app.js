@@ -595,41 +595,21 @@ function loadBookmarks() {
 ============== */
 
 async function loadBook() {
-
+  const owner=gesPascoAuth.currentUser?.uid;
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
   try {
-
-    const response =
-      await fetch(
-        "./library/sample.epub"
-      );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "EPUB file not found."
-      );
-
-    }
-
-    const blob =
-      await response.blob();
-
-    book = ePub(blob);
-
+    const response=await fetch('./library/sample.epub',{signal:controller.signal});
+    if(!response.ok)throw Error('Book download unavailable.');
+    const blob=await response.blob();
+    const header=new Uint8Array(await blob.slice(0,4).arrayBuffer());
+    if(header[0]!==80||header[1]!==75||header[2]!==3||header[3]!==4)throw Error('The downloaded file is not a readable EPUB.');
+    if(gesPascoAuth.currentUser?.uid!==owner)return;
+    book=ePub(blob);
     startReader();
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Failed to load EPUB."
-    );
-
-  }
-
+  } catch(error) {
+    console.warn('Reader could not open:',error);
+    if(gesPascoAuth.currentUser?.uid===owner)window.GESPascoRecovery?.show('book');
+  } finally {clearTimeout(timer);}
 }
 
 
@@ -895,8 +875,9 @@ function slidePage(direction, action) {
 
   setTimeout(() => {
 
-    /* Turn the page */
-    action();
+    /* Surface failed page loads while restoring the page animation normally. */
+    try {Promise.resolve(action()).catch(error=>{console.warn('Page could not open:',error);window.GESPascoRecovery?.show('book');});}
+    catch(error){console.warn('Page could not open:',error);window.GESPascoRecovery?.show('book');}
 
     /* Position new page on opposite side */
     viewer.style.transition = "none";
@@ -955,7 +936,16 @@ function updateReadingLocationDisplay(location, locationsReady) {
   return percent;
 }
 
+function observeReaderDisplay(task,owner,kind) {
+  let timer;
+  return Promise.race([task,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('The reader took too long to open.')),30000);})])
+    .catch(error=>{console.warn('Reader display failed:',error);if(gesPascoAuth.currentUser?.uid===owner)window.GESPascoRecovery?.show(kind);})
+    .finally(()=>clearTimeout(timer));
+}
+
 function startReader() {
+  const readerOwner=gesPascoAuth.currentUser?.uid;
+  const failure=kind=>{if(gesPascoAuth.currentUser?.uid===readerOwner)window.GESPascoRecovery?.show(kind);};
   let locationsReady = false;
   updateReadingLocationDisplay(null, false);
 
@@ -1013,13 +1003,12 @@ function startReader() {
   const readerData = loadReaderData();
   const savedLocation = readerData.location;
 
-  rendition
-    .display(savedLocation || undefined)
-    .catch(() => rendition.display());
+  observeReaderDisplay(rendition.display(savedLocation || undefined),readerOwner,savedLocation?'position':'book');
 
   /* BACKGROUND SETUP — TOC + locations, never blocks rendering */
 
   book.ready.then(() => {
+    if(gesPascoAuth.currentUser?.uid!==readerOwner)return;
 
     toc.innerHTML = "";
 
@@ -1039,7 +1028,7 @@ function startReader() {
       })
       .catch(err => console.warn("Locations:", err));
 
-  });
+  }).catch(error=>{console.warn("Book setup failed:",error);failure("book");});
 
   /* =========================
      LINKS, CONTENTS & FOOTNOTES
@@ -2485,6 +2474,12 @@ window.addEventListener("ges-pasco-bookmarks-updated", loadBookmarks);
 
 /* Safe dashboard navigation into the existing reader, without a second reader instance. */
 window.GESPascoReading = {
+ async openBeginning(uid) {
+  if(gesPascoAuth.currentUser?.uid!==uid)throw Error('Your account changed. Reopen the reader.');
+  if(!rendition)throw Error('The reader is not ready. Retry loading it first.');
+  await rendition.display();
+  if(gesPascoAuth.currentUser?.uid===uid)this.showReader();
+ },
  async openLocation(uid,cfi) {
   if(gesPascoAuth.currentUser?.uid!==uid)throw Error('Your account changed. Reopen the reading dashboard.');
   if(!rendition || typeof cfi!=='string' || !cfi.startsWith('epubcfi('))throw Error('The reader is still loading. Try again in a moment.');
