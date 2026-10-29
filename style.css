@@ -1757,3 +1757,16 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .readingBookmarkList small {display:block;margin-top:6px;color:var(--ui-muted);font-size:12px;}
 .readingEmpty {padding:20px;border:1px dashed var(--ui-border);border-radius:12px;font-size:14px;line-height:1.6;color:var(--ui-muted);}
 #readingDashboard button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+
+#quizAdminEntry[hidden] {display:none;}
+#quizAdminDialog {position:fixed;inset:0;margin:auto;width:min(800px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:0;overflow:auto;overscroll-behavior:contain;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
+#quizAdminDialog::backdrop {background:#0008;}
+#quizAdminClose {width:44px;height:44px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+#quizAdminStatus {padding:16px 20px 0;font-size:13px;line-height:1.6;color:var(--ui-muted);}
+#quizAdminBody {padding:20px;}
+#quizAdminBody .reportForm input:not([type=checkbox]) {width:100%;padding:12px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+.quizBankCard {display:block;width:100%;text-align:start;margin-top:10px;overflow-wrap:anywhere;}
+.quizBankCard small {display:block;margin-top:6px;color:var(--ui-muted);}
+.quizReviewCheck {display:flex!important;align-items:flex-start;gap:12px!important;font-size:14px;line-height:1.6;}
+.quizReviewCheck input {width:20px;height:20px;flex-shrink:0;accent-color:var(--ui-accent);}
+#quizAdminDialog button:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}

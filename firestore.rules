@@ -191,6 +191,44 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Quiz editors are trusted reviewers. All published content is readable by signed-in users;
+    // drafts remain private. Every client also validates individual questions before use.
+    function validQuizBank(bank, bankId) {
+      return bank is map
+        && bank.keys().hasOnly(['schema','id','title','questions','version'])
+        && bank.keys().hasAll(['schema','id','title','questions'])
+        && bank.schema == 1 && bank.id == bankId
+        && bankId.matches('[-a-z0-9]{1,60}')
+        && reportText(bank.title,200) && bank.title.size() > 0
+        && bank.questions is list && bank.questions.size() >= 1 && bank.questions.size() <= 100
+        && (!('version' in bank) || (bank.version is int && bank.version >= 1));
+    }
+    match /quizDrafts/{bankId} {
+      allow read: if isReportAdmin();
+      allow create, update: if isReportAdmin()
+        && request.resource.data.keys().hasOnly(['bank','revision','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasAll(['bank','revision','updatedAt','updatedBy'])
+        && validQuizBank(request.resource.data.bank,bankId)
+        && request.resource.data.revision is int
+        && ((!exists(/databases/$(database)/documents/quizDrafts/$(bankId)) && request.resource.data.revision == 1)
+          || (exists(/databases/$(database)/documents/quizDrafts/$(bankId)) && request.resource.data.revision == resource.data.revision + 1))
+        && request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /quizBanks/{bankId} {
+      allow read: if signedIn();
+      allow create, update: if isReportAdmin()
+        && request.resource.data.keys().hasOnly(['bank','version','enabled','reviewed','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasAll(['bank','version','enabled','reviewed','updatedAt','updatedBy'])
+        && validQuizBank(request.resource.data.bank,bankId)
+        && request.resource.data.enabled is bool && request.resource.data.reviewed == true
+        && request.resource.data.version is int
+        && ((!exists(/databases/$(database)/documents/quizBanks/$(bankId)) && request.resource.data.version == 1)
+          || (exists(/databases/$(database)/documents/quizBanks/$(bankId)) && request.resource.data.version == resource.data.version + 1))
+        && request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
     match /users/{userId} {
       allow create: if isOwner(userId) && validProfileShape();
       allow read: if isOwner(userId);
