@@ -47,7 +47,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid','status','accessMode','updatedBy','updatedAt'])
         && request.resource.data.keys().hasAll(['uid','status','accessMode','updatedBy','updatedAt'])
         && request.resource.data.uid == uid && request.resource.data.status in ['active','suspended']
-        && request.resource.data.accessMode in ['automatic','trial-only']
+        && request.resource.data.accessMode in ['automatic','trial-only','free']
         && request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time;
       allow delete: if isOwner(uid) && deletingAccount();
     }

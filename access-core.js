@@ -5,6 +5,7 @@
  const dates=[createdAtMs,authCreatedAtMs].filter(n=>Number.isFinite(n)&&n>0),created=dates.length?Math.min(...dates):0;
  if(admin)return {allowed:true,kind:'administrator',expiresAtMs:now+86400000};
  if(control?.status==='suspended')return {allowed:false,kind:'suspended',expiresAtMs:0};
+ if(control?.accessMode==='free')return {allowed:true,kind:'free',expiresAtMs:now+7*86400000};
  if(control?.accessMode!=='trial-only'&&Number.isFinite(endsAtMs)&&endsAtMs>now)return {allowed:true,kind:'subscription',expiresAtMs:endsAtMs};
  const end=created?created+trialMs:0;
  return {allowed:!!created&&now>=created-60000&&now<end,kind:created?'trial':'unverified',expiresAtMs:end};
