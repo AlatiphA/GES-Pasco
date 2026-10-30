@@ -5,7 +5,7 @@
  let owner='',attempt=null,banks=[],loading=null,timer=null,generation=0,storageProblem=false;
  const key=type=>'ges-pasco-practice-'+owner+'-'+type;
  function read(type,fallback){try{return JSON.parse(localStorage.getItem(key(type)))??fallback;}catch{return fallback;}}
- function write(type,value){try{localStorage.setItem(key(type),JSON.stringify(value));return true;}catch{storageProblem=true;status.textContent='Device storage is full or unavailable. This attempt cannot be saved until space is available.';return false;}}
+ function write(type,value){try{localStorage.setItem(key(type),JSON.stringify(value));if(type==='history')window.gesPascoReaderSync?.queuePractice();return true;}catch{storageProblem=true;status.textContent='Device storage is full or unavailable. This attempt cannot be saved until space is available.';return false;}}
  function persist(){if(window.GESPascoDataAccounts?.operationFor(owner))return;if(attempt&&owner&&gesPascoAuth.currentUser?.uid===owner)write('attempt',attempt);}
  function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
  function button(text,action,cls='profileAction'){const b=node('button',text,cls);b.type='button';b.onclick=action;return b;}
@@ -41,7 +41,7 @@
   for(const b of banks){const option=node('option',b.title+' ('+b.questions.length+')');option.value=b.id;select.append(option);}count.type=minutes.type='number';count.min='1';count.max='100';count.value='10';minutes.min='0';minutes.max='120';minutes.value='0';count.required=minutes.required=true;const limit=()=>{const max=banks.find(b=>b.id===select.value).questions.length;count.max=String(max);if(Number(count.value)>max)count.value=String(max);};select.onchange=limit;limit();
   for(const [name,input] of [['Question set',select],['Number of questions',count],['Time limit in minutes (0 = untimed)',minutes]]){const label=node('label',name);label.append(input);form.append(label);}const start=node('button','Start practice','profileAction profileActionPrimary');start.type='submit';form.append(start);form.onsubmit=e=>{e.preventDefault();if(gesPascoAuth.currentUser?.uid!==owner)return;if(attempt&&!attempt.finishedAtMs&&!confirm('Replace your unfinished test?'))return;try{attempt=core.create(banks.find(b=>b.id===select.value),{owner,count:Number(count.value),minutes:Number(minutes.value)});persist();question();}catch(error){status.textContent=error.message;}};body.append(form);
   if(attempt)body.append(button(attempt.finishedAtMs?'View latest result':'Resume saved test',()=>{tick();if(attempt.finishedAtMs)results();else question();}));
-  const history=read('history',[]);if(history.length){body.append(node('h3','Recent results'));history.slice(0,5).forEach(h=>body.append(node('p',h.title+' · '+h.percent+'% · '+new Date(h.finishedAtMs).toLocaleDateString(),'practiceMuted')));}body.append(node('p','Attempts and results stay on this browser for this account. They do not sync between devices. Up to 20 results are retained.','practiceMuted'));
+  const history=read('history',[]);if(history.length){body.append(node('h3','Recent results'));history.slice(0,5).forEach(h=>body.append(node('p',h.title+' · '+h.percent+'% · '+new Date(h.finishedAtMs).toLocaleDateString(),'practiceMuted')));}body.append(node('p','Completed results and revision progress sync with your account when connected. The latest 20 completed results are shown. Unfinished tests stay on this device.','practiceMuted'));
   }catch(error){if(epoch===generation)status.textContent=error.message;}
  }
  function revisionRecords(){return revisionCore.rows(read('history',[]),attempt,owner,core);}
@@ -49,7 +49,7 @@
   const epoch=++generation,uid=owner;document.getElementById('practiceTitle').textContent='Revision dashboard';resetBody();
   const records=revisionRecords(),data=revisionCore.summarize(records,filter);
   body.append(button('Back to practice tests',setup));
-  body.append(node('p','Based on up to 20 completed attempts for this account on this browser. Results do not sync between devices.','practiceMuted'));
+  body.append(node('p','Based on the latest 20 completed attempts saved for this account. Completed results sync when connected; use Account → Cloud sync → Retry sync to refresh from another device.','practiceMuted'));
   if(attempt&&!attempt.finishedAtMs)body.append(node('p','Your unfinished test is saved. A timed test keeps counting while you view revision.','practiceMuted'));
   if(!records.length){body.append(node('h3','Build your revision record'),node('p','Complete a practice test to see your accuracy, exam-set scores, recent results and questions to revisit.','practiceMuted'));return;}
   const allGroups=revisionCore.summarize(records).groups,label=node('label','Question set','revisionFilter'),select=document.createElement('select');select.setAttribute('aria-label','Revision question set');const all=node('option','All question sets');all.value='all';select.append(all);
@@ -89,6 +89,7 @@
  document.querySelectorAll('[data-open-revision]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!dialog.open)open('revision');}));
  document.getElementById('practiceClose').addEventListener('click',close);dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
  window.addEventListener('storage',e=>{if(owner&&e.key===key('attempt')&&dialog.open){clearInterval(timer);generation++;attempt=null;dialog.close();}});
+ window.addEventListener('ges-pasco-practice-updated',()=>{if(dialog.open&&document.getElementById('practiceTitle').textContent==='Revision dashboard')revision();});
  window.addEventListener('pagehide',persist);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')tick();else persist();});
  gesPascoAuth.onAuthStateChanged(user=>{if(user?.uid!==owner){if(dialog.open)close();owner=user?.uid||'';attempt=null;generation++;}});
 })();

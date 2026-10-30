@@ -42,6 +42,17 @@
     for(const [cfi,b] of wanted)if(!records[cfi]||records[cfi].deleted||JSON.stringify(normalize(records[cfi]))!==JSON.stringify(b)){records[cfi]=b;dirty('bookmark|'+cfi,b);}
     persist();
   }
+  const practiceKey=uid=>'ges-pasco-practice-'+uid+'-history';
+  function practiceRows(uid){try{return JSON.parse(localStorage.getItem(practiceKey(uid)))||[];}catch{return [];}}
+  function queuePractice(){if(!user||window.GESPascoDataAccounts?.operationFor(user.uid))return;const core=window.GESPascoPracticeSyncCore;if(!core)return;for(const row of core.merge(practiceRows(user.uid),[],user.uid))dirty('practice|'+row.id,core.encode(row));}
+  async function pullPractice(context,token){
+    const snapshot=await gesPascoDb.collection('users').doc(context.uid).collection('practiceResults').orderBy('finishedAtMs','desc').limit(20).get({source:'server'});
+    if(token!==epoch)return;
+    const core=window.GESPascoPracticeSyncCore,remote=snapshot.docs.map(d=>core.decode(d.data(),context.uid)).filter(Boolean);
+    const merged=core.merge(practiceRows(context.uid),remote,context.uid);
+    localStorage.setItem(practiceKey(context.uid),JSON.stringify(merged));
+    window.dispatchEvent(new Event('ges-pasco-practice-updated'));
+  }
   async function pull(context,token) {
     const root=gesPascoDb.collection('users').doc(context.uid);
     const before=storage.getItem('ges-pasco-data');
@@ -61,6 +72,7 @@
     for(const [key,op] of Object.entries(pending))if(key.startsWith('bookmark|'))next[op.value.cfi]=op.value;
     records=next;visible();persist();
     window.dispatchEvent(new Event('ges-pasco-bookmarks-updated'));
+    await pullPractice(context,token);
   }
   async function flush(refresh=false) {
     if(!user||!navigator.onLine||running){render();return;}
@@ -71,6 +83,7 @@
         for(const [key,op] of Object.entries(pending)) {
           if(token!==epoch)return;
           if(key==='position') {const d=op.value;await root.collection('readerData').doc('default').set({location:d.location,chapter:d.chapter||'',progress:Number(d.progress)||0,lastRead:d.lastRead,updatedAt:stamp()});}
+          else if(key.startsWith('practice|')){const ref=root.collection('practiceResults').doc(encodeURIComponent(op.value.recordId));const saved=await ref.get({source:'server'});if(token!==epoch)return;if(!saved.exists)await ref.set(op.value);}
           else if(key==='preferences')await root.collection('readerData').doc('preferences').set({...op.value,updatedAt:stamp()});
           else await root.collection('bookmarks').doc(id(op.value.cfi)).set({...op.value,updatedAt:stamp()});
           if(token!==epoch)return;
@@ -91,6 +104,7 @@
       localStorage.setItem('ges-pasco-legacy-owner',user.uid);
     }
     if(!localStorage.getItem(ownKey('initialized'))){for(const b of read('ges-pasco-bookmarks',[])){const value=normalize(b);records[b.cfi]=value;dirty('bookmark|'+b.cfi,value);}localStorage.setItem(ownKey('initialized'),'true');}
+    queuePractice();
     persist();
     // Start restoration without allowing an unavailable server to block offline reading.
     if(!navigator.onLine){render();return;}
@@ -101,5 +115,5 @@
   function resetLocal(){if(user)for(const name of ['pending','records','initialized'])localStorage.removeItem(ownKey(name));clearUser();}
   window.addEventListener('online',()=>flush(true));window.addEventListener('offline',render);
   window.addEventListener('pagehide',()=>flush());
-  window.gesPascoReaderSync={prepare,queue,queuePreferences,syncBookmarks,flush,clearUser,resetLocal};
+  window.gesPascoReaderSync={prepare,queue,queuePreferences,syncBookmarks,flush,clearUser,resetLocal,queuePractice};
 })();

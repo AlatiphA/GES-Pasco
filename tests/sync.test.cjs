@@ -1,8 +1,8 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');
 function setup(local=new Map(),cloud=new Map()){
  const events={},label={},button={};let fail=false;
- const ref=path=>({collection:n=>ref(path+'/'+n),doc:n=>ref(path+'/'+n),async get(){if(fail)throw Error('network');const value=cloud.get(path);return {exists:!!value,data:()=>value,docs:[...cloud].filter(([k])=>k.startsWith(path+'/')&&!k.slice(path.length+1).includes('/')).map(([id,v])=>({id:id.split('/').pop(),data:()=>v}))};},async set(value){if(fail)throw Error('network');cloud.set(path,JSON.parse(JSON.stringify(value)));}});
- const context={console,navigator:{onLine:true},localStorage:{getItem:k=>local.get(k)??null,setItem:(k,v)=>local.set(k,String(v)),removeItem:k=>local.delete(k)},document:{getElementById:k=>k==='syncStatus'?label:button},firebase:{firestore:{FieldValue:{serverTimestamp:()=>123}}},gesPascoDb:{collection:n=>ref(n)},setTimeout:()=>1,clearTimeout(){},confirm:()=>false,Event:class{constructor(type){this.type=type;}}};context.window=context;context.addEventListener=(n,fn)=>events[n]=fn;context.dispatchEvent=()=>{};vm.runInNewContext(fs.readFileSync('firestore-data.js','utf8'),context);
+ const ref=path=>({collection:n=>ref(path+'/'+n),doc:n=>ref(path+'/'+n),orderBy:()=>ref(path),limit:()=>ref(path),async get(){if(fail)throw Error('network');const value=cloud.get(path);return {exists:!!value,data:()=>value,docs:[...cloud].filter(([k])=>k.startsWith(path+'/')&&!k.slice(path.length+1).includes('/')).map(([id,v])=>({id:id.split('/').pop(),data:()=>v}))};},async set(value){if(fail)throw Error('network');cloud.set(path,JSON.parse(JSON.stringify(value)));}});
+ const context={console,navigator:{onLine:true},localStorage:{getItem:k=>local.get(k)??null,setItem:(k,v)=>local.set(k,String(v)),removeItem:k=>local.delete(k)},document:{getElementById:k=>k==='syncStatus'?label:button},firebase:{firestore:{FieldValue:{serverTimestamp:()=>123}}},gesPascoDb:{collection:n=>ref(n)},setTimeout:()=>1,clearTimeout(){},confirm:()=>false,Event:class{constructor(type){this.type=type;}}};context.GESPascoPracticeSyncCore=require('../practice-sync-core.js');context.window=context;context.addEventListener=(n,fn)=>events[n]=fn;context.dispatchEvent=()=>{};vm.runInNewContext(fs.readFileSync('firestore-data.js','utf8'),context);
  return {api:context.gesPascoReaderSync,storage:context.gesPascoStorage,local,cloud,context,label,setFail:v=>fail=v};
 }
 const mark=cfi=>({cfi,chapter:'Chapter',progress:10,date:'2026-10-27T10:00:00Z'});
@@ -18,3 +18,13 @@ test('pinch zoom and one-finger swipe paths remain intact',()=>{
    if(start.includes('_pinchActive'))assert.ok(patched.includes(region.trimEnd()));else assert.ok(patched.includes(region));
  }
 });
+
+const result=(id,uid='a',time=1000)=>({id,owner:uid,title:'Exam',bankId:'bank',finishedAtMs:time,total:1,correct:1,unanswered:0,percent:100,detail:[{id:'q',correct:true,unanswered:false}]});
+test('offline completed results survive restart, merge with another device, and do not cross accounts',async()=>{
+ let a=setup();await a.api.prepare({uid:'a'});a.context.navigator.onLine=false;a.local.set('ges-pasco-practice-a-history',JSON.stringify([result('first')]));a.api.queuePractice();await a.api.flush();assert.equal(a.cloud.has('users/a/practiceResults/first'),false);
+ a=setup(a.local,a.cloud);await a.api.prepare({uid:'a'});assert.ok(a.cloud.has('users/a/practiceResults/first'));
+ const b=setup(new Map([['ges-pasco-practice-a-history',JSON.stringify([result('second','a',2000)])]]),a.cloud);await b.api.prepare({uid:'a'});assert.deepEqual(JSON.parse(b.local.get('ges-pasco-practice-a-history')).map(r=>r.id),['second','first']);
+ await a.api.flush(true);assert.deepEqual(JSON.parse(a.local.get('ges-pasco-practice-a-history')).map(r=>r.id),['second','first']);
+ await b.api.prepare({uid:'b'});assert.equal(b.local.get('ges-pasco-practice-b-history'),'[]');assert.equal(b.cloud.has('users/b/practiceResults/first'),false);
+});
+test('cloud failure leaves practice uploads pending for retry',async()=>{const s=setup();await s.api.prepare({uid:'a'});s.local.set('ges-pasco-practice-a-history',JSON.stringify([result('retry')]));s.setFail(true);s.api.queuePractice();await s.api.flush();assert.match(s.label.textContent,/unavailable/);s.setFail(false);await s.api.flush(true);assert.ok(s.cloud.has('users/a/practiceResults/retry'));assert.match(s.label.textContent,/Synced/);});

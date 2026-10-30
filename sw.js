@@ -24,6 +24,7 @@ const FILES_TO_CACHE = [
   "./user-guide.js",
   "./firebase-config.js",
   "./firestore-data.js",
+  "./practice-sync-core.js",
   "./auth.js",
   "./account-settings.js",
   "./account-menu.js",

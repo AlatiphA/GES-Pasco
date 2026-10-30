@@ -272,6 +272,18 @@ service cloud.firestore {
         allow delete: if isOwner(userId) && deletingAccount();
       }
 
+      match /practiceResults/{resultId} {
+        allow read: if isOwner(userId);
+        allow create: if signedIn() && isOwner(userId)
+          && request.resource.data.keys().hasOnly(['recordId','finishedAtMs','payload'])
+          && request.resource.data.keys().hasAll(['recordId','finishedAtMs','payload'])
+          && request.resource.data.recordId is string && request.resource.data.recordId.size() > 0 && request.resource.data.recordId.size() <= 400
+          && request.resource.data.finishedAtMs is int && request.resource.data.finishedAtMs > 0
+          && request.resource.data.payload is string && request.resource.data.payload.size() <= 100000;
+        allow update: if signedIn() && isOwner(userId) && request.resource.data == resource.data;
+        allow delete: if isOwner(userId) && deletingAccount();
+      }
+
       match /bookmarks/{bookmarkId} {
         allow read: if isOwner(userId);
         allow create, update: if signedIn() && isOwner(userId) && validBookmark();
