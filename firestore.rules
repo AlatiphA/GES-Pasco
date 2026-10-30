@@ -27,6 +27,76 @@ service cloud.firestore {
       allow list, update, delete: if false;
     }
 
+    function paymentAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/paymentAdmins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/paymentAdmins/$(request.auth.uid)).data.active == true;
+    }
+    function validPlan(plan,amount) {
+      return (plan == 'm1' && amount == 2000) || (plan == 'm3' && amount == 5000)
+        || (plan == 'm6' && amount == 8000) || (plan == 'm12' && amount == 10000);
+    }
+    match /paymentAdmins/{uid} {
+      allow get: if signedIn() && isOwner(uid);
+      allow list, write: if false;
+    }
+    match /momoRequests/{id} {
+      allow read: if signedIn() && (paymentAdmin() || resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid','kind','planId','amountPesewas','reference','status','createdAt'])
+        && request.resource.data.keys().hasAll(['uid','kind','planId','amountPesewas','reference','status','createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending' && request.resource.data.createdAt == request.time
+        && request.resource.data.reference is string && request.resource.data.reference.matches('^[A-Z0-9-]{6,80}$')
+        && request.resource.data.amountPesewas is int
+        && ((request.resource.data.kind == 'support' && request.resource.data.planId == '' && request.resource.data.amountPesewas >= 100 && request.resource.data.amountPesewas <= 1000000)
+          || (request.resource.data.kind == 'subscription' && validPlan(request.resource.data.planId,request.resource.data.amountPesewas)))
+        && !exists(/databases/$(database)/documents/momoReceipts/$(request.resource.data.reference));
+      allow update: if paymentAdmin() && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewedBy','reviewedAt','endsAtMs'])
+        && request.resource.data.reviewedBy == request.auth.uid && request.resource.data.reviewedAt == request.time
+        && request.resource.data.endsAtMs is int
+        && ((request.resource.data.status == 'rejected' && request.resource.data.endsAtMs == 0)
+          || (request.resource.data.status == 'approved'
+            && getAfter(/databases/$(database)/documents/momoReceipts/$(resource.data.reference)).data.requestId == id
+            && (resource.data.kind == 'support' ? request.resource.data.endsAtMs == 0
+              : (getAfter(/databases/$(database)/documents/subscriptions/$(resource.data.uid)).data.requestId == id
+                 && getAfter(/databases/$(database)/documents/subscriptions/$(resource.data.uid)).data.endsAtMs == request.resource.data.endsAtMs))));
+      allow delete: if false;
+    }
+    match /momoReceipts/{reference} {
+      allow read: if signedIn() && (paymentAdmin() || resource.data.uid == request.auth.uid);
+      allow create: if paymentAdmin()
+        && request.resource.data.keys().hasOnly(['requestId','uid','reference','amountPesewas','kind','planId','approvedBy','approvedAt'])
+        && request.resource.data.keys().hasAll(['requestId','uid','reference','amountPesewas','kind','planId','approvedBy','approvedAt'])
+        && request.resource.data.reference == reference && request.resource.data.approvedBy == request.auth.uid
+        && request.resource.data.approvedAt == request.time
+        && get(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.status == 'pending'
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.status == 'approved'
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.uid == request.resource.data.uid
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.reference == reference
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.amountPesewas == request.resource.data.amountPesewas
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.kind == request.resource.data.kind
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.planId == request.resource.data.planId;
+      allow update, delete: if false;
+    }
+    match /subscriptions/{uid} {
+      allow read: if signedIn() && (isOwner(uid) || paymentAdmin());
+      allow create, update: if paymentAdmin()
+        && request.resource.data.keys().hasOnly(['uid','planId','endsAtMs','requestId','updatedBy','updatedAt'])
+        && request.resource.data.keys().hasAll(['uid','planId','endsAtMs','requestId','updatedBy','updatedAt'])
+        && request.resource.data.uid == uid && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time && request.resource.data.endsAtMs is int
+        && request.resource.data.endsAtMs > request.time.toMillis()
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.uid == uid
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.kind == 'subscription'
+        && get(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.status == 'pending'
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.status == 'approved'
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.endsAtMs == request.resource.data.endsAtMs
+        && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.planId == request.resource.data.planId
+        && (!exists(/databases/$(database)/documents/subscriptions/$(uid)) || request.resource.data.requestId != resource.data.requestId);
+      allow delete: if false;
+    }
+
     function validProfileShape() {
       return request.resource.data.keys().hasOnly([
                'displayName', 'email', 'role', 'accountStatus',

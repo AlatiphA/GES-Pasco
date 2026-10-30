@@ -1907,3 +1907,10 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .securityPanelContent .accountSettingsForm{padding:14px;border:1px solid var(--ui-border);border-radius:12px;background:var(--ui-surface);}
 .securityPanelContent .accountSettingsForm strong{font-size:14px;}
 #securitySettingsStatus:empty{display:none;}
+
+#momoDialog{position:fixed;inset:0;margin:auto;width:min(740px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);overflow:auto;overscroll-behavior:contain;}
+#momoDialog::backdrop{background:rgba(0,0,0,.58);}
+#momoBody{display:grid;gap:16px;padding:18px;}
+#momoBody .reportCard,#momoBody .reportForm{min-width:0;overflow-wrap:anywhere;}
+#momoStatus{padding:0 18px;}
+#momoClose{width:44px;height:44px;border:0;background:transparent;color:inherit;font-size:26px;cursor:pointer;}

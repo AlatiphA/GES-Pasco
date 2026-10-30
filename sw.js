@@ -28,6 +28,8 @@ const FILES_TO_CACHE = [
   "./auth.js",
   "./account-settings.js",
   "./account-menu.js",
+  "./momo-core.js",
+  "./momo.js",
   "./data-accounts-core.js",
   "./data-accounts.js",
   "./study-backup-core.js",

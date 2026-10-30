@@ -1,4 +1,4 @@
-const {test,before,after}=require('node:test');const {createRequire}=require('node:module');const req=createRequire(process.env.GES_REPORT_TEST_PACKAGE||require('node:path').resolve('package.json'));const {initializeTestEnvironment,assertSucceeds:yes,assertFails:no}=req('@firebase/rules-unit-testing');const {doc,setDoc,getDoc,getDocs,collection,query,where,updateDoc,deleteDoc,serverTimestamp}=req('firebase/firestore');let env;
+const {test,before,after}=require('node:test');const {createRequire}=require('node:module');const req=createRequire(process.env.GES_REPORT_TEST_PACKAGE||require('node:path').resolve('package.json'));const {initializeTestEnvironment,assertSucceeds:yes,assertFails:no}=req('@firebase/rules-unit-testing');const {doc,setDoc,getDoc,getDocs,collection,query,where,updateDoc,deleteDoc,writeBatch,serverTimestamp}=req('firebase/firestore');let env;
 before(async()=>{env=await initializeTestEnvironment({projectId:'demo-ges-pasco-reports',firestore:{host:'127.0.0.1',port:8080,rules:require('node:fs').readFileSync('firestore.rules','utf8')}});await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'reportAdmins/reviewer'),{active:true}));});after(async()=>env?.cleanup());
 const db=id=>id?env.authenticatedContext(id,{email:id+'@example.com'}).firestore():env.unauthenticatedContext().firestore();
 const payload=()=>({reporterUid:'alice',question:{id:'q1',bankId:'b1',bankTitle:'Exam',prompt:'Question?',options:['A','B'],answerIndex:1,source:'Section A'},category:'wrong_answer',description:'Please check',suggestion:'',status:'new',createdAt:serverTimestamp(),updatedAt:serverTimestamp(),reviewNote:'',reviewedBy:'',reviewedAt:null,appVersion:'1.0.22',queuedAtMs:123});
@@ -31,4 +31,23 @@ test('practice results are owner-only, bounded and immutable; deletion requires 
  await no(setDoc(doc(db('study'),'users/study/practiceResults/large'),{...value,payload:'x'.repeat(100001)}));
  await no(setDoc(doc(db('study'),'users/study/practiceResults/extra'),{...value,extra:true}));
  await no(setDoc(doc(db('study'),'users/study/practiceResults/invalid'),{...value,finishedAtMs:-1}));
+});
+
+const payment=(uid='payer',reference='MOMO123456')=>({uid,kind:'subscription',planId:'m1',amountPesewas:2000,reference,status:'pending',createdAt:serverTimestamp()});
+test('MoMo requests are private, bounded, not self-approved and cannot grant payment-admin access',async()=>{
+ await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'paymentAdmins/finance'),{active:true}));
+ await yes(setDoc(doc(db('payer'),'momoRequests/pay-one'),payment()));
+ await yes(getDoc(doc(db('payer'),'momoRequests/pay-one')));await no(getDoc(doc(db('bob'),'momoRequests/pay-one')));await no(getDoc(doc(db(),'momoRequests/pay-one')));
+ await no(setDoc(doc(db('payer'),'momoRequests/wrong-price'),{...payment(),amountPesewas:1}));await no(setDoc(doc(db('payer'),'momoRequests/spoof'),payment('bob')));
+ await no(updateDoc(doc(db('payer'),'momoRequests/pay-one'),{status:'approved'}));await no(setDoc(doc(db('payer'),'paymentAdmins/payer'),{active:true}));
+ await no(setDoc(doc(db('payer'),'subscriptions/payer'),{uid:'payer',endsAtMs:Date.now()+100000}));
+ await yes(setDoc(doc(db('payer'),'momoRequests/support'),{...payment(),kind:'support',planId:'',amountPesewas:1234,reference:'SUPPORT123'}));
+ await no(updateDoc(doc(db('reviewer'),'momoRequests/pay-one'),{status:'rejected',reviewedBy:'reviewer',reviewedAt:serverTimestamp(),endsAtMs:0}));
+});
+test('MoMo approval is atomic, transaction IDs cannot be reused, and approvals cannot be changed',async()=>{
+ const finance=db('finance'),request='momoRequests/pay-one',end=Date.now()+31*86400000;
+ await no(updateDoc(doc(finance,request),{status:'approved',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:end}));
+ const batch=writeBatch(finance);batch.update(doc(finance,request),{status:'approved',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:end});batch.set(doc(finance,'momoReceipts/MOMO123456'),{requestId:'pay-one',uid:'payer',reference:'MOMO123456',amountPesewas:2000,kind:'subscription',planId:'m1',approvedBy:'finance',approvedAt:serverTimestamp()});batch.set(doc(finance,'subscriptions/payer'),{uid:'payer',planId:'m1',endsAtMs:end,requestId:'pay-one',updatedBy:'finance',updatedAt:serverTimestamp()});await yes(batch.commit());
+ await no(setDoc(doc(db('payer'),'momoRequests/reuse'),payment()));await no(updateDoc(doc(finance,'momoReceipts/MOMO123456'),{amountPesewas:1}));await no(deleteDoc(doc(finance,'momoReceipts/MOMO123456')));
+ await no(updateDoc(doc(finance,request),{status:'rejected',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:0}));await yes(getDoc(doc(db('payer'),'subscriptions/payer')));await no(getDoc(doc(db('bob'),'subscriptions/payer')));
 });
