@@ -1914,3 +1914,12 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 #momoBody .reportCard,#momoBody .reportForm{min-width:0;overflow-wrap:anywhere;}
 #momoStatus{padding:0 18px;}
 #momoClose{width:44px;height:44px;border:0;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+
+#momoDialog{--account-bg:var(--ui-surface);--account-line:var(--ui-border);--account-text:var(--ui-text);--account-accent:#956433;font-size:14px;line-height:1.6;}
+#momoBody .reportCard{margin:0;}
+#momoBody .reportCard p{margin:10px 0;}
+#momoBody .reportCard h3{margin:0 0 8px;font-size:15px;}
+#momoBody .reportCard > .profileAction{margin:8px 8px 0 0;}
+#momoBody input:not([type=checkbox]){width:100%;min-width:0;padding:12px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
+#momoBody label{display:grid;gap:8px;}
+#momoClose{border:1px solid var(--ui-border);border-radius:50%;}
