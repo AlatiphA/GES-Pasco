@@ -26,6 +26,8 @@ const FILES_TO_CACHE = [
   "./firestore-data.js",
   "./practice-sync-core.js",
   "./auth.js",
+  "./access-core.js",
+  "./access.js",
   "./account-settings.js",
   "./account-menu.js",
   "./momo-core.js",

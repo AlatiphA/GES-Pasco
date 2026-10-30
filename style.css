@@ -1923,3 +1923,10 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 #momoBody input:not([type=checkbox]){width:100%;min-width:0;padding:12px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface);color:var(--ui-text);font:inherit;}
 #momoBody label{display:grid;gap:8px;}
 #momoClose{border:1px solid var(--ui-border);border-radius:50%;}
+
+#accessGate{position:fixed;inset:0;z-index:10010;display:grid;place-items:center;padding:20px;overflow:auto;background:var(--ui-raised);color:var(--ui-text);--account-bg:var(--ui-surface);--account-line:var(--ui-border);--account-text:var(--ui-text);--account-accent:#956433;}
+#accessGate[hidden]{display:none;}
+.accessCard{display:grid;gap:14px;width:min(440px,100%);padding:24px;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);line-height:1.6;}
+.accessCard h2{font-size:22px;}
+html[data-access-locked] #viewer{visibility:hidden!important;}
+html[data-access-locked] #readerApp > footer{visibility:hidden!important;}

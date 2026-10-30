@@ -333,6 +333,8 @@
         // Resolve the newest reading position before app.js starts. This lets
         // another device resume from Firestore without changing EPUB startup.
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
+        if (window.GESPascoAccess && !await window.GESPascoAccess.prepare(user)) return;
+        if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
         if (window.gesPascoReaderSync) {
           await window.gesPascoReaderSync.prepare(user);
         }

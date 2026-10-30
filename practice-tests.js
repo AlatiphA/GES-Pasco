@@ -84,7 +84,7 @@
 
  }
  function close(){persist();clearInterval(timer);generation++;dialog.close();}
- function open(view='practice'){const user=gesPascoAuth.currentUser;if(!user)return;owner=user.uid;const saved=read('attempt',null);attempt=core.validAttempt(saved,owner)?saved:null;if(attempt?.finishedAtMs)write('history',revisionRecords());dialog.showModal();if(view==='revision')revision();else setup();clearInterval(timer);timer=setInterval(tick,1000);}
+ function open(view='practice'){if(view==='practice'&&window.GESPascoAccess&&!window.GESPascoAccess.allowed())return;const user=gesPascoAuth.currentUser;if(!user)return;owner=user.uid;const saved=read('attempt',null);attempt=core.validAttempt(saved,owner)?saved:null;if(attempt?.finishedAtMs)write('history',revisionRecords());dialog.showModal();if(view==='revision')revision();else setup();clearInterval(timer);timer=setInterval(tick,1000);}
  document.querySelectorAll('[data-open-practice]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!dialog.open)open();}));
  document.querySelectorAll('[data-open-revision]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(!dialog.open)open('revision');}));
  document.getElementById('practiceClose').addEventListener('click',close);dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
