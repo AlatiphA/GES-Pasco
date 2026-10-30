@@ -1899,3 +1899,11 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .studyBackupFile{display:grid;gap:10px;margin-top:16px;font-weight:600;}
 .studyBackupFile input{width:100%;min-width:0;max-width:100%;font:inherit;}
 #studyBackupSection p{overflow-wrap:anywhere;}
+
+.profileSettings > .accountSecuritySection{margin:0;padding:0;border:0;border-bottom:1px solid var(--ui-border);}
+.securityPanelContent{display:grid;gap:14px;}
+.securityIdentity .profileSettingStatus{display:block;overflow-wrap:anywhere;margin-top:6px;}
+.securityPanelContent #accountPasswordControls{display:grid;gap:14px;}
+.securityPanelContent .accountSettingsForm{padding:14px;border:1px solid var(--ui-border);border-radius:12px;background:var(--ui-surface);}
+.securityPanelContent .accountSettingsForm strong{font-size:14px;}
+#securitySettingsStatus:empty{display:none;}
