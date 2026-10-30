@@ -1,10 +1,11 @@
 /* Trial age is original account age, never installation or first-visit age. */
 (function(root){
  const trialMs=7*86400000;
- function evaluate({createdAtMs,authCreatedAtMs,endsAtMs=0,admin=false},now=Date.now()){
+ function evaluate({createdAtMs,authCreatedAtMs,endsAtMs=0,admin=false,control={}},now=Date.now()){
  const dates=[createdAtMs,authCreatedAtMs].filter(n=>Number.isFinite(n)&&n>0),created=dates.length?Math.min(...dates):0;
  if(admin)return {allowed:true,kind:'administrator',expiresAtMs:now+86400000};
- if(Number.isFinite(endsAtMs)&&endsAtMs>now)return {allowed:true,kind:'subscription',expiresAtMs:endsAtMs};
+ if(control?.status==='suspended')return {allowed:false,kind:'suspended',expiresAtMs:0};
+ if(control?.accessMode!=='trial-only'&&Number.isFinite(endsAtMs)&&endsAtMs>now)return {allowed:true,kind:'subscription',expiresAtMs:endsAtMs};
  const end=created?created+trialMs:0;
  return {allowed:!!created&&now>=created-60000&&now<end,kind:created?'trial':'unverified',expiresAtMs:end};
  }

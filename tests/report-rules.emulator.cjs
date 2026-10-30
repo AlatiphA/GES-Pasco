@@ -51,3 +51,17 @@ test('MoMo approval is atomic, transaction IDs cannot be reused, and approvals c
  await no(setDoc(doc(db('payer'),'momoRequests/reuse'),payment()));await no(updateDoc(doc(finance,'momoReceipts/MOMO123456'),{amountPesewas:1}));await no(deleteDoc(doc(finance,'momoReceipts/MOMO123456')));
  await no(updateDoc(doc(finance,request),{status:'rejected',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:0}));await yes(getDoc(doc(db('payer'),'subscriptions/payer')));await no(getDoc(doc(db('bob'),'subscriptions/payer')));
 });
+
+test('registered users and financial exemptions are visible only to authorized payment administrators',async()=>{
+ await env.withSecurityRulesDisabled(async c=>{await setDoc(doc(c.firestore(),'users/list-person'),{email:'person@example.com',displayName:'Person',createdAt:serverTimestamp()});await setDoc(doc(c.firestore(),'paymentAdmins/list-person'),{active:true});});
+ await yes(getDocs(collection(db('finance'),'users')));await yes(getDoc(doc(db('finance'),'users/list-person')));await yes(getDoc(doc(db('finance'),'paymentAdmins/list-person')));
+ await no(getDocs(collection(db('payer'),'users')));await no(getDocs(collection(db('reviewer'),'users')));await no(getDoc(doc(db('payer'),'users/list-person')));await no(getDoc(doc(db('reviewer'),'paymentAdmins/list-person')));await no(getDocs(collection(db(),'users')));
+ await no(updateDoc(doc(db('finance'),'users/list-person'),{displayName:'Changed'}));await no(updateDoc(doc(db('finance'),'paymentAdmins/list-person'),{active:false}));
+});
+
+test('only financial administrators manage non-administrator app access and send private messages',async()=>{
+ const control={uid:'payer',status:'suspended',accessMode:'automatic',updatedBy:'finance',updatedAt:serverTimestamp()};await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'users/payer'),{email:'payer@example.com'}));
+ await no(setDoc(doc(db('payer'),'accountControls/payer'),{...control,updatedBy:'payer'}));await no(setDoc(doc(db('reviewer'),'accountControls/payer'),{...control,updatedBy:'reviewer'}));await yes(setDoc(doc(db('finance'),'accountControls/payer'),control));await yes(getDoc(doc(db('payer'),'accountControls/payer')));await no(getDoc(doc(db('bob'),'accountControls/payer')));
+ await no(setDoc(doc(db('finance'),'accountControls/finance'),{...control,uid:'finance'}));await no(setDoc(doc(db('finance'),'accountControls/list-person'),{...control,uid:'list-person'}));await yes(updateDoc(doc(db('finance'),'accountControls/payer'),{status:'active',accessMode:'trial-only',updatedAt:serverTimestamp()}));
+ const message={title:'Message from GES Pasco',body:'Please contact support.',authorUid:'finance',createdAt:serverTimestamp()};await yes(setDoc(doc(db('finance'),'users/payer/adminMessages/one'),message));await yes(getDoc(doc(db('payer'),'users/payer/adminMessages/one')));await no(getDoc(doc(db('bob'),'users/payer/adminMessages/one')));await no(setDoc(doc(db('payer'),'users/payer/adminMessages/forged'),{...message,authorUid:'payer'}));await no(setDoc(doc(db('reviewer'),'users/payer/adminMessages/forged-reviewer'),{...message,authorUid:'reviewer'}));
+});

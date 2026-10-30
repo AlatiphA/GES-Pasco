@@ -36,8 +36,32 @@ service cloud.firestore {
         || (plan == 'm6' && amount == 8000) || (plan == 'm12' && amount == 10000);
     }
     match /paymentAdmins/{uid} {
-      allow get: if signedIn() && isOwner(uid);
+      allow get: if signedIn() && (isOwner(uid) || paymentAdmin());
       allow list, write: if false;
+    }
+    match /accountControls/{uid} {
+      allow read: if signedIn() && (isOwner(uid) || paymentAdmin());
+      allow create, update: if paymentAdmin() && uid != request.auth.uid
+        && !(exists(/databases/$(database)/documents/paymentAdmins/$(uid)) && get(/databases/$(database)/documents/paymentAdmins/$(uid)).data.active == true)
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && request.resource.data.keys().hasOnly(['uid','status','accessMode','updatedBy','updatedAt'])
+        && request.resource.data.keys().hasAll(['uid','status','accessMode','updatedBy','updatedAt'])
+        && request.resource.data.uid == uid && request.resource.data.status in ['active','suspended']
+        && request.resource.data.accessMode in ['automatic','trial-only']
+        && request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid) && deletingAccount();
+    }
+    match /users/{uid}/adminMessages/{id} {
+      allow read: if isOwner(uid);
+      allow create: if paymentAdmin() && !exists(/databases/$(database)/documents/accountDeletions/$(uid))
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && request.resource.data.keys().hasOnly(['title','body','authorUid','createdAt'])
+        && request.resource.data.keys().hasAll(['title','body','authorUid','createdAt'])
+        && request.resource.data.title == 'Message from GES Pasco'
+        && request.resource.data.body is string && request.resource.data.body.size() > 0 && request.resource.data.body.size() <= 2000
+        && request.resource.data.authorUid == request.auth.uid && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if isOwner(uid) && deletingAccount();
     }
     match /momoRequests/{id} {
       allow read: if signedIn() && (paymentAdmin() || resource.data.uid == request.auth.uid);
@@ -320,7 +344,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow create: if signedIn() && isOwner(userId) && validProfileShape();
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || paymentAdmin();
 
       // Ordinary users may refresh their own name/email/login timestamp,
       // but cannot change role, accountStatus or createdAt.
