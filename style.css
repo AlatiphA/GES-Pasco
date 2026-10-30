@@ -1895,3 +1895,7 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 
 .aboutInstallCard > strong {font-size:13px;font-weight:600;}
 .aboutInstallCard .profileSettingStatus {margin-top:8px;font-size:13px;line-height:1.6;}
+
+.studyBackupFile{display:grid;gap:10px;margin-top:16px;font-weight:600;}
+.studyBackupFile input{width:100%;min-width:0;max-width:100%;font:inherit;}
+#studyBackupSection p{overflow-wrap:anywhere;}

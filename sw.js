@@ -30,6 +30,8 @@ const FILES_TO_CACHE = [
   "./account-menu.js",
   "./data-accounts-core.js",
   "./data-accounts.js",
+  "./study-backup-core.js",
+  "./study-backup.js",
   "./quiz-core.js",
   "./quiz-admin-core.js",
   "./question-banks.js",
