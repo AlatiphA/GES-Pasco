@@ -1930,3 +1930,6 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .accessCard h2{font-size:22px;}
 html[data-access-locked] #viewer{visibility:hidden!important;}
 html[data-access-locked] #readerApp > footer{visibility:hidden!important;}
+
+/* Reader pinches belong to text sizing; retain single-finger panning. */
+#viewer, #viewer iframe { touch-action: pan-x pan-y; }

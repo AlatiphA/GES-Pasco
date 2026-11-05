@@ -937,6 +937,7 @@ function startReader() {
     const style = doc.createElement("style");
     style.id = "custom-fonts";
     style.textContent = `
+      html, body { touch-action: pan-x pan-y !important; }
       @font-face {
         font-family: 'Merriweather';
         src: url('${base}/fonts/Merriweather-VariableFont_opsz_wdth_wght.ttf') format('truetype');
@@ -1054,6 +1055,7 @@ function startReader() {
     let _pinchStartDistance = 0;
     let _pinchStartFontSize = fontSize;
     let _pinchLastFontSize = fontSize;
+    let _pinchAnchor = null;
 
     const pinchDistance = touches => {
       if (!touches || touches.length < 2) return 0;
@@ -1065,19 +1067,44 @@ function startReader() {
     const clampReaderFontSize = value =>
       Math.max(70, Math.min(200, Math.round(value / 10) * 10));
 
+    // Defer reflow until release: moving columns beneath active touches can
+    // lose the visible sentence and interrupt the browser's touch sequence.
     const applyPinchFontSize = value => {
-      const nextSize = clampReaderFontSize(value);
-      if (nextSize === _pinchLastFontSize) return;
-      fontSize = nextSize;
-      _pinchLastFontSize = nextSize;
-      rendition.themes.fontSize(fontSize + "%");
-      window.gesPascoStorage.setItem("fontSize", fontSize);
+      _pinchLastFontSize = clampReaderFontSize(value);
     };
+
+    const finishReaderPinch = () => {
+      if (!_pinchActive) { _tx = _ty = null; return; }
+      _pinchActive = false;
+      _tx = _ty = null;
+      _tt = Date.now(); // Ignore the synthetic click following a pinch.
+      if (_pinchLastFontSize === fontSize) return;
+      fontSize = _pinchLastFontSize;
+      rendition.themes.fontSize(fontSize + "%");
+      if (_pinchAnchor) {
+        Promise.resolve(rendition.display(_pinchAnchor)).catch(err => console.error(err));
+      }
+      window.gesPascoStorage.setItem("fontSize", fontSize);
+      window.gesPascoReaderSync?.queuePreferences({
+        theme: window.gesPascoStorage.getItem("theme-v2") || "dark",
+        fontSize: fontSize,
+        fontFamily: fontFamily
+      });
+    };
+
+    // Safari also emits native gesture events; cancel only in the book.
+    ["gesturestart", "gesturechange", "gestureend"].forEach(name => {
+      doc.addEventListener(name, e => e.preventDefault(), { passive: false });
+    });
+    doc.addEventListener("touchcancel", finishReaderPinch);
 
     doc.addEventListener("touchstart", e => {
       if (!e.touches) return;
 
-      if (e.touches.length === 2) {
+      if (e.touches.length >= 2) {
+        if (e.cancelable) e.preventDefault();
+        if (_pinchActive) return;
+        _pinchAnchor = rendition.currentLocation()?.start?.cfi || null;
         _pinchActive = true;
         _pinchStartDistance = pinchDistance(e.touches);
         _pinchStartFontSize = fontSize;
@@ -1089,7 +1116,7 @@ function startReader() {
         return;
       }
 
-      if (e.touches.length !== 1) {
+      if (_pinchActive || e.touches.length !== 1) {
         _tx = _ty = null;
         return;
       }
@@ -1097,15 +1124,15 @@ function startReader() {
       _ty = e.touches[0].clientY;
       _tt = Date.now();
       _pullRefreshFired = false;
-    }, { passive: true });
+    }, { passive: false });
 
     /* Android standalone PWAs can turn a vertical pull into touchcancel
        before touchend. Detect the threshold during touchmove instead. */
     doc.addEventListener("touchmove", e => {
-      if (_pinchActive && e.touches && e.touches.length >= 2) {
+      if (_pinchActive) {
         /* This is the only touch path we cancel: it prevents browser/page
            magnification while leaving every one-finger gesture untouched. */
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         const distance = pinchDistance(e.touches);
         if (_pinchStartDistance > 0 && distance > 0) {
           applyPinchFontSize(_pinchStartFontSize * (distance / _pinchStartDistance));
@@ -1126,16 +1153,7 @@ function startReader() {
       if (_pinchActive) {
         /* Keep swallowing the gesture until both fingers are up. */
         if (e.touches && e.touches.length > 0) return;
-        _pinchActive = false;
-        _tx = _ty = null;
-        window.gesPascoStorage.setItem("fontSize", fontSize);
-        if (window.gesPascoReaderSync) {
-          window.gesPascoReaderSync.queuePreferences({
-            theme: window.gesPascoStorage.getItem("theme-v2") || "dark",
-            fontSize: fontSize,
-            fontFamily: fontFamily
-          });
-        }
+        finishReaderPinch();
         return;
       }
 
