@@ -71,11 +71,10 @@ async function fetchWithTimeout(request, init = {}) {
   if (controller) options.signal = controller.signal;
   let timer;
   try {
-    return await Promise.race([
-      fetch(new Request(request, options)),
-      new Promise((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); })
-    ]);
-  } finally { clearTimeout(timer); }
+    const attempts = [fetch(new Request(request, options))];
+    if (typeof setTimeout === 'function') attempts.push(new Promise((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); }));
+    return await Promise.race(attempts);
+  } finally { if (timer !== undefined && typeof clearTimeout === 'function') clearTimeout(timer); }
 }
 
 // Keep working copies until every required replacement has downloaded successfully.
@@ -84,6 +83,11 @@ async function validBook(response) {
   if (!response || !response.ok) return false;
   const bytes = new Uint8Array(await response.clone().arrayBuffer());
   return bytes.length > 100 && bytes[0] === 80 && bytes[1] === 75 && bytes[2] === 3 && bytes[3] === 4;
+}
+async function matchCached(request, options) {
+  if (typeof caches.match === 'function') return caches.match(request, options);
+  const cache = await caches.open(CACHE_NAME);
+  return typeof cache.match === 'function' ? cache.match(request, options) : undefined;
 }
 async function offlineStatus() {
   const cache = await caches.open(CACHE_NAME);
@@ -169,16 +173,16 @@ self.addEventListener("fetch", event => {
   // Read cached app resources first. The new worker replaces the old shell
   // only after its install has fetched and validated every required file.
   event.respondWith((async () => {
-    const cached = await caches.match(event.request, {ignoreSearch:isAppShell});
+    const cached = await matchCached(event.request, {ignoreSearch:isAppShell});
     if (cached) return cached;
     try {
-      const response = await fetchWithTimeout(event.request);
+      const response = await fetchWithTimeout(event.request, {cache:'no-store'});
       if (!response.ok) throw new Error('Download unavailable');
       const clone = response.clone();
       caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone)).catch(() => {});
       return response;
     } catch {
-      if (event.request.mode === 'navigate') return (await caches.match('./index.html')) || Response.error();
+      if (event.request.mode === 'navigate') return (await matchCached('./index.html')) || Response.error();
       return Response.error();
     }
   })());
