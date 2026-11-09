@@ -66,12 +66,14 @@ const FILES_TO_CACHE = [
 // Bound every network miss so a slow connection cannot hold app startup or installation open.
 const NETWORK_TIMEOUT_MS = 12000;
 async function fetchWithTimeout(request, init = {}) {
-  const controller = new AbortController();
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  const options = {...init};
+  if (controller) options.signal = controller.signal;
   let timer;
   try {
     return await Promise.race([
-      fetch(new Request(request, {...init, signal:controller.signal})),
-      new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); })
+      fetch(new Request(request, options)),
+      new Promise((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); })
     ]);
   } finally { clearTimeout(timer); }
 }
