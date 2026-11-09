@@ -63,7 +63,20 @@ const FILES_TO_CACHE = [
   "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js",
 ];
 
-// Keep working copies until each replacement has downloaded successfully.
+// Bound every network miss so a slow connection cannot hold app startup or installation open.
+const NETWORK_TIMEOUT_MS = 12000;
+async function fetchWithTimeout(request, init = {}) {
+  const controller = new AbortController();
+  let timer;
+  try {
+    return await Promise.race([
+      fetch(new Request(request, {...init, signal:controller.signal})),
+      new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); })
+    ]);
+  } finally { clearTimeout(timer); }
+}
+
+// Keep working copies until every required replacement has downloaded successfully.
 let offlineJob = null;
 async function validBook(response) {
   if (!response || !response.ok) return false;
@@ -84,7 +97,7 @@ function prepareOffline() {
   offlineJob = (async () => {
     const cache = await caches.open(CACHE_NAME);
     const results = await Promise.allSettled(FILES_TO_CACHE.map(async url => {
-      const response = await fetch(new Request(url, {cache:'reload'}));
+      const response = await fetchWithTimeout(new Request(url, {cache:'reload'}));
       if (!response.ok || (url.endsWith('.epub') && !await validBook(response))) throw new Error('Incomplete download: '+url);
       if (url === './version.js' && !(await response.clone().text()).includes('"'+globalThis.GES_PASCO_VERSION+'"')) throw new Error('A newer release is available. Install the app update before repairing downloads.');
       return {url,response};
@@ -140,7 +153,7 @@ self.addEventListener("fetch", event => {
 
   // A release check must never fall back to a cached version file.
   if (url.pathname.endsWith('/version.js') && url.searchParams.has('release-check')) {
-    event.respondWith(fetch(new Request(event.request, {cache:'no-store'})));
+    event.respondWith(fetchWithTimeout(event.request, {cache:'no-store'}));
     return;
   }
   const isAppShell =
@@ -151,42 +164,22 @@ self.addEventListener("fetch", event => {
     url.pathname === "/" ||
     url.pathname.endsWith("/");
 
-  if (isAppShell) {
-
-    /* Network-first: always try to get the freshest
-       app shell, fall back to cache if offline */
-    event.respondWith(
-      fetch(new Request(event.request, {cache:'no-store'}))
-        .then(networkResponse => {
-          if (!networkResponse.ok) throw new Error('Download unavailable');
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => cache.put(event.request, clone));
-          return networkResponse;
-        })
-        .catch(() => caches.match(event.request))
-    );
-
-  } else {
-
-    /* Cache-first: EPUB, icons, fonts â€” stable assets */
-    event.respondWith(
-      caches.match(event.request)
-        .then(cached => {
-          if (cached) return cached;
-          return fetch(event.request)
-            .then(networkResponse => {
-              if (!networkResponse.ok) throw new Error('Download unavailable');
-          const clone = networkResponse.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => cache.put(event.request, clone));
-              return networkResponse;
-            });
-        })
-        .catch(async () => event.request.mode === "navigate" ? (await caches.match("./index.html")) || Response.error() : Response.error())
-    );
-
-  }
+  // Read cached app resources first. The new worker replaces the old shell
+  // only after its install has fetched and validated every required file.
+  event.respondWith((async () => {
+    const cached = await caches.match(event.request, {ignoreSearch:isAppShell});
+    if (cached) return cached;
+    try {
+      const response = await fetchWithTimeout(event.request);
+      if (!response.ok) throw new Error('Download unavailable');
+      const clone = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone)).catch(() => {});
+      return response;
+    } catch {
+      if (event.request.mode === 'navigate') return (await caches.match('./index.html')) || Response.error();
+      return Response.error();
+    }
+  })());
 
 });
 

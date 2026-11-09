@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const keys = ['ges-pasco-data','ges-pasco-bookmarks','ges-pasco-preferences-meta','theme-v2','reader-theme','fontSize','fontFamily'];
-  let user = null, epoch = 0, timer, running = false, failed = false, storageFailed = false;
+  let user = null, epoch = 0, hydrationEpoch = 0, timer, retryTimer, running = false, hydrating = false, failed = false, storageFailed = false, retryNeeded = false, retryDelay = 30000;
   let pending = {}, records = {};
   const scoped = key => keys.includes(key) ? key + '-user-' + (user?.uid || 'signed-out') : key;
   const storage = window.gesPascoStorage = {
@@ -21,9 +21,10 @@
   function render() {
     const label=document.getElementById('syncStatus'),button=document.getElementById('syncRetry');
     if(label)label.textContent=storageFailed?'Device storage unavailable':!navigator.onLine?'Offline — saved on this device':running?'Syncing…':failed?'Sync unavailable — saved on this device':Object.keys(pending).length?'Saved on this device — sync pending':'Synced';
-    if(button) { button.disabled=!user||!navigator.onLine||running; button.onclick=()=>flush(true); }
+    if(button) { button.disabled=!user||!navigator.onLine||running; button.onclick=()=>flush(true,true); }
   }
-  function dirty(key,value) { pending[key]={value,revision:Date.now()+'-'+Math.random()}; persist(); clearTimeout(timer); timer=setTimeout(flush,1500); }
+  function scheduleRetry(){if(!user||!navigator.onLine||running||!retryNeeded||retryTimer)return;const delay=retryDelay;retryTimer=setTimeout(()=>{retryTimer=null;flush(true);},delay);retryDelay=Math.min(300000,retryDelay*2);}
+  function dirty(key,value) { pending[key]={value,revision:Date.now()+'-'+Math.random()}; persist(); if(retryNeeded){scheduleRetry();return;} clearTimeout(timer); timer=setTimeout(flush,1500); }
   const stamp=()=>firebase.firestore.FieldValue.serverTimestamp();
   function id(cfi) { let h=2166136261; for(const c of cfi){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return 'b_'+(h>>>0).toString(36); }
   function normalize(b) {return {cfi:String(b.cfi),chapter:String(b.chapter||''),progress:Number(b.progress)||0,date:b.date||new Date().toISOString(),deleted:!!b.deleted};}
@@ -45,20 +46,20 @@
   const practiceKey=uid=>'ges-pasco-practice-'+uid+'-history';
   function practiceRows(uid){try{return JSON.parse(localStorage.getItem(practiceKey(uid)))||[];}catch{return [];}}
   function queuePractice(){if(!user||window.GESPascoDataAccounts?.operationFor(user.uid))return;const core=window.GESPascoPracticeSyncCore;if(!core)return;for(const row of core.merge(practiceRows(user.uid),[],user.uid))dirty('practice|'+row.id,core.encode(row));}
-  async function pullPractice(context,token){
+  async function pullPractice(context,token,hydrationToken){
     const snapshot=await gesPascoDb.collection('users').doc(context.uid).collection('practiceResults').orderBy('finishedAtMs','desc').limit(20).get({source:'server'});
-    if(token!==epoch)return;
+    if(token!==epoch||(hydrationToken!==undefined&&hydrationToken!==hydrationEpoch))return;
     const core=window.GESPascoPracticeSyncCore,remote=snapshot.docs.map(d=>core.decode(d.data(),context.uid)).filter(Boolean);
     const merged=core.merge(practiceRows(context.uid),remote,context.uid);
     localStorage.setItem(practiceKey(context.uid),JSON.stringify(merged));
     window.dispatchEvent(new Event('ges-pasco-practice-updated'));
   }
-  async function pull(context,token) {
+  async function pull(context,token,hydrationToken) {
     const root=gesPascoDb.collection('users').doc(context.uid);
     const before=storage.getItem('ges-pasco-data');
     const beforePrefs=storage.getItem('ges-pasco-preferences-meta');
     const [position,prefs,marks]=await Promise.all([root.collection('readerData').doc('default').get({source:'server'}),root.collection('readerData').doc('preferences').get({source:'server'}),root.collection('bookmarks').get({source:'server'})]);
-    if(token!==epoch)return;
+    if(token!==epoch||(hydrationToken!==undefined&&hydrationToken!==hydrationEpoch))return;
     const local=read('ges-pasco-data',{}),remote=position.exists?position.data():null;
     if(storage.getItem('ges-pasco-data')===before&&remote&&Date.parse(remote.lastRead)> (Date.parse(local.lastRead)||0)&&!pending.position)storage.setItem('ges-pasco-data',JSON.stringify(remote));
     else if(local.location&&!pending.position&&(!remote||Date.parse(local.lastRead)>Date.parse(remote.lastRead)))dirty('position',local);
@@ -72,11 +73,12 @@
     for(const [key,op] of Object.entries(pending))if(key.startsWith('bookmark|'))next[op.value.cfi]=op.value;
     records=next;visible();persist();
     window.dispatchEvent(new Event('ges-pasco-bookmarks-updated'));
-    await pullPractice(context,token);
+    await pullPractice(context,token,hydrationToken);
   }
-  async function flush(refresh=false) {
+  async function flush(refresh=false,manual=false) {
     if(!user||!navigator.onLine||running){render();return;}
-    const context=user,token=epoch;running=true;failed=false;render();
+    if(manual){clearTimeout(timer);clearTimeout(retryTimer);retryTimer=null;retryDelay=30000;}
+    const context=user,token=epoch;running=true;failed=false;clearTimeout(timer);render();
     const task=(async()=>{
       try {
         const root=gesPascoDb.collection('users').doc(context.uid);
@@ -90,13 +92,14 @@
           if(pending[key]?.revision===op.revision)delete pending[key];persist();
         }
         if(refresh)await pull(context,token);
-      } catch(e) {if(token===epoch){failed=true;console.warn('Cloud sync deferred:',e);}}
-      finally {if(token===epoch){running=false;persist();if(Object.keys(pending).length){clearTimeout(timer);timer=setTimeout(flush,30000);}}}
+        if(token===epoch){retryNeeded=false;retryDelay=30000;}
+      } catch(e) {if(token===epoch){failed=true;retryNeeded=true;console.warn('Cloud sync deferred:',e);}}
+      finally {if(token===epoch){running=false;persist();if(retryNeeded)scheduleRetry();else if(Object.keys(pending).length){clearTimeout(timer);timer=setTimeout(flush,1500);}}}
     })();await task;
   }
   async function prepare(nextUser) {
     clearUser();user=nextUser;if(!user)return;
-    const token=epoch;
+    const token=epoch,hydrationToken=++hydrationEpoch;
     try {pending=JSON.parse(localStorage.getItem(ownKey('pending'))||'{}');records=JSON.parse(localStorage.getItem(ownKey('records'))||'{}');}catch{pending={};records={};}
     const legacyOwner=localStorage.getItem('ges-pasco-legacy-owner');
     if(!legacyOwner&&(localStorage.getItem('ges-pasco-data')||localStorage.getItem('ges-pasco-bookmarks'))&&confirm('Older reading data is saved on this device. Does it belong to '+(user.email||'this account')+'? Choose OK to import it, or Cancel to keep it unassigned.')) {
@@ -108,12 +111,13 @@
     persist();
     // Start restoration without allowing an unavailable server to block offline reading.
     if(!navigator.onLine){render();return;}
-    const restore=(async()=>{try{await pull(user,token);if(token===epoch)await flush();}catch(e){if(token===epoch){failed=true;render();}}})();
-    await Promise.race([restore,new Promise(resolve=>setTimeout(resolve,4000))]);
+    hydrating=true;
+    const restore=(async()=>{try{await pull(user,token,hydrationToken);if(token===epoch&&hydrationToken===hydrationEpoch)await flush();}catch(e){if(token===epoch&&hydrationToken===hydrationEpoch){failed=true;retryNeeded=true;render();scheduleRetry();}}})();
+    let timerId,timedOut=false;await Promise.race([restore,new Promise(resolve=>{timerId=setTimeout(()=>{timedOut=true;resolve();},15000);})]);clearTimeout(timerId);hydrating=false;if(timedOut&&token===epoch){hydrationEpoch++;failed=true;retryNeeded=true;render();scheduleRetry();}
   }
-  function clearUser(){epoch++;user=null;pending={};records={};running=false;clearTimeout(timer);failed=false;}
+  function clearUser(){epoch++;user=null;pending={};records={};running=false;hydrating=false;hydrationEpoch++;clearTimeout(timer);clearTimeout(retryTimer);retryTimer=null;failed=false;retryNeeded=false;retryDelay=30000;}
   function resetLocal(){if(user)for(const name of ['pending','records','initialized'])localStorage.removeItem(ownKey(name));clearUser();}
-  window.addEventListener('online',()=>flush(true));window.addEventListener('offline',render);
+  window.addEventListener('online',()=>{if(retryNeeded)scheduleRetry();else if(!hydrating)flush(true);});window.addEventListener('offline',()=>{clearTimeout(timer);clearTimeout(retryTimer);retryTimer=null;render();});
   window.addEventListener('pagehide',()=>flush());
   window.gesPascoReaderSync={prepare,queue,queuePreferences,syncBookmarks,flush,clearUser,resetLocal,queuePractice};
 })();

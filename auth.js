@@ -316,30 +316,49 @@
       }
 
       if (user) {
-        if(await window.GESPascoDataAccounts?.deleting(user)) {
+        const hasSavedAccess = window.GESPascoAccess?.openCached?.(user) === true;
+        if (hasSavedAccess && window.GESPascoDataAccounts?.deletionPendingLocal?.(user)) {
+          authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);return;
+        }
+        if (!hasSavedAccess && await window.GESPascoDataAccounts?.deleting(user)) {
           if(epoch!==authEpoch||gesPascoAuth.currentUser?.uid!==user.uid)return;
           authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);return;
         }
         authGate.hidden = true;
         readerApp.hidden = false;
-        try {
-          if (navigator.onLine === false) renderProfile({}, user);
-          else await loadUserProfile(user);
-        } catch (error) {
-          console.error("Could not load user profile:", error);
-          renderProfile({}, user);
+        renderProfile({}, user);
+
+        if (hasSavedAccess) {
+          // Keep the account deletion guard; its server check and all hydration
+          // happen in the background while this locally verified reader opens.
+          window.GESPascoAccess.prepare(user).catch(() => {});
+          window.GESPascoDataAccounts?.deleting(user).then(pending => {
+            if (pending && epoch===authEpoch && gesPascoAuth.currentUser?.uid===user.uid) {
+              readerApp.hidden=true;
+              window.GESPascoAccess?.lockForDeletion?.();
+              window.GESPascoDataAccounts.open(true);
+              return;
+            }
+            if (!pending && epoch===authEpoch && gesPascoAuth.currentUser?.uid===user.uid) {
+              loadUserProfile(user).catch(error => console.warn("Profile refresh deferred:",error));
+            }
+          }).catch(() => {});
+          if (window.gesPascoReaderSync) window.gesPascoReaderSync.prepare(user).catch(error => console.warn("Cloud reading data deferred:",error));
+          if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
+          loadedUid=user.uid;
+          loadReaderOnce();
+          return;
         }
 
-        // Resolve the newest reading position before app.js starts. This lets
-        // another device resume from Firestore without changing EPUB startup.
+        // Without a valid saved access receipt, keep server verification as
+        // the gate before showing the reader.
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
+        loadUserProfile(user).catch(error => console.warn("Profile refresh deferred:",error));
         if (window.GESPascoAccess && !await window.GESPascoAccess.prepare(user)) return;
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
-        if (window.gesPascoReaderSync) {
-          await window.gesPascoReaderSync.prepare(user);
-        }
+        if (window.gesPascoReaderSync) window.gesPascoReaderSync.prepare(user).catch(error => console.warn("Cloud reading data deferred:",error));
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
-        loadedUid = user.uid;
+        loadedUid=user.uid;
         loadReaderOnce();
       } else {
         if (window.gesPascoReaderSync) window.gesPascoReaderSync.clearUser();
