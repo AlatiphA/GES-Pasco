@@ -71,7 +71,8 @@ async function fetchWithTimeout(request, init = {}) {
   if (controller) options.signal = controller.signal;
   let timer;
   try {
-    const attempts = [fetch(new Request(request, options))];
+    const timedRequest = controller || Object.keys(options).length ? new Request(request, options) : request;
+    const attempts = [fetch(timedRequest)];
     if (typeof setTimeout === 'function') attempts.push(new Promise((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); }));
     return await Promise.race(attempts);
   } finally { if (timer !== undefined && typeof clearTimeout === 'function') clearTimeout(timer); }
