@@ -574,7 +574,7 @@ async function loadBook() {
     startReader();
   } catch(error) {
     console.warn('Reader could not open:',error);
-    if(gesPascoAuth.currentUser?.uid===owner)window.GESPascoRecovery?.show('book');
+    if(gesPascoAuth.currentUser?.uid===owner){window.GESPascoStartup?.hide();window.GESPascoRecovery?.show('book');}
   } finally {clearTimeout(timer);}
 }
 
@@ -970,7 +970,8 @@ function startReader() {
   const readerData = loadReaderData();
   const savedLocation = readerData.location;
 
-  observeReaderDisplay(rendition.display(savedLocation || undefined),readerOwner,savedLocation?'position':'book');
+  observeReaderDisplay(rendition.display(savedLocation || undefined),readerOwner,savedLocation?'position':'book')
+    .then(()=>{if(gesPascoAuth.currentUser?.uid===readerOwner)window.GESPascoStartup?.hide();});
 
   /* BACKGROUND SETUP — TOC + locations, never blocks rendering */
 

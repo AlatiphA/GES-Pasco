@@ -11,6 +11,7 @@
   const signupForm = document.getElementById("signupForm");
   const forgotForm = document.getElementById("forgotForm");
   const authMessage = document.getElementById("authMessage");
+  const startupMessage = document.getElementById("startupMessage");
   const logoutBtn = document.getElementById("logoutBtn");
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
@@ -26,6 +27,12 @@
   let loadedUid = null;
   let authEpoch = 0;
   let signupInProgress = false;
+  function showStartup(message) {
+    if (message && startupMessage) startupMessage.textContent = message;
+    startupGate.hidden = false;
+  }
+  function hideStartup() { startupGate.hidden = true; }
+  window.GESPascoStartup = { show: showStartup, hide: hideStartup };
   const googleProvider = new firebase.auth.GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
 
@@ -159,10 +166,11 @@
   function loadReaderOnce() {
     if (readerLoaded) return;
     readerLoaded = true;
+    showStartup("Opening your saved page…");
     const script = document.createElement("script");
     script.src = "./app.js";
     script.defer = true;
-    script.onerror = () => { if (gesPascoAuth.currentUser?.uid !== loadedUid) return; if(window.GESPascoRecovery)window.GESPascoRecovery.show("app");else showMessage("The reader could not be loaded. Please refresh and try again."); };
+    script.onerror = () => { if (gesPascoAuth.currentUser?.uid !== loadedUid) return; hideStartup(); if(window.GESPascoRecovery)window.GESPascoRecovery.show("app");else showMessage("The reader could not be loaded. Please refresh and try again."); };
     document.body.appendChild(script);
   }
 
@@ -303,7 +311,7 @@
       // session. Until this first callback, show only the neutral startup gate.
       if (!initialAuthResolved) {
         initialAuthResolved = true;
-        startupGate.hidden = true;
+        showStartup(user ? "Opening your saved page…" : "Preparing sign-in…");
       }
 
       // createUserWithEmailAndPassword signs a new account in automatically.
@@ -312,17 +320,19 @@
       if (signupInProgress) {
         readerApp.hidden = true;
         authGate.hidden = false;
+        hideStartup();
         return;
       }
 
       if (user) {
+        showStartup("Restoring your account and saved page…");
         const hasSavedAccess = window.GESPascoAccess?.openCached?.(user) === true;
         if (hasSavedAccess && window.GESPascoDataAccounts?.deletionPendingLocal?.(user)) {
-          authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);return;
+          authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);hideStartup();return;
         }
         if (!hasSavedAccess && await window.GESPascoDataAccounts?.deleting(user)) {
           if(epoch!==authEpoch||gesPascoAuth.currentUser?.uid!==user.uid)return;
-          authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);return;
+          authGate.hidden=true;readerApp.hidden=true;window.GESPascoDataAccounts.open(true);hideStartup();return;
         }
         authGate.hidden = true;
         readerApp.hidden = false;
@@ -354,7 +364,11 @@
         // the gate before showing the reader.
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
         loadUserProfile(user).catch(error => console.warn("Profile refresh deferred:",error));
-        if (window.GESPascoAccess && !await window.GESPascoAccess.prepare(user)) return;
+        if (window.GESPascoAccess) {
+          const accessCheck = window.GESPascoAccess.prepare(user);
+          if (!window.GESPascoAccess.allowed()) hideStartup();
+          if (!await accessCheck) return;
+        }
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
         if (window.gesPascoReaderSync) window.gesPascoReaderSync.prepare(user).catch(error => console.warn("Cloud reading data deferred:",error));
         if (epoch !== authEpoch || gesPascoAuth.currentUser?.uid !== user.uid) return;
@@ -365,10 +379,11 @@
         readerApp.hidden = true;
         authGate.hidden = false;
         showForm(loginForm);
+        hideStartup();
       }
     }, error => {
       console.error("Authentication state check failed:", error);
-      startupGate.hidden = true;
+      hideStartup();
       readerApp.hidden = true;
       authGate.hidden = false;
       showForm(loginForm);

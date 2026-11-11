@@ -1279,6 +1279,50 @@ body.night .momoCard { background: rgba(255,196,0,0.04); }
   background: inherit;
   color: inherit;
   pointer-events: none;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.startupCard {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(320px, 100%);
+  color: var(--ui-text, #242b29);
+}
+
+.startupLogo {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+.startupSpinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--ui-border, #d4d9d4);
+  border-top-color: var(--ui-accent, #805025);
+  border-radius: 50%;
+  animation: gesPascoStartupSpin .8s linear infinite;
+}
+
+#startupMessage {
+  margin: 0;
+  color: var(--ui-muted, #606b66);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@keyframes gesPascoStartupSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startupSpinner { animation-duration: 2.4s; }
 }
 
 /* =========================
