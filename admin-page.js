@@ -27,7 +27,7 @@
  }};
  for(const entry of entries){entry.addEventListener('click',event=>{if(!verified||!mayLeave()){event.preventDefault();event.stopImmediatePropagation();return;}selected=entry;},true);new MutationObserver(firstView).observe(entry,{attributes:true,attributeFilter:['hidden']});}
  document.getElementById('adminBack').addEventListener('click',event=>{if(!mayLeave())event.preventDefault();});
- document.addEventListener('input',event=>{const panel=event.target.closest('.adminPanel');if(panel&&!event.target.closest('.userSearch'))panel.dataset.dirty='true';});
+ document.addEventListener('input',event=>{const panel=event.target.closest('.adminPanel');if(panel&&panel.id!=='adminReportsPanel'&&!event.target.closest('.userSearch'))panel.dataset.dirty='true';});
  window.addEventListener('beforeunload',event=>{if(guards.some(check=>!check())||panels.some(panel=>panel.dataset.dirty==='true')){event.preventDefault();event.returnValue='';}});
  document.getElementById('adminRetry').onclick=()=>{if(mayLeave())location.reload();};
  document.addEventListener('DOMContentLoaded',()=>{
