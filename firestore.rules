@@ -294,7 +294,8 @@ service cloud.firestore {
         && d.queuedAtMs is int && d.queuedAtMs > 0 && d.queuedAtMs < 1000000000000000;
     }
     match /reportAdmins/{adminUid} {
-      allow get: if isOwner(adminUid);
+      // The existing Users administrator needs this flag to show accurate access.
+      allow get: if isOwner(adminUid) || paymentAdmin();
       allow delete: if isOwner(adminUid) && deletingAccount();
       allow list, create, update: if false;
     }
