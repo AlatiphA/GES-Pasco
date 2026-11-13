@@ -21,3 +21,8 @@ test('ordinary users cannot load reports, and server errors never present zero t
 test('sign-out cancels pending reads and clears sensitive reporting data',async()=>{
  const a=await setup({hold:true});await a.signout();a.release();await tick();assert.equal(a.w.document.querySelectorAll('.overviewCard').length,0);assert.equal(a.w.document.getElementById('adminReportsBody').textContent,'');a.dom.window.close();
 });
+
+
+test('changing a read-only report filter does not prompt about unsaved edits when leaving',async()=>{
+ const a=await setup();let prompts=0;a.w.confirm=()=>{prompts++;return true;};const select=a.w.document.querySelector('#adminReportsBody select');select.value='all';select.dispatchEvent(new a.w.Event('input',{bubbles:true}));a.w.document.getElementById('auditAdminEntry').click();await tick();assert.equal(prompts,0);assert.equal(a.w.document.getElementById('adminReportsTitle').textContent,'Recent audit');a.dom.window.close();
+});
