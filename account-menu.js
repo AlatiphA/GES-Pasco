@@ -1,6 +1,6 @@
-/* Group existing reviewer actions without introducing a second permission check. */
+/* The existing role checks control the single full-page administration link. */
 (()=>{
- const group=document.getElementById('profileAdministration'),entries=['reviewReportsEntry','quizAdminEntry','paymentAdminEntry','usersAdminEntry','protectedContentAdminEntry'].map(id=>document.getElementById(id));
- function update(){const visible=entries.some(entry=>entry&&!entry.hidden);group.hidden=!visible;if(!visible)group.open=false;}
+ const group=document.getElementById('profileAdministration'),link=document.getElementById('openAdminPage'),entries=['reviewReportsEntry','quizAdminEntry','paymentAdminEntry','usersAdminEntry','protectedContentAdminEntry'].map(id=>document.getElementById(id));
+ function update(){link.hidden=!entries.some(entry=>entry&&!entry.hidden);group.hidden=true;group.open=false;}
  const observer=new MutationObserver(update);for(const entry of entries)if(entry)observer.observe(entry,{attributes:true,attributeFilter:['hidden']});update();
 })();

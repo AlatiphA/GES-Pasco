@@ -2,6 +2,7 @@
 (()=>{
  const core=window.GESPascoReportsCore,db=firebase.firestore(),dialog=document.getElementById('reportsDialog'),body=document.getElementById('reportsBody'),status=document.getElementById('reportsStatus'),title=document.getElementById('reportsTitle');
  let epoch=0,admin=false,cursor=null,mode='mine',loaded=[],busy=false;
+ let savingReview=false;window.GESPascoAdminPage?.registerGuard(()=>!savingReview);
  const uid=()=>gesPascoAuth.currentUser?.uid||'';
  const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
  const button=(text,fn)=>{const b=node('button',text,'profileAction');b.type='button';b.onclick=fn;return b;};
@@ -13,7 +14,7 @@
  }});
  function pendingMessage(){return navigator.onLine?'Pending on this device. Submission failed; check your connection or reporting setup and retry.':'Pending on this device. It will be submitted when you reconnect with this account.';}
  async function flush(){if(!uid()||!navigator.onLine)return;try{await outbox.flush();}catch{/* Keep the durable outbox until the server acknowledges it. */}}
- function show(heading){epoch++;title.textContent=heading;status.textContent='';body.replaceChildren();if(!dialog.open)dialog.showModal();}
+ function show(heading){epoch++;title.textContent=heading;status.textContent='';body.replaceChildren();if(window.GESPascoAdminPage)window.GESPascoAdminPage.open(dialog);else if(!dialog.open)dialog.showModal();}
  function questionCard(q){const box=node('section',undefined,'reportCard');box.append(node('strong',q.bankTitle),node('p',q.prompt));const opts=node('ol');for(const option of q.options)opts.append(node('li',option));box.append(opts,node('p','Practice answer: '+q.options[q.answerIndex]),node('small',q.source));return box;}
  function field(form,label,input){const wrap=node('label',label);wrap.append(input);form.append(wrap);return input;}
  function open(question){if(!uid())return;const owner=uid(),q=JSON.parse(JSON.stringify(question));if(!core.validQuestion(q))return;show('Report a question');const token=epoch;body.append(questionCard(q),node('p','Tell us what needs checking. Reporting does not change the book answer or your score.','practiceMuted'));
@@ -27,7 +28,7 @@
   body.append(node('p',mode==='review'?'Review saved reports. Responses below are visible to the reporter. Mark Corrected only after the correction has been published.':'Submitted reports and reviewer responses appear below.','practiceMuted'));
   for(const row of loaded){const r=row.data,card=node('details',undefined,'reportCard');card.append(node('summary',(core.statuses[r.status]||r.status)+' — '+r.question.prompt));card.append(questionCard(r.question),node('p','Issue: '+core.categories[r.category]),node('p',r.description));if(r.suggestion)card.append(node('p','Suggested correction: '+r.suggestion));if(r.reviewNote)card.append(node('p','Reviewer response: '+r.reviewNote));if(mode==='review'){
    const form=node('form',undefined,'reportForm'),select=node('select');for(const [value,label] of Object.entries(core.statuses)){const option=node('option',label);option.value=value;select.append(option);}select.value=r.status;field(form,'Review status',select);const note=field(form,'Response to reporter',node('textarea'));note.value=r.reviewNote||'';note.maxLength=2000;note.rows=3;const save=node('button','Save review','profileAction');save.type='submit';form.append(save);const owner=uid(),token=epoch;
-   form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{if(!admin||owner!==uid())throw Error('Reviewer session changed.');const review={status:select.value,reviewNote:note.value.trim(),reviewedBy:owner,reviewedAt:stamp(),updatedAt:stamp()};if(window.GESPascoInbox)await window.GESPascoInbox.saveReview(row.id,r.reporterUid,review);else await db.collection('questionReports').doc(row.id).update(review);if(token===epoch){status.textContent='Review saved.';r.status=select.value;r.reviewNote=note.value.trim();render();}}catch{if(token===epoch){status.textContent='Review could not be saved. Check your connection and reviewer access.';save.disabled=false;}}};card.append(form);
+   form.onsubmit=async e=>{e.preventDefault();if(savingReview)return;savingReview=true;save.disabled=true;try{if(!admin||owner!==uid())throw Error('Reviewer session changed.');const review={status:select.value,reviewNote:note.value.trim(),reviewedBy:owner,reviewedAt:stamp(),updatedAt:stamp()};if(window.GESPascoInbox)await window.GESPascoInbox.saveReview(row.id,r.reporterUid,review);else await db.collection('questionReports').doc(row.id).update(review);if(token===epoch){window.GESPascoAdminPage?.saved(dialog);status.textContent='Review saved.';r.status=select.value;r.reviewNote=note.value.trim();render();}}catch{if(token===epoch){status.textContent='Review could not be saved. Check your connection and reviewer access.';save.disabled=false;}}finally{savingReview=false;}};card.append(form);
   }body.append(card);}
   if(!loaded.length)body.append(node('p','No submitted reports loaded.'));if(cursor)body.append(button('Load more reports',()=>fetchPage(false)));
  }
