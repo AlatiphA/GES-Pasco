@@ -31,6 +31,41 @@ service cloud.firestore {
       return signedIn() && exists(/databases/$(database)/documents/paymentAdmins/$(request.auth.uid))
         && get(/databases/$(database)/documents/paymentAdmins/$(request.auth.uid)).data.active == true;
     }
+    function isReportAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/reportAdmins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/reportAdmins/$(request.auth.uid)).data.active == true;
+    }
+    function fullReaderAccess() {
+      return signedIn() && (paymentAdmin() || isReportAdmin() || (
+        (!exists(/databases/$(database)/documents/accountControls/$(request.auth.uid))
+          || get(/databases/$(database)/documents/accountControls/$(request.auth.uid)).data.status != 'suspended')
+        && (
+          (exists(/databases/$(database)/documents/accountControls/$(request.auth.uid))
+            && get(/databases/$(database)/documents/accountControls/$(request.auth.uid)).data.accessMode in ['full-access','free'])
+          || ((!exists(/databases/$(database)/documents/accountControls/$(request.auth.uid))
+                || get(/databases/$(database)/documents/accountControls/$(request.auth.uid)).data.accessMode != 'trial-only')
+              && exists(/databases/$(database)/documents/subscriptions/$(request.auth.uid))
+              && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.endsAtMs is int
+              && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.endsAtMs > request.time.toMillis())
+        )
+      ));
+    }
+    function sampleReaderAccess() {
+      return signedIn()
+        && (!exists(/databases/$(database)/documents/accountControls/$(request.auth.uid))
+          || get(/databases/$(database)/documents/accountControls/$(request.auth.uid)).data.status != 'suspended');
+    }
+    function validProtectedManifest() {
+      return request.resource.data.keys().hasOnly(['editionId','epubBytes','epubChunks','epubSha256','practiceJson','updatedAt'])
+        && request.resource.data.keys().hasAll(['editionId','epubBytes','epubChunks','epubSha256','practiceJson','updatedAt'])
+        && request.resource.data.editionId is string && request.resource.data.editionId.matches('^edition-[a-z0-9]{1,24}$')
+        && request.resource.data.epubBytes is int && request.resource.data.epubBytes > 100 && request.resource.data.epubBytes <= 26214400
+        && request.resource.data.epubChunks is int && request.resource.data.epubChunks >= 1 && request.resource.data.epubChunks <= 100
+        && request.resource.data.epubSha256 is string && request.resource.data.epubSha256.matches('^[a-f0-9]{64}$')
+        && request.resource.data.practiceJson is string && request.resource.data.practiceJson.size() <= 650000
+        && request.resource.data.updatedAt == request.time;
+    }
     function validPlan(plan,amount) {
       return (plan == 'm1' && amount == 2000) || (plan == 'm3' && amount == 5000)
         || (plan == 'm6' && amount == 8000) || (plan == 'm12' && amount == 10000);
@@ -47,7 +82,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid','status','accessMode','updatedBy','updatedAt'])
         && request.resource.data.keys().hasAll(['uid','status','accessMode','updatedBy','updatedAt'])
         && request.resource.data.uid == uid && request.resource.data.status in ['active','suspended']
-        && request.resource.data.accessMode in ['automatic','trial-only','free']
+        && request.resource.data.accessMode in ['automatic','trial-only','free','full-access']
         && request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time;
       allow delete: if isOwner(uid) && deletingAccount();
     }
@@ -119,6 +154,23 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/momoRequests/$(request.resource.data.requestId)).data.planId == request.resource.data.planId
         && (!exists(/databases/$(database)/documents/subscriptions/$(uid)) || request.resource.data.requestId != resource.data.requestId);
       allow delete: if false;
+    }
+    match /protectedLibrary/{libraryId} {
+      allow get: if libraryId == 'current' && fullReaderAccess();
+      allow list: if false;
+      allow create, update: if libraryId == 'current' && paymentAdmin() && validProtectedManifest();
+      allow delete: if false;
+      match /chunks/{chunkId} {
+        allow get: if fullReaderAccess();
+        allow list: if false;
+        allow create, update: if paymentAdmin()
+          && request.resource.data.keys().hasOnly(['index','payload','updatedAt'])
+          && request.resource.data.keys().hasAll(['index','payload','updatedAt'])
+          && request.resource.data.index is int && request.resource.data.index >= 0 && request.resource.data.index < 100
+          && request.resource.data.payload is string && request.resource.data.payload.size() <= 700000
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if false;
+      }
     }
 
     function validProfileShape() {
@@ -210,11 +262,6 @@ service cloud.firestore {
     }
 
     // Reviewer access is granted only through the trusted Firebase Console/Admin SDK.
-    function isReportAdmin() {
-      return signedIn()
-        && exists(/databases/$(database)/documents/reportAdmins/$(request.auth.uid))
-        && get(/databases/$(database)/documents/reportAdmins/$(request.auth.uid)).data.active == true;
-    }
     function reportText(value, maximum) { return value is string && value.size() <= maximum; }
     function validQuestionSnapshot(q) {
       return q is map
@@ -304,8 +351,8 @@ service cloud.firestore {
       allow delete: if isOwner(userId) && deletingAccount();
     }
 
-    // Quiz editors are trusted reviewers. All published content is readable by signed-in users;
-    // drafts remain private. Every client also validates individual questions before use.
+    // Quiz editors are trusted reviewers. Only the bundled sample sets are free;
+    // drafts and premium sets remain private to their authorized readers.
     function validQuizBank(bank, bankId) {
       return bank is map
         && bank.keys().hasOnly(['schema','id','title','questions','version'])
@@ -329,7 +376,8 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /quizBanks/{bankId} {
-      allow read: if signedIn();
+      allow get: if fullReaderAccess() || (sampleReaderAccess() && bankId in ['index-split-043-1','index-split-047-1','index-split-050-1']);
+      allow list: if fullReaderAccess();
       allow create, update: if isReportAdmin()
         && request.resource.data.keys().hasOnly(['bank','version','enabled','reviewed','updatedAt','updatedBy'])
         && request.resource.data.keys().hasAll(['bank','version','enabled','reviewed','updatedAt','updatedBy'])

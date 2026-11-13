@@ -114,6 +114,9 @@ const rightZone =
 let book;
 let rendition;
 let currentLocation = null;
+let bookLoadToken = 0;
+let loadedFullLibrary = false;
+let desiredFullLibrary = window.GESPascoAccess?.fullAccess?.() === true;
 
 let activeSearchHighlight =
   null;
@@ -562,21 +565,40 @@ function loadBookmarks() {
 
 async function loadBook() {
   const owner=gesPascoAuth.currentUser?.uid;
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
+  const token=++bookLoadToken,controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
   try {
-    const response=await fetch('./library/sample.epub',{signal:controller.signal});
-    if(!response.ok)throw Error('Book download unavailable.');
-    const blob=await response.blob();
+    let blob,hasFullLibrary=false,warning='';
+    if(window.GESPascoPremiumContent){const selected=await window.GESPascoPremiumContent.bookBlob(owner);blob=selected.blob;hasFullLibrary=selected.fullAccess===true;warning=selected.warning||'';}
+    else {const response=await fetch('./library/sample.epub',{signal:controller.signal});if(!response.ok)throw Error('Book download unavailable.');blob=await response.blob();}
     const header=new Uint8Array(await blob.slice(0,4).arrayBuffer());
     if(header[0]!==80||header[1]!==75||header[2]!==3||header[3]!==4)throw Error('The downloaded file is not a readable EPUB.');
-    if(gesPascoAuth.currentUser?.uid!==owner)return;
+    if(token!==bookLoadToken||gesPascoAuth.currentUser?.uid!==owner)return;
+    try{rendition?.destroy?.();}catch{}try{book?.destroy?.();}catch{}viewer.replaceChildren();
     book=ePub(blob);
+    loadedFullLibrary=hasFullLibrary;
     startReader();
+    if(warning)window.dispatchEvent(new CustomEvent('ges-pasco-premium-unavailable',{detail:{message:warning}}));
   } catch(error) {
     console.warn('Reader could not open:',error);
-    if(gesPascoAuth.currentUser?.uid===owner){window.GESPascoStartup?.hide();window.GESPascoRecovery?.show('book');}
+    if(token===bookLoadToken&&gesPascoAuth.currentUser?.uid===owner){window.GESPascoStartup?.hide();window.GESPascoRecovery?.show('book');}
   } finally {clearTimeout(timer);}
 }
+
+function displayReaderHref(href,label='This chapter') {
+  if(window.GESPascoPremiumContent&&!window.GESPascoPremiumContent.readableHref(href)){
+    window.GESPascoPremiumContent.showPaywall(label);
+    return Promise.resolve(false);
+  }
+  return rendition.display(href);
+}
+
+window.addEventListener('ges-pasco-access-updated',event=>{
+  const next=event.detail?.fullAccess===true;
+  if(next!==desiredFullLibrary){desiredFullLibrary=next;if(!next&&loadedFullLibrary){try{rendition?.destroy?.();}catch{}try{book?.destroy?.();}catch{}book=null;rendition=null;loadedFullLibrary=false;viewer.replaceChildren();window.GESPascoStartup?.show('Opening the free sample chapters…');}if(bookLoadToken>0)loadBook();}
+});
+window.addEventListener('ges-pasco-protected-content-updated',()=>{
+  if(desiredFullLibrary&&book&&!loadedFullLibrary)loadBook();
+});
 
 
 /* =================
@@ -701,6 +723,8 @@ function buildTOC(
     "tocItem";
 
   row.dataset.href = item.href;
+  const readable=!window.GESPascoPremiumContent||window.GESPascoPremiumContent.readableHref(item.href);
+  row.classList.toggle('tocLocked',!readable);
 
   row.style.paddingLeft =
     (level * 20) + "px";
@@ -727,8 +751,7 @@ function buildTOC(
       "a"
     );
 
-  link.textContent =
-    item.label;
+  link.textContent = item.label + (readable ? '' : '  🔒');
 
   link.href = "#";
 
@@ -738,9 +761,7 @@ function buildTOC(
 
       e.preventDefault();
 
-      rendition.display(
-        item.href
-      );
+      displayReaderHref(item.href,item.label);
 
       // closeSidebar();
         toggleSidebar();
@@ -968,7 +989,8 @@ function startReader() {
   /* DISPLAY IMMEDIATELY — don't wait for locations */
 
   const readerData = loadReaderData();
-  const savedLocation = readerData.location;
+  const positionLocked=!loadedFullLibrary&&window.GESPascoPremiumContent&&!window.GESPascoPremiumContent.isSampleHref(readerData.chapter);
+  const savedLocation = positionLocked ? null : readerData.location;
 
   observeReaderDisplay(rendition.display(savedLocation || undefined),readerOwner,savedLocation?'position':'book')
     .then(()=>{if(gesPascoAuth.currentUser?.uid===readerOwner)window.GESPascoStartup?.hide();});
@@ -1270,7 +1292,7 @@ function startReader() {
       /* On a Table of Contents page, all links should
          navigate normally — never show a footnote popup */
       if (isTocPage) {
-        rendition.display(href).catch(err => console.error(err));
+        displayReaderHref(href).catch(err => console.error(err));
         return;
       }
 
@@ -1293,7 +1315,7 @@ function startReader() {
       if (href.startsWith("#")) {
         /* On notes page — back-links should navigate, not show popup */
         if (isNotesPage) {
-          rendition.display(section.href + href).catch(() => {
+          displayReaderHref(section.href + href).catch(() => {
             rendition.history?.back?.();
           });
           return;
@@ -1308,7 +1330,7 @@ function startReader() {
          (e.g. TOC link to "chapter2.xhtml#section-b") */
       if (href.includes("#")) {
         if (isNotesPage || !isNote) {
-          rendition.display(href).catch(err => console.error(err));
+          displayReaderHref(href).catch(err => console.error(err));
           return;
         }
         const parts = href.split("#");
@@ -1322,9 +1344,9 @@ function startReader() {
               const el = targetDoc.getElementById(fragId);
               if (el) { showFootnote(el); return; }
             }
-            rendition.display(href).catch(err => console.error(err));
+            displayReaderHref(href).catch(err => console.error(err));
           }).catch(() => {
-            rendition.display(href).catch(err => console.error(err));
+            displayReaderHref(href).catch(err => console.error(err));
           });
           return;
         }
@@ -1338,7 +1360,7 @@ function startReader() {
       }
 
       /* Internal chapter navigation */
-      rendition.display(href).catch(err => console.error(err));
+      displayReaderHref(href).catch(err => console.error(err));
 
     }, true); /* capture: true — fires before epub.js */
 
