@@ -60,6 +60,7 @@
  }
  async function installUpdate(){
   if(checking||installing||reloadRequested||(!registration?.waiting&&!reloadNeeded()))return;
+  if(window.GESPascoDevices?.isBusy?.()){say('Finish the device action before installing the update.');return;}
   installing=true;say('Installing update...');render();
   try{
    try{await Promise.race([window.gesPascoReaderSync?.flush(),new Promise(resolve=>setTimeout(resolve,1500))]);}catch{}

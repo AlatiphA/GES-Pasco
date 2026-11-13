@@ -3,7 +3,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() {
-      return request.auth != null && !exists(/databases/$(database)/documents/accountDeletions/$(request.auth.uid));
+      return request.auth != null
+        && (!('firebase' in request.auth.token) || request.auth.token.firebase.sign_in_provider != 'anonymous')
+        && !exists(/databases/$(database)/documents/accountDeletions/$(request.auth.uid));
     }
 
     function isOwner(userId) {
@@ -36,7 +38,7 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/reportAdmins/$(request.auth.uid))
         && get(/databases/$(database)/documents/reportAdmins/$(request.auth.uid)).data.active == true;
     }
-    function fullReaderAccess() {
+    function entitledReaderAccess() {
       return signedIn() && (paymentAdmin() || isReportAdmin() || (
         (!exists(/databases/$(database)/documents/accountControls/$(request.auth.uid))
           || get(/databases/$(database)/documents/accountControls/$(request.auth.uid)).data.status != 'suspended')
@@ -50,6 +52,115 @@ service cloud.firestore {
               && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.endsAtMs > request.time.toMillis())
         )
       ));
+    }
+    // Reader devices have their own Firebase identity, separate from the account login.
+    // A copied local device ID is not enough to read protected server content.
+    function devicePolicyEnabled() {
+      return exists(/databases/$(database)/documents/readerDevicePolicy/current)
+        && get(/databases/$(database)/documents/readerDevicePolicy/current).data.enabled == true;
+    }
+    function readerPaidAccount(uid) {
+      return !exists(/databases/$(database)/documents/accountDeletions/$(uid))
+        && (!exists(/databases/$(database)/documents/accountControls/$(uid))
+          || (get(/databases/$(database)/documents/accountControls/$(uid)).data.status != 'suspended'
+            && get(/databases/$(database)/documents/accountControls/$(uid)).data.accessMode != 'trial-only'))
+        && exists(/databases/$(database)/documents/subscriptions/$(uid))
+        && get(/databases/$(database)/documents/subscriptions/$(uid)).data.endsAtMs is int
+        && get(/databases/$(database)/documents/subscriptions/$(uid)).data.endsAtMs > request.time.toMillis();
+    }
+    function anonymousDevice() {
+      return request.auth != null && 'firebase' in request.auth.token
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+    function registeredDevice(uid) {
+      return anonymousDevice()
+        && get(/databases/$(database)/documents/readerDevices/$(request.auth.uid)).data.ownerUid == uid
+        && request.auth.uid in [get(/databases/$(database)/documents/readerRegistrations/$(uid)).data.slot1,
+                               get(/databases/$(database)/documents/readerRegistrations/$(uid)).data.slot2];
+    }
+    function admittedDevice() {
+      let uid = get(/databases/$(database)/documents/readerDevices/$(request.auth.uid)).data.ownerUid;
+      let lease = get(/databases/$(database)/documents/readerLeases/$(uid)).data;
+      return registeredDevice(uid) && readerPaidAccount(uid) && lease.deviceUid == request.auth.uid
+        && lease.active == true && lease.updatedAt + duration.value(120,'s') > request.time;
+    }
+    function fullReaderAccess() {
+      return (entitledReaderAccess() && (paymentAdmin() || isReportAdmin()
+        || (exists(/databases/$(database)/documents/accountControls/$(request.auth.uid))
+          && get(/databases/$(database)/documents/accountControls/$(request.auth.uid)).data.accessMode in ['full-access','free'])
+        || !devicePolicyEnabled())) || (anonymousDevice() && admittedDevice());
+    }
+    function recentReaderOwner(uid) {
+      return signedIn() && isOwner(uid) && 'auth_time' in request.auth.token
+        && request.auth.token.auth_time > request.time.toMillis() / 1000 - 300;
+    }
+    function validDeviceId(id) { return id is string && (id == '' || id.matches('^[A-Za-z0-9_-]{1,128}$')); }
+    function registryShape(uid) {
+      let d=request.resource.data;
+      return d.keys().hasOnly(['slot1','slot2','revision','updatedAt']) && d.keys().hasAll(['slot1','slot2','revision','updatedAt'])
+        && validDeviceId(d.slot1) && validDeviceId(d.slot2) && (d.slot1 == '' || d.slot1 != d.slot2)
+        && d.revision is int && d.updatedAt == request.time;
+    }
+    function newDeviceBound(uid,id) {
+      return id != '' && id != uid && getAfter(/databases/$(database)/documents/readerDevices/$(id)).data.ownerUid == uid
+        && getAfter(/databases/$(database)/documents/readerDevices/$(id)).data.registeredAt == request.time;
+    }
+    match /readerDevicePolicy/{id} {
+      allow get: if id == 'current' && signedIn();
+      allow create, update: if id == 'current' && paymentAdmin()
+        && request.resource.data.keys().hasOnly(['enabled','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasAll(['enabled','updatedAt','updatedBy'])
+        && request.resource.data.enabled is bool && request.resource.data.updatedAt == request.time
+        && request.resource.data.updatedBy == request.auth.uid;
+      allow list, delete: if false;
+    }
+    match /readerRegistrations/{uid} {
+      allow get: if isOwner(uid) || registeredDevice(uid);
+      allow create: if signedIn() && isOwner(uid) && readerPaidAccount(uid) && registryShape(uid)
+        && request.resource.data.revision == 1 && request.resource.data.slot2 == ''
+        && newDeviceBound(uid,request.resource.data.slot1);
+      allow update: if signedIn() && isOwner(uid) && registryShape(uid)
+        && request.resource.data.revision == resource.data.revision + 1
+        && ((readerPaidAccount(uid) &&
+          ((resource.data.slot1 == '' && request.resource.data.slot2 == resource.data.slot2 && newDeviceBound(uid,request.resource.data.slot1))
+           || (resource.data.slot2 == '' && request.resource.data.slot1 == resource.data.slot1 && newDeviceBound(uid,request.resource.data.slot2))))
+          || (recentReaderOwner(uid) &&
+          ((resource.data.slot1 != '' && request.resource.data.slot1 == '' && request.resource.data.slot2 == resource.data.slot2)
+           || (resource.data.slot2 != '' && request.resource.data.slot2 == '' && request.resource.data.slot1 == resource.data.slot1))));
+      allow delete: if isOwner(uid) && deletingAccount();
+    }
+    match /readerDevices/{id} {
+      allow get: if request.auth != null && (request.auth.uid == id
+        || (signedIn() && (!exists(/databases/$(database)/documents/readerDevices/$(id)) || resource.data.ownerUid == request.auth.uid))
+        || (deletingAccount() && resource.data.ownerUid == request.auth.uid));
+      allow create: if signedIn() && id != request.auth.uid && validDeviceId(id)
+        && request.resource.data.keys().hasOnly(['ownerUid','label','registeredAt'])
+        && request.resource.data.keys().hasAll(['ownerUid','label','registeredAt'])
+        && request.resource.data.ownerUid == request.auth.uid && request.resource.data.label is string
+        && request.resource.data.label.size() > 0 && request.resource.data.label.size() <= 80
+        && request.resource.data.registeredAt == request.time && readerPaidAccount(request.auth.uid)
+        && id in [getAfter(/databases/$(database)/documents/readerRegistrations/$(request.auth.uid)).data.slot1,
+                  getAfter(/databases/$(database)/documents/readerRegistrations/$(request.auth.uid)).data.slot2];
+      allow delete: if resource.data.ownerUid == request.auth.uid
+        && (deletingAccount() || (recentReaderOwner(request.auth.uid)
+          && !(id in [getAfter(/databases/$(database)/documents/readerRegistrations/$(request.auth.uid)).data.slot1,
+                      getAfter(/databases/$(database)/documents/readerRegistrations/$(request.auth.uid)).data.slot2])));
+      allow list, update: if false;
+    }
+    match /readerLeases/{uid} {
+      allow get: if isOwner(uid) || registeredDevice(uid);
+      allow create, update: if registeredDevice(uid) && readerPaidAccount(uid)
+        && request.resource.data.keys().hasOnly(['deviceUid','active','updatedAt'])
+        && request.resource.data.keys().hasAll(['deviceUid','active','updatedAt'])
+        && request.resource.data.deviceUid == request.auth.uid && request.resource.data.active is bool
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.active == true && (!exists(/databases/$(database)/documents/readerLeases/$(uid))
+          || resource.data.active == false || resource.data.updatedAt + duration.value(120,'s') <= request.time
+          || resource.data.deviceUid == request.auth.uid
+          || !(resource.data.deviceUid in [get(/databases/$(database)/documents/readerRegistrations/$(uid)).data.slot1,
+                                           get(/databases/$(database)/documents/readerRegistrations/$(uid)).data.slot2])))
+          || (request.resource.data.active == false && resource.data.deviceUid == request.auth.uid));
+      allow delete: if isOwner(uid) && deletingAccount();
     }
     function sampleReaderAccess() {
       return signedIn()
@@ -208,7 +319,13 @@ service cloud.firestore {
         && ((request.resource.data.action in ['account.suspended','account.activated','reading.policy'] && validControlAudit(request.resource.data))
           || (request.resource.data.action in ['payment.approved','payment.rejected'] && validPaymentAudit(request.resource.data))
           || (request.resource.data.action == 'subscription.removed' && validRemovalAudit(request.resource.data))
-          || (request.resource.data.action == 'message.sent' && validMessageAudit(request.resource.data)));
+          || (request.resource.data.action == 'message.sent' && validMessageAudit(request.resource.data))
+          || (request.resource.data.action == 'devices.policy' && request.resource.data.sourceId == 'current'
+            && request.resource.data.targetUid == request.auth.uid
+            && getAfter(/databases/$(database)/documents/readerDevicePolicy/current).data.updatedBy == request.auth.uid
+            && getAfter(/databases/$(database)/documents/readerDevicePolicy/current).data.updatedAt == request.time
+            && (!exists(/databases/$(database)/documents/readerDevicePolicy/current)
+              || getAfter(/databases/$(database)/documents/readerDevicePolicy/current).data.enabled != get(/databases/$(database)/documents/readerDevicePolicy/current).data.enabled)));
       allow update, delete: if false;
     }
     match /protectedLibrary/{libraryId} {

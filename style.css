@@ -1986,6 +1986,17 @@ html[data-ui-theme] #progressText {font-variant-numeric:tabular-nums;min-width:4
 .accessCard h2{font-size:22px;}
 html[data-access-locked] #viewer{visibility:hidden!important;}
 html[data-access-locked] #readerApp > footer{visibility:hidden!important;}
+#readerDevicesDialog{position:fixed;inset:0;margin:auto;width:min(680px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);overflow:auto;overscroll-behavior:contain;--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
+#readerDevicesDialog::backdrop{background:rgba(0,0,0,.58);}
+#readerDevicesDialog .practiceHeader{position:sticky;top:0;background:var(--ui-surface);padding:18px;border-bottom:1px solid var(--ui-border);z-index:1;}
+#readerDevicesDialog .practiceHeader h2{margin:0;font-size:19px;line-height:1.4;}
+#readerDevicesClose{flex:0 0 40px;width:40px;height:40px;border:1px solid var(--ui-border);border-radius:50%;background:var(--ui-surface);color:var(--ui-text);font-size:25px;cursor:pointer;}
+#readerDevicesStatus{padding:0 18px;color:var(--ui-muted);line-height:1.6;}
+#readerDevicesBody{display:grid;gap:14px;padding:0 18px 18px;}
+#readerDevicesBody .reportCard{border:1px solid var(--ui-border);border-radius:12px;padding:16px;margin:0;overflow-wrap:anywhere;}
+#readerDevicesBody h3{font-size:16px;margin:0 0 10px;}#readerDevicesBody p{font-size:14px;line-height:1.6;}
+#readerDevicesBody .reportCard p{margin:8px 0;}#readerDevicesBody .profileAction{min-height:44px;line-height:1.4;}#readerDevicesDialog :is(button,input):focus-visible{outline:2px solid var(--ui-accent);outline-offset:3px;}
+#readerDevicesSummary{overflow-wrap:anywhere;}
 
 /* Reader pinches belong to text sizing; retain single-finger panning. */
 #viewer, #viewer iframe { touch-action: pan-x pan-y; }
