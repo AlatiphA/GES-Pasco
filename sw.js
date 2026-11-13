@@ -66,15 +66,15 @@ const FILES_TO_CACHE = [
 
 // Bound every network miss so a slow connection cannot hold app startup or installation open.
 const NETWORK_TIMEOUT_MS = 12000;
-async function fetchWithTimeout(request, init = {}) {
+async function fetchWithTimeout(request, init = {}, completeBody = false, milliseconds = NETWORK_TIMEOUT_MS) {
   const controller = typeof AbortController === 'function' ? new AbortController() : null;
   const options = {...init};
   if (controller) options.signal = controller.signal;
   let timer;
   try {
     const timedRequest = controller || Object.keys(options).length ? new Request(request, options) : request;
-    const attempts = [fetch(timedRequest)];
-    if (typeof setTimeout === 'function') attempts.push(new Promise((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('Network request timed out')); }, NETWORK_TIMEOUT_MS); }));
+    const attempts = [(async()=>{const response=await fetch(timedRequest);if(completeBody)await response.clone().arrayBuffer();return response;})()];
+    if (typeof setTimeout === 'function') attempts.push(new Promise((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('Network request timed out')); }, milliseconds); }));
     return await Promise.race(attempts);
   } finally { if (timer !== undefined && typeof clearTimeout === 'function') clearTimeout(timer); }
 }
@@ -104,20 +104,29 @@ function prepareOffline() {
   if (offlineJob) return offlineJob;
   offlineJob = (async () => {
     const cache = await caches.open(CACHE_NAME);
-    const results = await Promise.allSettled(FILES_TO_CACHE.map(async url => {
-      // Exact third-party URLs are unchanged dependencies already verified by
-      // a previous working shell. New app files always come from this release.
-      if (/^https:\/\//.test(url)) {
-        const existing = await matchCached(url);
-        if (existing?.ok) return {url, response:existing};
-      }
-      const response = await fetchWithTimeout(new Request(url, {cache:'reload'}));
-      if (!response.ok || (url.endsWith('.epub') && !await validBook(response))) throw new Error('Incomplete download: '+url);
-      if (url === './version.js' && !(await response.clone().text()).includes('"'+globalThis.GES_PASCO_VERSION+'"')) throw new Error('A newer release is available. Install the app update before repairing downloads.');
+    const optional = url => /^https:\/\//.test(url) || url.startsWith('./fonts/');
+    async function download(url,required){
+      if(optional(url)){const existing=await matchCached(url);if(existing?.ok)return {url,response:existing};}
+      const response=await fetchWithTimeout(new Request(url,{cache:'reload'}),{},true,required?20000:8000);
+      if(!response.ok||(url.endsWith('.epub')&&!await validBook(response)))throw Error('Incomplete download: '+url);
+      if(url==='./version.js'&&!(await response.clone().text()).includes('"'+globalThis.GES_PASCO_VERSION+'"'))throw Error('Release files changed during download. Check for updates again.');
       return {url,response};
-    }));
-    if (results.some(result => result.status === 'rejected')) throw new Error('Required app files could not be cached. Connect and retry; existing copies are retained.');
-    for (const result of results) await cache.put(result.value.url, result.value.response);
+    }
+    async function collect(urls,required){
+      const results=new Array(urls.length);let cursor=0;
+      await Promise.all(Array.from({length:Math.min(4,urls.length)},async()=>{while(cursor<urls.length){const i=cursor++;try{results[i]={status:'fulfilled',value:await download(urls[i],required)};}catch(error){results[i]={status:'rejected',reason:Error(urls[i]+': '+error.message)};}}}));
+      return results;
+    }
+    const required=await collect(FILES_TO_CACHE.filter(url=>!optional(url)),true);
+    const failed=required.filter(r=>r.status==='rejected');
+    if(failed.length){
+      try{const diagnostics=await caches.open('ges-pasco-update-status');await diagnostics.put('./status.json',new Response(JSON.stringify({version:CACHE_VERSION,errors:failed.map(r=>r.reason.message)}),{headers:{'Content-Type':'application/json'}}));}catch{}
+      throw Error('Required app files could not be cached: '+failed.map(r=>r.reason.message).join('; '));
+    }
+    // Only commit a complete new app shell. Optional dependencies cannot block it.
+    for(const result of required)await cache.put(result.value.url,result.value.response);
+    const extras=await collect(FILES_TO_CACHE.filter(optional),false);
+    for(const result of extras)if(result.status==='fulfilled')await cache.put(result.value.url,result.value.response);
     return offlineStatus();
   })().finally(() => {offlineJob = null;});
   return offlineJob;
