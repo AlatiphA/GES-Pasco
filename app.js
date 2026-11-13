@@ -114,6 +114,7 @@ const rightZone =
 let book;
 let rendition;
 let currentLocation = null;
+let bookmarkLocationsReady = Promise.resolve(false);
 let bookLoadToken = 0;
 let loadedFullLibrary = false;
 let desiredFullLibrary = window.GESPascoAccess?.fullAccess?.() === true;
@@ -348,17 +349,18 @@ function loadReaderData() {
 ================== */
 
 /* SAVE BOOKMARK */
-function saveBookmark() {
-
-  if (
-    !rendition ||
-    !currentLocation
-  ) {
-
-    return;
-
-  }
-
+async function saveBookmark() {
+  const readingBook=book,readingRendition=rendition,owner=gesPascoAuth.currentUser?.uid;
+  const location=readingRendition?.currentLocation?.()||currentLocation;
+  const cfi=location?.start?.cfi,href=location?.start?.href;
+  if(!readingBook||!readingRendition||!owner||typeof cfi!=='string'||!cfi)return false;
+  // Keep the exact page clicked even if the reader moves while indexing finishes.
+  let timer;
+  const ready=await Promise.race([bookmarkLocationsReady,new Promise(resolve=>{timer=setTimeout(()=>resolve(false),30000);})]).finally(()=>clearTimeout(timer));
+  if(!ready||book!==readingBook||rendition!==readingRendition||gesPascoAuth.currentUser?.uid!==owner)return false;
+  const rawPct=readingBook.locations.percentageFromCfi(cfi);
+  if(!Number.isFinite(rawPct)||rawPct<0||rawPct>1)return false;
+  const percent=Math.floor(rawPct*100);
   const bookmarks =
     JSON.parse(
       window.gesPascoStorage.getItem(
@@ -366,25 +368,12 @@ function saveBookmark() {
       ) || "[]"
     );
 
-  const chapterName =
-    getCurrentChapter(
-      currentLocation.start.href
-    );
-
-  const rawPct =
-    book.locations.total > 0
-      ? book.locations.percentageFromCfi(
-          currentLocation.start.cfi
-        )
-      : 0;
-
-  const percent =
-    Math.floor((rawPct || 0) * 100);
+  const chapterName = getCurrentChapter(href);
 
   bookmarks.push({
 
     cfi:
-      currentLocation.start.cfi,
+      cfi,
 
     chapter:
       chapterName,
@@ -432,6 +421,7 @@ function saveBookmark() {
   if (bTab) bTab.classList.add("active");
   if (bPanel) bPanel.classList.add("active");
 
+  return true;
 }
 
 /* LOAD BOOKMARKS */
@@ -931,7 +921,10 @@ function observeReaderDisplay(task,owner,kind) {
 }
 
 function startReader() {
-  const readerOwner=gesPascoAuth.currentUser?.uid;
+  const readerOwner=gesPascoAuth.currentUser?.uid,readingBook=book;
+  currentLocation=null;
+  let finishBookmarkLocations;
+  bookmarkLocationsReady=new Promise(resolve=>{finishBookmarkLocations=resolve;});
   const failure=kind=>{if(gesPascoAuth.currentUser?.uid===readerOwner)window.GESPascoRecovery?.show(kind);};
   let locationsReady = false;
   updateReadingLocationDisplay(null, false);
@@ -998,7 +991,7 @@ function startReader() {
   /* BACKGROUND SETUP — TOC + locations, never blocks rendering */
 
   book.ready.then(() => {
-    if(gesPascoAuth.currentUser?.uid!==readerOwner)return;
+    if(gesPascoAuth.currentUser?.uid!==readerOwner||book!==readingBook){finishBookmarkLocations(false);return;}
 
     toc.innerHTML = "";
 
@@ -1008,17 +1001,19 @@ function startReader() {
     loadBookmarks();
 
     /* Generate locations in background — progress works once ready */
-    book.locations
+    readingBook.locations
       .generate(1000)
       .then(() => {
+        if(book!==readingBook||gesPascoAuth.currentUser?.uid!==readerOwner){finishBookmarkLocations(false);return;}
         locationsReady = true;
+        finishBookmarkLocations(true);
         const percent = updateReadingLocationDisplay(currentLocation, true);
         const saved = loadReaderData();
         if (saved.location && percent !== null) saveReaderData({...saved, progress:percent});
       })
-      .catch(err => console.warn("Locations:", err));
+      .catch(err => {finishBookmarkLocations(false);console.warn("Locations:", err);});
 
-  }).catch(error=>{console.warn("Book setup failed:",error);failure("book");});
+  }).catch(error=>{finishBookmarkLocations(false);console.warn("Book setup failed:",error);failure("book");});
 
   /* =========================
      LINKS, CONTENTS & FOOTNOTES
@@ -2202,18 +2197,15 @@ prevPage.addEventListener(
   }
 );
 
-bookmarkBtn.addEventListener(
-  "click",
-  () => {
-
-    saveBookmark();
-
-    alert(
-      "Bookmark saved"
-    );
-
-  }
-);
+bookmarkBtn.addEventListener("click",async()=>{
+  if(bookmarkBtn.disabled)return;
+  bookmarkBtn.disabled=true;
+  try{
+    const saved=await saveBookmark();
+    alert(saved?'Bookmark saved':'The reader is still locating this page. Please try again shortly.');
+  }catch(error){console.warn('Bookmark could not be saved:',error);alert('Bookmark could not be saved. Please try again.');}
+  finally{bookmarkBtn.disabled=false;}
+});
 
 bottomDecreaseFont.addEventListener(
   "click",
