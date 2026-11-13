@@ -6,11 +6,11 @@
   const term=key(text);if(!term)return true;
   return (field!=='email'&&key(profile.displayName).includes(term))||(field!=='name'&&key(profile.email).includes(term));
  }
- async function page(fetchBatch,{text='',field='all',cursor=null,current=()=>{}}={}){
-  const found=[],size=text.trim()?100:26;let after=cursor;
+ async function page(fetchBatch,{text='',field='all',cursor=null,current=()=>{},accept=null}={}){
+  const found=[],size=text.trim()||accept?100:26;let after=cursor;
   while(true){
    current();const docs=await fetchBatch(after,size);current();
-   for(const doc of docs){if(matches(doc.data(),text,field))found.push(doc);if(found.length===26)break;}
+   for(const doc of docs){if(matches(doc.data(),text,field)&&(!accept||await accept(doc)))found.push(doc);current();if(found.length===26)break;}
    if(found.length===26||docs.length<size)break;
    after=docs.at(-1);if(!after)break;
   }

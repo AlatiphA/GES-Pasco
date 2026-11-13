@@ -2,7 +2,7 @@
 (()=>{
  const workspace=document.getElementById('adminWorkspace'),notice=document.getElementById('adminAccess'),identity=document.getElementById('adminIdentity');
  const entries=[...document.querySelectorAll('[data-admin-view]')],panels=[...document.querySelectorAll('.adminPanel')],guards=[];
- let verified=false,financial=false,reviewer=false,epoch=0,selected=null,requested=location.hash.slice(1)||'users';
+ let verified=false,financial=false,reviewer=false,epoch=0,selected=null,requested=location.hash.slice(1)||'overview';
  function mayLeave(){
   if(guards.some(check=>!check())){notice.textContent='Please wait for the current action to finish.';return false;}
   const dirty=panels.find(panel=>!panel.hidden&&panel.dataset.dirty==='true');
@@ -16,7 +16,7 @@
   for(const entry of entries)entry.setAttribute('aria-pressed',String(entry===selected));
   if(selected)history.replaceState(null,'','#'+selected.dataset.adminView);
  }
- function firstView(){if(!verified||selected)return;const wanted=entries.find(entry=>entry.dataset.adminView===requested),fallback=entries.find(entry=>!entry.hidden),entry=wanted&&!wanted.hidden?wanted:requested==='users'&&!financial?fallback:null;if(entry)entry.click();}
+ function firstView(){if(!verified||selected)return;const wanted=entries.find(entry=>entry.dataset.adminView===requested),fallback=entries.find(entry=>!entry.hidden),entry=wanted&&!wanted.hidden?wanted:['overview','users','audit'].includes(requested)&&!financial?fallback:null;if(entry)entry.click();}
  window.GESPascoAdminPage={open,registerGuard:check=>guards.push(check),saved:panel=>{delete panel.dataset.dirty;}};
  // Quiz administration uses the protected library only after the server verifies a role.
  window.GESPascoAccess={fullAccess:()=>verified&&(financial||reviewer)};
@@ -43,7 +43,7 @@
     financial=payment.exists&&payment.data().active===true;reviewer=report.exists&&report.data().active===true;
     if(!financial&&!reviewer)throw Error('This account does not have administrator access.');
     verified=true;workspace.hidden=false;notice.textContent='Administrator access verified. Only your permitted tools are shown.';
-    const wanted=entries.find(entry=>entry.dataset.adminView===requested);if(!wanted||(wanted.dataset.role==='payment'&&!financial)||(wanted.dataset.role==='review'&&!reviewer))requested=financial?'users':'reports';firstView();
+    const wanted=entries.find(entry=>entry.dataset.adminView===requested);if(!wanted||(wanted.dataset.role==='payment'&&!financial)||(wanted.dataset.role==='review'&&!reviewer))requested=financial?'overview':'reports';firstView();
    }catch(error){if(token===epoch)notice.textContent=error.message||'Connect to verify administrator access.';}finally{clearTimeout(timer);}
   });
  });

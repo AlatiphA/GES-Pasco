@@ -16,6 +16,8 @@ const FILES_TO_CACHE = [
   "./admin.css",
   "./admin-page.js",
   "./admin-users-core.js",
+  "./admin-reports-core.js",
+  "./admin-reports.js",
   "./faq.html",
   "./privacy.html",
   "./terms.html",

@@ -96,3 +96,26 @@ test('paid access removal is narrow, preserves reading grants and receipts, and 
  const subscription=await getDoc(doc(db('finance'),'subscriptions/revoke-reader')),grant=await getDoc(doc(db('finance'),'accountControls/revoke-reader'));assert.equal(subscription.data().endsAtMs,0);assert.equal(subscription.data().requestId,'approved-revoke-reader');assert.equal(grant.data().accessMode,'full-access');await yes(getDoc(doc(db('revoke-reader'),'protectedLibrary/current')));
  await no(updateDoc(doc(db('finance'),'subscriptions/revoke-reader'),removal));
 });
+
+
+const auditEvent=(action,targetUid,sourceId=targetUid)=>({actorUid:'finance',targetUid,sourceId,action,createdAt:serverTimestamp()});
+test('audit is admin-only, immutable, and cannot be forged without a source mutation',async()=>{
+ const f=db('finance');await no(getDocs(collection(db('payer'),'adminAudit')));await no(getDocs(collection(db('reviewer'),'adminAudit')));await no(getDocs(collection(db(),'adminAudit')));await yes(getDocs(collection(f,'adminAudit')));
+ await no(setDoc(doc(f,'adminAudit/fake'),auditEvent('account.suspended','payer')));await no(setDoc(doc(db('payer'),'adminAudit/owner'),{...auditEvent('account.suspended','payer'),actorUid:'payer'}));
+ const batch=writeBatch(f);batch.update(doc(f,'accountControls/payer'),{status:'suspended',updatedBy:'finance',updatedAt:serverTimestamp()});batch.set(doc(f,'adminAudit/suspend'),auditEvent('account.suspended','payer'));await yes(batch.commit());
+ await no(updateDoc(doc(f,'adminAudit/suspend'),{action:'account.activated'}));await no(deleteDoc(doc(f,'adminAudit/suspend')));
+ await no(setDoc(doc(f,'adminAudit/replay'),auditEvent('account.suspended','payer')));
+ const wrong=writeBatch(f);wrong.update(doc(f,'accountControls/payer'),{status:'active',updatedAt:serverTimestamp()});wrong.set(doc(f,'adminAudit/wrong'),auditEvent('account.suspended','payer'));await no(wrong.commit());
+ const activate=writeBatch(f);activate.update(doc(f,'accountControls/payer'),{status:'active',updatedAt:serverTimestamp()});activate.set(doc(f,'adminAudit/activate'),auditEvent('account.activated','payer'));await yes(activate.commit());
+});
+test('audit accepts linked policy changes, paid removal and private messages without exposing message content',async()=>{
+ const f=db('finance'),policy=writeBatch(f);policy.update(doc(f,'accountControls/payer'),{accessMode:'full-access',updatedAt:serverTimestamp()});policy.set(doc(f,'adminAudit/policy'),auditEvent('reading.policy','payer'));await yes(policy.commit());
+ await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'subscriptions/audit-paid'),{uid:'audit-paid',endsAtMs:Date.now()+86400000,requestId:'keep'}));const remove=writeBatch(f);remove.update(doc(f,'subscriptions/audit-paid'),{endsAtMs:0,updatedBy:'finance',updatedAt:serverTimestamp()});remove.set(doc(f,'adminAudit/removal'),auditEvent('subscription.removed','audit-paid'));await yes(remove.commit());
+ const message=writeBatch(f);message.set(doc(f,'users/payer/adminMessages/audit-message'),{title:'Message from GES Pasco',body:'Private',authorUid:'finance',createdAt:serverTimestamp()});message.set(doc(f,'adminAudit/message'),auditEvent('message.sent','payer','audit-message'));await yes(message.commit());
+ await no(setDoc(doc(f,'adminAudit/fake-message'),{...auditEvent('message.sent','payer','audit-message'),body:'Private'}));
+});
+test('payment audit must match the actual atomic payment decision and target account',async()=>{
+ const f=db('finance');await yes(setDoc(doc(db('payer'),'momoRequests/audit-reject'),payment('payer','AUDITREJECT')));const b=writeBatch(f);b.update(doc(f,'momoRequests/audit-reject'),{status:'rejected',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:0});b.set(doc(f,'adminAudit/rejected'),auditEvent('payment.rejected','payer','audit-reject'));await yes(b.commit());
+ await yes(setDoc(doc(db('payer'),'momoRequests/audit-approve'),{...payment('payer','AUDITSUPPORT'),kind:'support',planId:''}));const approved=writeBatch(f);approved.update(doc(f,'momoRequests/audit-approve'),{status:'approved',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:0});approved.set(doc(f,'momoReceipts/AUDITSUPPORT'),{requestId:'audit-approve',uid:'payer',reference:'AUDITSUPPORT',amountPesewas:2000,kind:'support',planId:'',approvedBy:'finance',approvedAt:serverTimestamp()});approved.set(doc(f,'adminAudit/approved'),auditEvent('payment.approved','payer','audit-approve'));await yes(approved.commit());
+ await yes(setDoc(doc(db('payer'),'momoRequests/audit-subscription'),payment('payer','AUDITSUBSCRIPTION')));const subscription=writeBatch(f),end=Date.now()+86400000;subscription.update(doc(f,'momoRequests/audit-subscription'),{status:'approved',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:end});subscription.set(doc(f,'momoReceipts/AUDITSUBSCRIPTION'),{requestId:'audit-subscription',uid:'payer',reference:'AUDITSUBSCRIPTION',amountPesewas:2000,kind:'subscription',planId:'m1',approvedBy:'finance',approvedAt:serverTimestamp()});subscription.set(doc(f,'subscriptions/payer'),{uid:'payer',planId:'m1',endsAtMs:end,requestId:'audit-subscription',updatedBy:'finance',updatedAt:serverTimestamp()});subscription.set(doc(f,'adminAudit/subscription-approved'),auditEvent('payment.approved','payer','audit-subscription'));await yes(subscription.commit());
+});
