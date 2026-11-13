@@ -2,6 +2,8 @@
 importScripts("./version.js");
 const CACHE_VERSION = "v" + globalThis.GES_PASCO_VERSION;
 const CACHE_NAME = `alatipha-ges-pasco-${CACHE_VERSION}`;
+// Only the redacted sample EPUB is ever stored here; never migrate legacy full books.
+const SAMPLE_BOOK_CACHE = "ges-pasco-sample-library-v1";
 
 /* ====================
    APP SHELL
@@ -95,18 +97,19 @@ async function offlineStatus() {
   const cache = await caches.open(CACHE_NAME);
   const missing = [];
   for (const url of FILES_TO_CACHE) {
-    const response = await cache.match(url);
+    const response = await (url.endsWith('.epub') ? await caches.open(SAMPLE_BOOK_CACHE) : cache).match(url);
     if (!response || !response.ok || (url.endsWith('.epub') && !await validBook(response))) missing.push(url);
   }
   return {version:CACHE_VERSION, ready:missing.length === 0, missing:missing.length, total:FILES_TO_CACHE.length};
 }
-function prepareOffline() {
+function prepareOffline(includeBook = true) {
   if (offlineJob) return offlineJob;
   offlineJob = (async () => {
     const cache = await caches.open(CACHE_NAME);
     const optional = url => /^https:\/\//.test(url) || url.startsWith('./fonts/');
+    const isBook = url => url.endsWith('.epub');
     async function download(url,required){
-      if(optional(url)){const existing=await matchCached(url);if(existing?.ok)return {url,response:existing};}
+      if(optional(url)&&!isBook(url)){const existing=await matchCached(url);if(existing?.ok)return {url,response:existing};}
       const response=await fetchWithTimeout(new Request(url,{cache:'reload'}),{},true,required?20000:8000);
       if(!response.ok||(url.endsWith('.epub')&&!await validBook(response)))throw Error('Incomplete download: '+url);
       if(url==='./version.js'&&!(await response.clone().text()).includes('"'+globalThis.GES_PASCO_VERSION+'"'))throw Error('Release files changed during download. Check for updates again.');
@@ -117,15 +120,15 @@ function prepareOffline() {
       await Promise.all(Array.from({length:Math.min(4,urls.length)},async()=>{while(cursor<urls.length){const i=cursor++;try{results[i]={status:'fulfilled',value:await download(urls[i],required)};}catch(error){results[i]={status:'rejected',reason:Error(urls[i]+': '+error.message)};}}}));
       return results;
     }
-    const required=await collect(FILES_TO_CACHE.filter(url=>!optional(url)),true);
+    const required=await collect(FILES_TO_CACHE.filter(url=>!optional(url)&&(includeBook||!isBook(url))),true);
     const failed=required.filter(r=>r.status==='rejected');
     if(failed.length){
       try{const diagnostics=await caches.open('ges-pasco-update-status');await diagnostics.put('./status.json',new Response(JSON.stringify({version:CACHE_VERSION,errors:failed.map(r=>r.reason.message)}),{headers:{'Content-Type':'application/json'}}));}catch{}
       throw Error('Required app files could not be cached: '+failed.map(r=>r.reason.message).join('; '));
     }
     // Only commit a complete new app shell. Optional dependencies cannot block it.
-    for(const result of required)await cache.put(result.value.url,result.value.response);
-    const extras=await collect(FILES_TO_CACHE.filter(optional),false);
+    for(const result of required){const target=result.value.url.endsWith('.epub')?await caches.open(SAMPLE_BOOK_CACHE):cache;await target.put(result.value.url,result.value.response);}
+    const extras=await collect(FILES_TO_CACHE.filter(url=>optional(url)&&!isBook(url)),false);
     for(const result of extras)if(result.status==='fulfilled')await cache.put(result.value.url,result.value.response);
     return offlineStatus();
   })().finally(() => {offlineJob = null;});
@@ -138,7 +141,7 @@ function prepareOffline() {
 
 self.addEventListener("install", event => {
 
-  event.waitUntil(prepareOffline());
+  event.waitUntil(prepareOffline(false));
 
 });
 
@@ -190,13 +193,15 @@ self.addEventListener("fetch", event => {
   // Read cached app resources first. The new worker replaces the old shell
   // only after its install has fetched and validated every required file.
   event.respondWith((async () => {
-    const cached = await matchCached(event.request, {ignoreSearch:isAppShell});
+    const isSampleBook=url.pathname.endsWith('/library/sample.epub');
+    const sampleBooks=isSampleBook?await caches.open(SAMPLE_BOOK_CACHE):null;
+    const cached = isSampleBook?await sampleBooks.match(event.request):await matchCached(event.request, {ignoreSearch:isAppShell});
     if (cached) return cached;
     try {
       const response = await fetchWithTimeout(event.request, {cache:'no-store'});
       if (!response.ok) throw new Error('Download unavailable');
       const clone = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone)).catch(() => {});
+      caches.open(isSampleBook?SAMPLE_BOOK_CACHE:CACHE_NAME).then(cache => cache.put(event.request, clone)).catch(() => {});
       return response;
     } catch {
       if (event.request.mode === 'navigate') return (await matchCached('./index.html')) || Response.error();
