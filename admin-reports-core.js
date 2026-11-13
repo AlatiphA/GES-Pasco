@@ -25,6 +25,6 @@
   const total=rows=>{const sum=rows.reduce((n,r)=>n+r.amount,0);if(!Number.isSafeInteger(sum))throw Error('Payment total exceeds the supported range.');return sum;};
   return {asOfMs:now,monthStartMs,active,expiring,pending,verified,summary:{users:profiles.length,active:active.length,expiring:expiring.length,pending:pending.length,verifiedCount:subscriptionsPaid.length,verifiedTotal:total(subscriptionsPaid),monthTotal:total(subscriptionsPaid.filter(r=>r.approvedAtMs>=monthStartMs)),supportTotal:total(support),invalid}};
  }
- const labels={'account.suspended':'Account suspended','account.activated':'Account activated','reading.policy':'Reading access policy changed','subscription.removed':'Paid access removed','payment.approved':'Payment approved','payment.rejected':'Payment rejected','message.sent':'Private message sent'};
+ const labels={'devices.policy':'Device reading limits changed','account.suspended':'Account suspended','account.activated':'Account activated','reading.policy':'Reading access policy changed','subscription.removed':'Paid access removed','payment.approved':'Payment approved','payment.rejected':'Payment rejected','message.sent':'Private message sent'};
  const api={ms,date,money,csv,download,matches,report,labels};if(typeof module==='object')module.exports=api;else root.GESPascoAdminReportsCore=api;
 })(typeof window==='object'?window:globalThis);

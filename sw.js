@@ -35,6 +35,8 @@ const FILES_TO_CACHE = [
   "./practice-sync-core.js",
   "./auth.js",
   "./access-core.js",
+  "./reader-devices-core.js",
+  "./reader-devices.js",
   "./access.js",
   "./premium-content.js",
   "./account-settings.js",

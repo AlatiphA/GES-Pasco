@@ -119,3 +119,52 @@ test('payment audit must match the actual atomic payment decision and target acc
  await yes(setDoc(doc(db('payer'),'momoRequests/audit-approve'),{...payment('payer','AUDITSUPPORT'),kind:'support',planId:''}));const approved=writeBatch(f);approved.update(doc(f,'momoRequests/audit-approve'),{status:'approved',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:0});approved.set(doc(f,'momoReceipts/AUDITSUPPORT'),{requestId:'audit-approve',uid:'payer',reference:'AUDITSUPPORT',amountPesewas:2000,kind:'support',planId:'',approvedBy:'finance',approvedAt:serverTimestamp()});approved.set(doc(f,'adminAudit/approved'),auditEvent('payment.approved','payer','audit-approve'));await yes(approved.commit());
  await yes(setDoc(doc(db('payer'),'momoRequests/audit-subscription'),payment('payer','AUDITSUBSCRIPTION')));const subscription=writeBatch(f),end=Date.now()+86400000;subscription.update(doc(f,'momoRequests/audit-subscription'),{status:'approved',reviewedBy:'finance',reviewedAt:serverTimestamp(),endsAtMs:end});subscription.set(doc(f,'momoReceipts/AUDITSUBSCRIPTION'),{requestId:'audit-subscription',uid:'payer',reference:'AUDITSUBSCRIPTION',amountPesewas:2000,kind:'subscription',planId:'m1',approvedBy:'finance',approvedAt:serverTimestamp()});subscription.set(doc(f,'subscriptions/payer'),{uid:'payer',planId:'m1',endsAtMs:end,requestId:'audit-subscription',updatedBy:'finance',updatedAt:serverTimestamp()});subscription.set(doc(f,'adminAudit/subscription-approved'),auditEvent('payment.approved','payer','audit-subscription'));await yes(subscription.commit());
 });
+
+
+const deviceDb=id=>env.authenticatedContext(id,{firebase:{sign_in_provider:'anonymous'}}).firestore();
+const deviceOwner=()=>env.authenticatedContext('device-payer',{auth_time:Math.floor(Date.now()/1000)}).firestore();
+const registry=(first,second='',revision=1)=>({slot1:first,slot2:second,revision,updatedAt:serverTimestamp()});
+const deviceBinding=()=>({ownerUid:'device-payer',label:'Browser / PWA',registeredAt:serverTimestamp()});
+async function registerTestDevice(id,first,second,revision){const f=deviceOwner(),b=writeBatch(f);b.set(doc(f,'readerDevices/'+id),deviceBinding());b.set(doc(f,'readerRegistrations/device-payer'),registry(first,second,revision));return b.commit();}
+const leaseFor=id=>({deviceUid:id,active:true,updatedAt:serverTimestamp()});
+test('device identities cannot use ordinary app, account or administration permissions',async()=>{
+ await no(setDoc(doc(deviceDb('anon'),'questionReports/anonymous-report'),{...payload(),reporterUid:'anon'}));await no(getDocs(collection(deviceDb('anon'),'announcements')));await no(getDocs(collection(deviceDb('anon'),'users')));await no(getDoc(doc(deviceDb('anon'),'users/payer')));
+});
+test('device registry is account-owned, bounded to two, and cannot overwrite another binding',async()=>{
+ await env.withSecurityRulesDisabled(async c=>{const f=c.firestore();await setDoc(doc(f,'users/device-payer'),{email:'device@example.com'});await setDoc(doc(f,'subscriptions/device-payer'),{endsAtMs:Date.now()+86400000});});
+ await yes(setDoc(doc(db('finance'),'readerDevicePolicy/current'),{enabled:true,updatedAt:serverTimestamp(),updatedBy:'finance'}));await no(setDoc(doc(db('payer'),'readerDevicePolicy/current'),{enabled:false,updatedAt:serverTimestamp(),updatedBy:'payer'}));
+ await yes(registerTestDevice('browser-one','browser-one','',1));await yes(registerTestDevice('browser-two','browser-one','browser-two',2));await no(registerTestDevice('browser-three','browser-three','browser-two',3));
+ await no(updateDoc(doc(deviceOwner(),'readerRegistrations/device-payer'),{slot3:'browser-three',updatedAt:serverTimestamp(),revision:3}));await no(setDoc(doc(deviceDb('browser-three'),'readerDevices/browser-three'),deviceBinding()));await no(getDoc(doc(db('bob'),'readerRegistrations/device-payer')));await no(getDoc(doc(db('bob'),'readerDevices/browser-one')));
+ await no(updateDoc(doc(deviceOwner(),'readerDevices/browser-one'),{label:'Overwritten'}));await no(setDoc(doc(db('bob'),'readerDevices/browser-one'),{...deviceBinding(),ownerUid:'bob'}));
+});
+test('protected books require the authenticated admitted device, not the account password or a copied local ID',async()=>{
+ const path='protectedLibrary/current',first=deviceDb('browser-one'),second=deviceDb('browser-two');await no(getDoc(doc(db('device-payer'),path)));await no(getDoc(doc(first,path)));await no(getDoc(doc(deviceDb('browser-clone'),path)));
+ await yes(setDoc(doc(first,'readerLeases/device-payer'),leaseFor('browser-one')));await yes(getDoc(doc(first,path)));await yes(getDoc(doc(first,'protectedLibrary/edition-test/chunks/0')));await yes(getDocs(collection(first,'quizBanks')));
+ await no(setDoc(doc(second,'readerLeases/device-payer'),leaseFor('browser-two')));await no(getDoc(doc(second,path)));await no(setDoc(doc(db('device-payer'),'readerLeases/device-payer'),leaseFor('browser-two')));await no(setDoc(doc(second,'readerLeases/device-payer'),leaseFor('browser-one')));
+ await yes(updateDoc(doc(first,'readerLeases/device-payer'),{active:false,updatedAt:serverTimestamp()}));await yes(setDoc(doc(second,'readerLeases/device-payer'),leaseFor('browser-two')));await yes(getDoc(doc(second,path)));await no(getDoc(doc(first,path)));
+});
+test('lease expiry, revocation, recent-owner removal and re-registration are enforced by server rules',async()=>{
+ await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'readerLeases/device-payer'),{deviceUid:'browser-two',active:true,updatedAt:new Date(Date.now()-121000)}));await yes(setDoc(doc(deviceDb('browser-one'),'readerLeases/device-payer'),leaseFor('browser-one')));
+ const stale=db('device-payer'),bad=writeBatch(stale);bad.set(doc(stale,'readerRegistrations/device-payer'),registry('','browser-two',3));bad.delete(doc(stale,'readerDevices/browser-one'));await no(bad.commit());
+ const f=deviceOwner(),remove=writeBatch(f);remove.set(doc(f,'readerRegistrations/device-payer'),registry('','browser-two',3));remove.delete(doc(f,'readerDevices/browser-one'));await yes(remove.commit());await no(getDoc(doc(deviceDb('browser-one'),'protectedLibrary/current')));await no(setDoc(doc(deviceDb('browser-one'),'readerLeases/device-payer'),leaseFor('browser-one')));
+ await yes(registerTestDevice('browser-three','browser-three','browser-two',4));await yes(setDoc(doc(deviceDb('browser-three'),'readerLeases/device-payer'),leaseFor('browser-three')));
+ await env.withSecurityRulesDisabled(async c=>updateDoc(doc(c.firestore(),'subscriptions/device-payer'),{endsAtMs:Date.now()-1}));await no(getDoc(doc(deviceDb('browser-three'),'protectedLibrary/current')));await no(setDoc(doc(deviceDb('browser-three'),'readerLeases/device-payer'),leaseFor('browser-three')));
+ for(const exempt of ['finance','reviewer','granted-reader','legacy-reader'])await yes(getDoc(doc(db(exempt),'protectedLibrary/current')));
+});
+
+
+test('deleting an account revokes device content immediately and permits owner-only metadata cleanup',async()=>{
+ await env.withSecurityRulesDisabled(async c=>{const f=c.firestore();await setDoc(doc(f,'subscriptions/device-payer'),{endsAtMs:Date.now()+86400000});await setDoc(doc(f,'accountDeletions/device-payer'),{uid:'device-payer',requestedAt:new Date()});});
+ await no(getDoc(doc(deviceDb('browser-three'),'protectedLibrary/current')));const f=deviceOwner();await yes(getDoc(doc(f,'readerRegistrations/device-payer')));const b=writeBatch(f);for(const path of ['readerDevices/browser-two','readerDevices/browser-three','readerRegistrations/device-payer','readerLeases/device-payer'])b.delete(doc(f,path));await yes(b.commit());
+ await no(deleteDoc(doc(db('bob'),'readerDevices/browser-two')));await no(deleteDoc(doc(deviceDb('browser-three'),'readerRegistrations/device-payer')));
+});
+
+
+test('simultaneous online claims admit exactly one authenticated registered device',async()=>{
+ await env.withSecurityRulesDisabled(async c=>{const f=c.firestore();await setDoc(doc(f,'subscriptions/racing-payer'),{endsAtMs:Date.now()+86400000});await setDoc(doc(f,'readerRegistrations/racing-payer'),registry('racer-one','racer-two',2));for(const id of ['racer-one','racer-two'])await setDoc(doc(f,'readerDevices/'+id),{ownerUid:'racing-payer',label:'Browser',registeredAt:new Date()});});
+ const results=await Promise.allSettled(['racer-one','racer-two'].map(id=>setDoc(doc(deviceDb(id),'readerLeases/racing-payer'),leaseFor(id))));assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected').length,1);
+});
+test('only an existing payment administrator can activate device enforcement with a linked audit event',async()=>{
+ const f=db('finance');await no(setDoc(doc(f,'adminAudit/fake-device-policy'),auditEvent('devices.policy','finance','current')));
+ for(const enabled of [false,true]){const b=writeBatch(f);b.set(doc(f,'readerDevicePolicy/current'),{enabled,updatedBy:'finance',updatedAt:serverTimestamp()});b.set(doc(f,'adminAudit/device-policy-'+enabled),auditEvent('devices.policy','finance','current'));await yes(b.commit());if(enabled)await no(getDoc(doc(db('paid-reader'),'protectedLibrary/current')));else await yes(getDoc(doc(db('paid-reader'),'protectedLibrary/current')));}
+});
