@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "source": "library/sample.epub",
-  "answerBasis": "Only questions with one clearly bold-marked answer in the book are included. Answers follow the book, not an independent current review.",
+  "answerBasis": "Available complete papers, including True/False and written questions adapted to answer-choice format. Book answers and linked explanations are retained; reviewed clarifications are identified in each explanation.",
   "banks": [
     {
       "schema": 1,
       "id": "index-split-043-1",
-      "title": "MoE/GES/DD/2020 — Section A",
-      "version": 1,
+      "title": "MoE/GES/DD/2020 — Complete paper",
+      "version": 2,
       "questions": [
         {
           "id": "index_split_043-1-1",
@@ -20,7 +20,7 @@
             "A social studies teacher uses visual aids and a logical progression of ideas when presenting lessons about new or unfamiliar topics."
           ],
           "answer": 1,
-          "explanation": "The book marks “A math teacher has students use hands-on materials and real-world problems to acquire new concepts and practice skills.” as the answer.",
+          "explanation": "The book marks “A math teacher has students use hands-on materials and real-world problems to acquire new concepts and practice skills.” as the answer.\n\nConstructivism is based on the idea that learners actively construct their own understanding through experience and reflection. Using hands-on materials and real-world problems allows students to build new knowledge on existing knowledge, which is a core principle of constructivism.",
           "source": "MoE/GES/DD/2020, Section A, question 1"
         },
         {
@@ -34,7 +34,7 @@
             "Reassuring students that they possess all of the skills and abilities needed to complete the project tasks."
           ],
           "answer": 1,
-          "explanation": "The book marks “Organizing project tasks in a step-by-step sequence and providing students with directions and reminders for completing each step.” as the answer.",
+          "explanation": "The book marks “Organizing project tasks in a step-by-step sequence and providing students with directions and reminders for completing each step.” as the answer.\n\nFor a complex, multi-stage project, scaffolding the process by breaking it down into manageable steps with clear directions is the most effective strategy to ensure student success and prevent them from becoming overwhelmed.",
           "source": "MoE/GES/DD/2020, Section A, question 2"
         },
         {
@@ -48,7 +48,7 @@
             "perceive that their performance compares favourably with that of peers engaged in the same tasks."
           ],
           "answer": 1,
-          "explanation": "The book marks “are interested in what they are learning and understand how it relates to their own lives.” as the answer.",
+          "explanation": "The book marks “are interested in what they are learning and understand how it relates to their own lives.” as the answer.\n\nIntrinsic motivation comes from within the learner. It is fueled by personal interest, curiosity, and the perceived relevance of the material to one's own life and goals.",
           "source": "MoE/GES/DD/2020, Section A, question 3"
         },
         {
@@ -90,7 +90,7 @@
             "the same strategies but may vary in the techniques used for each class."
           ],
           "answer": 1,
-          "explanation": "The book marks “teachers having at least four rules to guide them.” as the answer.",
+          "explanation": "The book marks “teachers having at least four rules to guide them.” as the answer.\n\nThis is false. Effective classroom management strategies doesn’t require a fixed number of rules. The number of rules should be flexible, clear and concise, and meaningful.",
           "source": "MoE/GES/DD/2020, Section A, question 6"
         },
         {
@@ -104,7 +104,7 @@
             "global culture"
           ],
           "answer": 1,
-          "explanation": "The book marks “civic learning” as the answer.",
+          "explanation": "The book marks “civic learning” as the answer.\n\nGlobal citizenship education is an extension of civic education. It prepares students to be informed, engaged, and responsible members of both their local and global communities.",
           "source": "MoE/GES/DD/2020, Section A, question 7"
         },
         {
@@ -118,7 +118,7 @@
             "2000 Dakar Framework for Action"
           ],
           "answer": 3,
-          "explanation": "The book marks “2000 Dakar Framework for Action” as the answer.",
+          "explanation": "The book marks “2000 Dakar Framework for Action” as the answer.\n\nThe Dakar Framework for Action (2000) is a commitment to achieving Quality Education for All by 2015, placing quality at the center of education.",
           "source": "MoE/GES/DD/2020, Section A, question 8"
         },
         {
@@ -188,7 +188,7 @@
             "Throughout the lesson, the teacher uses a variety of effective strategies to monitor student understanding."
           ],
           "answer": 0,
-          "explanation": "The book marks “In a class of 42, the teacher calls on one student to answer four out of ten questions asked.” as the answer.",
+          "explanation": "The book marks “In a class of 42, the teacher calls on one student to answer four out of ten questions asked.” as the answer.\n\nThis is the only option that provides a specific, observable, and quantifiable fact. The others are subjective judgments (\"highly responsive,\" \"little or no effort,\" \"variety of effective strategies\").",
           "source": "MoE/GES/DD/2020, Section A, question 13"
         },
         {
@@ -202,7 +202,7 @@
             "interviewing each teacher about his or her teaching practices."
           ],
           "answer": 0,
-          "explanation": "The book marks “arranging to observe instruction in each classroom.” as the answer.",
+          "explanation": "The book marks “arranging to observe instruction in each classroom.” as the answer.\n\nDirect observation of teaching provides the most authentic and objective data for evaluating teacher quality and identifying specific areas for support and improvement.",
           "source": "MoE/GES/DD/2020, Section A, question 14"
         },
         {
@@ -216,7 +216,7 @@
             "should ensure that teachers have lots of workload."
           ],
           "answer": 2,
-          "explanation": "The book marks “should ensure that teachers have the minimum academic qualification.” as the answer.",
+          "explanation": "The book marks “should ensure that teachers have the minimum academic qualification.” as the answer.\n\nThe \"expert\" role of a supervisor includes ensuring that all practicing teachers meet the minimum professional standards and qualifications required for the job.",
           "source": "MoE/GES/DD/2020, Section A, question 15"
         },
         {
@@ -230,7 +230,7 @@
             "Seeking information from the previous school head about leadership strategies that did and did not work at the school."
           ],
           "answer": 1,
-          "explanation": "The book marks “Holding discussions with many stakeholders to learn about local values, views, and priorities.” as the answer.",
+          "explanation": "The book marks “Holding discussions with many stakeholders to learn about local values, views, and priorities.” as the answer.\n\nThe first step in effective turnaround leadership is diagnosis. Engaging stakeholders to understand the school's context, culture, and challenges is essential before implementing any plan.",
           "source": "MoE/GES/DD/2020, Section A, question 16"
         },
         {
@@ -258,7 +258,7 @@
             "scoring the responses based on the knowledge of students' identity."
           ],
           "answer": 0,
-          "explanation": "The book marks “constantly following the scoring guide as the scripts are graded.” as the answer.",
+          "explanation": "The book marks “constantly following the scoring guide as the scripts are graded.” as the answer.\n\nThe most direct way to ensure scoring consistency (reliability) is to adhere strictly to a predefined rubric or scoring guide for every response.",
           "source": "MoE/GES/DD/2020, Section A, question 18"
         },
         {
@@ -272,7 +272,7 @@
             "Validity"
           ],
           "answer": 3,
-          "explanation": "The book marks “Validity” as the answer.",
+          "explanation": "The book marks “Validity” as the answer.\n\nThe head teacher is questioning whether the grade validly represents the student-teacher's actual ability to perform the task (writing test items). A test has validity if it measures what it claims to measure.",
           "source": "MoE/GES/DD/2020, Section A, question 19"
         },
         {
@@ -286,7 +286,7 @@
             "Assessment of learning."
           ],
           "answer": 3,
-          "explanation": "The book marks “Assessment of learning.” as the answer.",
+          "explanation": "The book marks “Assessment of learning.” as the answer.\n\nAssessment of learning is summative. Its purpose is to measure and certify learning at the end of a period, typically represented by a grade or score.",
           "source": "MoE/GES/DD/2020, Section A, question 20"
         },
         {
@@ -306,7 +306,7 @@
         {
           "id": "index_split_043-22-22",
           "topic": "Section A",
-          "prompt": "Which of the following statement(s) is /are false?\nI. It is easy to achieve the broad national goals of education when curriculum development is decentralized.\nII. Students who follow a decentralized curriculum in deprived school districts are likely to be disadvantaged in the job market.",
+          "prompt": "Which of the following statement(s) is /are false?\n\nI. It is easy to achieve the broad national goals of education when curriculum development is decentralized.\nII. Students who follow a decentralized curriculum in deprived school districts are likely to be disadvantaged in the job market.",
           "options": [
             "I only",
             "II only",
@@ -384,7 +384,7 @@
             "UNESCO Forum"
           ],
           "answer": 0,
-          "explanation": "The book marks “Dakar World Forum for Education” as the answer.",
+          "explanation": "The book marks “Dakar World Forum for Education” as the answer.\n\nThe Dakar Framework for Action (2000) specifically included expanding and improving early childhood care and education, which influenced Ghana's policy.",
           "source": "MoE/GES/DD/2020, Section A, question 27"
         },
         {
@@ -412,7 +412,7 @@
             "two best subjects of BECE candidates"
           ],
           "answer": 1,
-          "explanation": "The book marks “BECE candidates and not grades” as the answer.",
+          "explanation": "The book marks “BECE candidates and not grades” as the answer.\n\nThe placement system uses the aggregate scores which is derived from the grades of all subjects (i.e. four core subjects and two best subjects) to ensure a comprehensive assessment. Also names or identities of candidates are not part of the scoring metrics.",
           "source": "MoE/GES/DD/2020, Section A, question 29"
         },
         {
@@ -440,7 +440,7 @@
             "various ranks a teacher passes through in the teaching profession"
           ],
           "answer": 3,
-          "explanation": "The book marks “various ranks a teacher passes through in the teaching profession” as the answer.",
+          "explanation": "The book marks “various ranks a teacher passes through in the teaching profession” as the answer.\n\nA scheme of service outlines the career progression, ranks, qualifications, and requirements for advancement within a profession or organization.",
           "source": "MoE/GES/DD/2020, Section A, question 31"
         },
         {
@@ -454,13 +454,13 @@
             "By organizing educational games/programmes which will make children feel like speaking."
           ],
           "answer": 3,
-          "explanation": "The book marks “By organizing educational games/programmes which will make children feel like speaking.” as the answer.",
+          "explanation": "The book marks “By organizing educational games/programmes which will make children feel like speaking.” as the answer.\n\nFor a shy student, low-pressure, fun activities like games are the most effective way to encourage participation and self-expression without forcing it.",
           "source": "MoE/GES/DD/2020, Section A, question 32"
         },
         {
           "id": "index_split_043-33-33",
           "topic": "Section A",
-          "prompt": "A teacher is to use appropriate methods, techniques and sound principles of teaching and learning such as .......\nI. building on past learning or previous knowledge and positive reinforcement.\nII. providing guidance and practice in class before independent practice.\nIII. motivating and sustaining pupils' interest.\nIV. involving each learner in the teaching/learning process.\nV. distributing evaluative questions evenly.",
+          "prompt": "A teacher is to use appropriate methods, techniques and sound principles of teaching and learning such as .......\n\nI. building on past learning or previous knowledge and positive reinforcement.\nII. providing guidance and practice in class before independent practice.\nIII. motivating and sustaining pupils' interest.\nIV. involving each learner in the teaching/learning process.\nV. distributing evaluative questions evenly.",
           "options": [
             "I,II and III only",
             "I, II, III and IV only",
@@ -482,7 +482,7 @@
             "logical sequence"
           ],
           "answer": 0,
-          "explanation": "The book marks “behaviour” as the answer.",
+          "explanation": "The book marks “behaviour” as the answer.\n\nIn its broadest sense, a curriculum encompasses all the experiences (planned and unplanned) that a school provides to influence a child's learning and behavior.",
           "source": "MoE/GES/DD/2020, Section A, question 34"
         },
         {
@@ -496,7 +496,7 @@
             "Thinking Model"
           ],
           "answer": 0,
-          "explanation": "The book marks “Directive Model” as the answer.",
+          "explanation": "The book marks “Directive Model” as the answer.\n\nThe Directive Model is teacher-centered, with the teacher providing structured guidance and explicit instructions on what students should do.",
           "source": "MoE/GES/DD/2020, Section A, question 35"
         },
         {
@@ -512,14 +512,522 @@
           "answer": 3,
           "explanation": "The book marks “group work” as the answer.",
           "source": "MoE/GES/DD/2020, Section A, question 36"
+        },
+        {
+          "id": "index-split-043-1-complete-37",
+          "topic": "Section B",
+          "prompt": "Evidence of a positive school ethos includes consistent shared values and standards.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThe Directive Model is teacher-centered, with the teacher providing structured guidance and explicit instructions on what students should do.",
+          "source": "MoE/GES/DD/2020, Section B, question 37"
+        },
+        {
+          "id": "index-split-043-1-complete-38",
+          "topic": "Section B",
+          "prompt": "It is important that circuit supervisors keep their teachers' lesson plan notebooks.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 38"
+        },
+        {
+          "id": "index-split-043-1-complete-39",
+          "topic": "Section B",
+          "prompt": "Students learn best in a multitude of ways rather than one dominant means.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThis is a core principle of differentiated instruction and universal design for learning (UDL). Students have diverse learning styles and intelligences, so a variety of teaching methods is most effective.",
+          "source": "MoE/GES/DD/2020, Section B, question 39"
+        },
+        {
+          "id": "index-split-043-1-complete-40",
+          "topic": "Section B",
+          "prompt": "The competency-based training curriculum delivery methodology is suitable for TVET training at the second cycle level of education.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nCompetency-Based Training (CBT) is the ideal methodology for TVET as it focuses on mastering specific, practical skills required for employment, which is the central aim of TVET education.",
+          "source": "MoE/GES/DD/2020, Section B, question 40"
+        },
+        {
+          "id": "index-split-043-1-complete-41",
+          "topic": "Section B",
+          "prompt": "Every goal in the 2030 Agenda requires education to empower people with the knowledge, skills and values to live in dignity, build their lives and contribute to their societies.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 41"
+        },
+        {
+          "id": "index-split-043-1-complete-42",
+          "topic": "Section B",
+          "prompt": "A school head promoting a professional learning community can lead to a sense of competition among teachers in a school.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nA true Professional Learning Community (PLC) is built on collaboration, shared practice, and collective responsibility for student learning, not individual competition.",
+          "source": "MoE/GES/DD/2020, Section B, question 42"
+        },
+        {
+          "id": "index-split-043-1-complete-43",
+          "topic": "Section B",
+          "prompt": "As a supervisor, consulting your staff in advance when developing a plan may direct your attention to potential pitfalls.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 43"
+        },
+        {
+          "id": "index-split-043-1-complete-44",
+          "topic": "Section B",
+          "prompt": "The need for a supervisor to engage in a human relations angle of supervision means that the supervisor should be involved in problem solving and learner-centered education.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 44"
+        },
+        {
+          "id": "index-split-043-1-complete-45",
+          "topic": "Section B",
+          "prompt": "In mainstreaming special education students, it is important that they experience an educational environment that reinforces the differences between special education and general education students.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 45"
+        },
+        {
+          "id": "index-split-043-1-complete-46",
+          "topic": "Section B",
+          "prompt": "The school head should ensure that paid vouchers are numbered sequentially and entered same in the log book and properly filled.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThis is a fundamental accounting and internal control procedure to ensure financial accountability, prevent fraud, and allow for easy tracking and auditing of transactions. Note, there is a difference between log book and logbook.",
+          "source": "MoE/GES/DD/2020, Section B, question 46"
+        },
+        {
+          "id": "index-split-043-1-complete-47",
+          "topic": "Section B",
+          "prompt": "Climate Change, Environmental Education and Education for Sustainable Development have become major tools for protecting the environment and ensuring sustainable development.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 47"
+        },
+        {
+          "id": "index-split-043-1-complete-48",
+          "topic": "Section B",
+          "prompt": "Even though homework is important in the instructional system and teachers must therefore give homework as part of the instructional process, it is NOT scored as part of the School-Based Assessment in Ghana.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 48"
+        },
+        {
+          "id": "index-split-043-1-complete-49",
+          "topic": "Section B",
+          "prompt": "A teacher must test his/her students when assessing them.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nWhile testing is one way to assess learners, it is not the only method and certainly not a requirement in every assessment scenario. Other methods of assessments are observation, projects, portfolios, presentations, and questioning.",
+          "source": "MoE/GES/DD/2020, Section B, question 49"
+        },
+        {
+          "id": "index-split-043-1-complete-50",
+          "topic": "Section B",
+          "prompt": "Objective type tests cannot be used to assess higher-order thinking abilities.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 50"
+        },
+        {
+          "id": "index-split-043-1-complete-51",
+          "topic": "Section B",
+          "prompt": "Within the GES structure, decision-making takes place only within the GES council.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 51"
+        },
+        {
+          "id": "index-split-043-1-complete-52",
+          "topic": "Section B",
+          "prompt": "Transfers within the GES is an external exercise.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 52"
+        },
+        {
+          "id": "index-split-043-1-complete-53",
+          "topic": "Section B",
+          "prompt": "The GES Act 1995 [Act 506] and the Education Act 2008 [Act 877] are statutes that are directly related to the functions of GES.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nAct 506 establishes the GES, and Act 778 (Note: Act 877 is not related to GES) provides the broader legal framework for education in Ghana, which directly used to govern the functions of GES. Both have since been repealed.",
+          "source": "MoE/GES/DD/2020, Section B, question 53"
+        },
+        {
+          "id": "index-split-043-1-complete-54",
+          "topic": "Section B",
+          "prompt": "In 1974, the new structure and content of education was introduced which brought about the JSS concept implemented on pilot basis from 1976 to 1987.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 54"
+        },
+        {
+          "id": "index-split-043-1-complete-55",
+          "topic": "Section B",
+          "prompt": "The Ministry of Education's main mandate is to formulate education policies. A legal incident in this mandate is monitoring and evaluating their performance.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 55"
+        },
+        {
+          "id": "index-split-043-1-complete-56",
+          "topic": "Section B",
+          "prompt": "Legitimate Power of a school head is conferred by virtue of his or her appointment to the position and therefore can exert administrative authority.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/DD/2020, Section B, question 56"
+        },
+        {
+          "id": "index-split-043-1-complete-57",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "According to Skinnerian Operant conditioning theory, a negative reinforcement is .......",
+          "options": [
+            "The removal of an aversive stimulus to increase the likelihood of a behavior.",
+            "adding an unpleasant consequence to reduce behaviour",
+            "removing a reward to reduce behaviour",
+            "giving a reward unrelated to behaviour"
+          ],
+          "answer": 0,
+          "explanation": "The source answer is “The removal of an aversive stimulus to increase the likelihood of a behavior.”.\n\nNegative reinforcement is defined by the removal of an unpleasant stimulus (e.g., stopping nagging after a chore is done) which strengthens the behavior (doing the chore).\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 57 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-58",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "In classroom management the teacher's strategies and techniques must be .......",
+          "options": [
+            "fixed without considering learners",
+            "Varied/diversified.",
+            "identical in every situation",
+            "based only on punishment"
+          ],
+          "answer": 1,
+          "explanation": "The source answer is “Varied/diversified.”.\n\nEffective classroom management requires a diverse toolkit of strategies to address different situations and student needs.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 58 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-59",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The ultimate purpose of supervision is to ensure .......",
+          "options": [
+            "punishment of every teacher",
+            "production of examination rankings alone",
+            "Advancement of learner (child) welfare.",
+            "advancement of the supervisor's personal status"
+          ],
+          "answer": 2,
+          "explanation": "The source answer is “Advancement of learner (child) welfare.”.\n\nWhile supervision supports teachers, its ultimate goal is to improve student learning outcomes and well-being.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 59 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-60",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "Which Sustainable Development Goal is directly related to Education?",
+          "options": [
+            "Goal one (1)",
+            "Goal three (3)",
+            "Goal sixteen (16)",
+            "Goal four (4)."
+          ],
+          "answer": 3,
+          "explanation": "The source answer is “Goal four (4).”.\n\nSDG 4 is dedicated to quality education.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 60 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-61",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "What does the Sustainable Development Goal which directly relates to Education state?",
+          "options": [
+            "The goal is to ensure inclusive and equitable quality education and promote lifelong learning opportunities for all.",
+            "provide education only for children who can pay",
+            "exclude adults from lifelong learning",
+            "restrict quality schooling to selected regions"
+          ],
+          "answer": 0,
+          "explanation": "The source answer is “The goal is to ensure inclusive and equitable quality education and promote lifelong learning opportunities for all.”.\n\nThis is the exact wording of SDG 4.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 61 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-62",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The CSSPS seeks to improve the manual system of selection and placement of qualified BECE candidates into public and private senior high schools, technical and vocational institutes by .......",
+          "options": [
+            "restricting placement decisions to handwritten records",
+            "using computerized system or computerizing the process.",
+            "replacing all BECE scores with random allocation",
+            "abolishing selection criteria entirely"
+          ],
+          "answer": 1,
+          "explanation": "The source answer is “using computerized system or computerizing the process.”.\n\nThe key improvement of the Computerized School Selection and Placement System (CSSPS) is the move from a manual to a computerized process. The GES manages it, but the “how” is through computerization.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 62 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-63",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "On which date is World Teachers’ Day celebrated?",
+          "options": [
+            "8 March",
+            "1 May",
+            "5 October",
+            "24 January"
+          ],
+          "answer": 2,
+          "explanation": "The source answer is “5 October”.\n\nAdapted from a written question: choices were added for the quiz.\n\nThe source fill-in wording is truncated. Adapted to ask the date of World Teachers’ Day, consistent with the book’s suggested date.",
+          "source": "MoE/GES/DD/2020, Section C, question 63 (adapted answer-choice format)",
+          "answerBasis": "reviewed"
+        },
+        {
+          "id": "index-split-043-1-complete-64",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The rationale of educational planning in our education system is .......",
+          "options": [
+            "access for selected groups without regard to quality",
+            "ranking schools without planning resources",
+            "uniform teaching without considering learner needs",
+            "Access, quality and equity education for all."
+          ],
+          "answer": 3,
+          "explanation": "The source answer is “Access, quality and equity education for all.”.\n\nThese are the three fundamental pillars of educational planning in Ghana and globally.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 64 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-65",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The primary role of the mentoring teacher in the school of the pre-service teacher is most appropriately described as .......",
+          "options": [
+            "Mentoring.",
+            "Punishment",
+            "Payroll auditing",
+            "External licensing"
+          ],
+          "answer": 0,
+          "explanation": "The source answer is “Mentoring.”.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 65 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-66",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The basic purpose for instructional supervision is for .......",
+          "options": [
+            "comparison of staff seniority alone",
+            "Effective teaching and learning.",
+            "teacher punishment alone",
+            "administrative paperwork alone"
+          ],
+          "answer": 1,
+          "explanation": "The source answer is “Effective teaching and learning.”.\n\nThe core purpose of instructional supervision is to improve the quality of teaching, which directly leads to effective learning.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 66 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-67",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "When the school head directs an investigation into suspected fraud, the only authorities to impose sanctions are .......",
+          "options": [
+            "the investigating teacher alone in every case",
+            "any learner who reports a suspicion",
+            "GES Council or DEOC, SMC and Board of Governors depending on the severity.",
+            "every parent acting independently"
+          ],
+          "answer": 2,
+          "explanation": "The source answer is “GES Council or DEOC, SMC and Board of Governors depending on the severity.”.\n\nWhile the DEOC and SMC may investigate, the ultimate power to impose major sanctions (like dismissal) rests with the GES Council as the apex disciplinary body, as per the GES Act.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 67 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-68",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The method of obtaining information to judge the worth of a curriculum whiles it is being implemented is known as .......",
+          "options": [
+            "Placement testing",
+            "Teacher registration",
+            "School mapping",
+            "Evaluation."
+          ],
+          "answer": 3,
+          "explanation": "The source answer is “Evaluation.”.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 68 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-69",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The ability of a student to use an appropriate rule or principle to help him/her solve a problem without being prompted is specified in the cognitive domain of Bloom's Taxonomy as .......",
+          "options": [
+            "application.",
+            "Remembering",
+            "Understanding",
+            "Evaluating"
+          ],
+          "answer": 0,
+          "explanation": "The source answer is “application.”.\n\nThis is the definition of Application, the third level of Bloom’s original taxonomy.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 69 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-70",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The type of assessment which is used to determine students' strengths and weaknesses for correction and remediation is known as .......",
+          "options": [
+            "Certification test",
+            "Diagnostic test.",
+            "Summative test",
+            "Placement test"
+          ],
+          "answer": 1,
+          "explanation": "The source answer is “Diagnostic test.”.\n\nDiagnostic assessment is specifically designed to identify learning gaps and inform remediation.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 70 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-71",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "In the chain of command of the GES headquarters, the Director General is the chief executive accountable to the .......",
+          "options": [
+            "National Council for Curriculum and Assessment",
+            "West African Examinations Council",
+            "GES council.",
+            "National Teaching Council"
+          ],
+          "answer": 2,
+          "explanation": "The source answer is “GES council.”.\n\nThe Director-General is appointed by and reports to the GES Council.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 71 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-72",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "What is the core function of the National Inspectorate Board?",
+          "options": [
+            "issue professional teaching licences",
+            "formulate all national education policy",
+            "conduct all school entrance examinations",
+            "Undertake inspection of school, to evaluate on periodic basis first and second cycle institutions, set and enforce standards to be observed in both public and private basic and secondary educational institutions."
+          ],
+          "answer": 3,
+          "explanation": "The source answer is “Undertake inspection of school, to evaluate on periodic basis first and second cycle institutions, set and enforce standards to be observed in both public and private basic and secondary educational institutions.”.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 72 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-73",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The main role of the Education Sector Analysis (ESA) is to .......",
+          "options": [
+            "Identify progress made and outstanding challenges.",
+            "determine school uniform styles alone",
+            "allocate individual teacher pensions",
+            "replace evidence with personal opinion"
+          ],
+          "answer": 0,
+          "explanation": "The source answer is “Identify progress made and outstanding challenges.”.\n\nAn ESA is a diagnostic tool used to assess the current state of the education sector to inform planning.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 73 (adapted answer-choice format)"
+        },
+        {
+          "id": "index-split-043-1-complete-74",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "The GES was established in the year 1974 as a national organization under the Ministry of Education (MoE) by the Act .......",
+          "options": [
+            "Act 1023 of 2020",
+            "NRCD 247 of 1974",
+            "Act 506 of 1995",
+            "Act 778 of 2008"
+          ],
+          "answer": 1,
+          "explanation": "The source answer is “NRCD 247 of 1974”.\n\nAdapted from a written question: choices were added for the quiz.\n\nReviewed correction: the source lists Act 506, which is the 1995 Ghana Education Service Act. The original 1974 establishing decree was NRCD 247, also identified in the book’s DD 2026 question 7.",
+          "source": "MoE/GES/DD/2020, Section C, question 74 (adapted answer-choice format)",
+          "answerBasis": "reviewed"
+        },
+        {
+          "id": "index-split-043-1-complete-75",
+          "topic": "Section C — adapted fill-in",
+          "prompt": "It is important for teachers to know the Code of Conduct because .......",
+          "options": [
+            "it guarantees automatic promotion",
+            "it removes all professional accountability",
+            "It provides set of rules and regulations to guide teachers in the performance of their functions.",
+            "it replaces all national laws"
+          ],
+          "answer": 2,
+          "explanation": "The source answer is “It provides set of rules and regulations to guide teachers in the performance of their functions.”.\n\nAdapted from a written question: choices were added for the quiz.",
+          "source": "MoE/GES/DD/2020, Section C, question 75 (adapted answer-choice format)"
         }
       ]
     },
     {
       "schema": 1,
       "id": "index-split-047-1",
-      "title": "MoE/GES/AD I/2020 — Section A",
-      "version": 1,
+      "title": "MoE/GES/AD I/2020 — Complete paper",
+      "version": 2,
       "questions": [
         {
           "id": "index_split_047-1-1",
@@ -532,13 +1040,13 @@
             "National Commission for Civic Education"
           ],
           "answer": 3,
-          "explanation": "The book marks “National Commission for Civic Education” as the answer.",
+          "explanation": "The book marks “National Commission for Civic Education” as the answer.\n\nThe National Commission for Civic Education (NCCE) is an independent governance institution established by the Constitution, not an agency under the Ministry of Education.",
           "source": "MoE/GES/AD I/2020, Section A, question 1"
         },
         {
           "id": "index_split_047-2-2",
           "topic": "Section A",
-          "prompt": "Which of the following was/were part of the programmes and interventions implemented to facilitate the attainment of the Free Compulsory Universal Basic Education (FCUBE) policy objectives?\nI. Quality Improvement in Primary Schools (QUIPS)\nII. Child School Community Progress in Education (Child Scope)\nIII. Performance Monitoring Test (PMT)\nIV. District Teacher Support Teams (DTST)",
+          "prompt": "Which of the following was/were part of the programmes and interventions implemented to facilitate the attainment of the Free Compulsory Universal Basic Education (FCUBE) policy objectives?\n\nI. Quality Improvement in Primary Schools (QUIPS)\nII. Child School Community Progress in Education (Child Scope)\nIII. Performance Monitoring Test (PMT)\nIV. District Teacher Support Teams (DTST)",
           "options": [
             "I, II and III only",
             "I, II, III and IV",
@@ -574,7 +1082,7 @@
             "motivating and sustaining teachers' interest in teaching."
           ],
           "answer": 1,
-          "explanation": "The book marks “encouraging teachers to avoid tests and other assessments because they demoralize students.” as the answer.",
+          "explanation": "The book marks “encouraging teachers to avoid tests and other assessments because they demoralize students.” as the answer.\n\nA learner-centered school uses assessment for learning (formative assessment) to provide feedback and support growth, not to avoid it. Avoiding assessment altogether is not a principle of effective education.",
           "source": "MoE/GES/AD I/2020, Section A, question 4"
         },
         {
@@ -588,7 +1096,7 @@
             "personal development and leadership."
           ],
           "answer": 1,
-          "explanation": "The book marks “creativity and innovation.” as the answer.",
+          "explanation": "The book marks “creativity and innovation.” as the answer.\n\nEntrepreneurship is directly fueled by creativity and innovation, which is a core competency in the new standards-based curriculum.",
           "source": "MoE/GES/AD I/2020, Section A, question 5"
         },
         {
@@ -602,8 +1110,38 @@
             "Teachers desisting from harassing students."
           ],
           "answer": 2,
-          "explanation": "The book marks “Punishing pupils for absenteeism.” as the answer.",
+          "explanation": "The book marks “Punishing pupils for absenteeism.” as the answer.\n\nWhile discipline has its place, punishment is often the least effective and most negative remedy. Addressing the root causes through counseling, supervision, and a positive school environment is more effective.",
           "source": "MoE/GES/AD I/2020, Section A, question 6"
+        },
+        {
+          "id": "index-split-047-1-complete-7",
+          "topic": "Section A",
+          "prompt": "All the following learning assessment metrics are designed for Ghanaian basic schools except .......",
+          "options": [
+            "Early Grade Mathematics Assessment (EGMA).",
+            "Early Grade Reading Assessment (EGRA).",
+            "National Examination Assessment (NEA).",
+            "Trends In International Mathematics and Science Study (TIMSS)."
+          ],
+          "answer": 3,
+          "explanation": "Reviewed answer: Trends In International Mathematics and Science Study (TIMSS)..\n\nTIMSS is an international assessment for the Evaluation of Educational Achievement. It measures trends in maths and science achievements among learners in participating countries.\n\nThe option is unbolded in the source, but the linked book explanation supports this answer.",
+          "source": "MoE/GES/AD I/2020, Section A, question 7",
+          "answerBasis": "reviewed"
+        },
+        {
+          "id": "index-split-047-1-complete-8",
+          "topic": "Section A",
+          "prompt": "One of the students of a class hardly talks in the class. How would you encourage him to express himself?",
+          "options": [
+            "By encouraging children to take part in class activities",
+            "By giving good marks to those who express themselves well",
+            "By organizing classroom discussion activities",
+            "By organizing educational games/programmes in which children feel like speaking"
+          ],
+          "answer": 3,
+          "explanation": "Reviewed answer: By organizing educational games/programmes in which children feel like speaking.\n\nFor a shy student, low-pressure, fun activities like games are the most effective way to encourage participation and self-expression without forcing it.\n\nThe option is unbolded in the source, but the linked book explanation supports this answer.",
+          "source": "MoE/GES/AD I/2020, Section A, question 8",
+          "answerBasis": "reviewed"
         },
         {
           "id": "index_split_047-9-7",
@@ -616,8 +1154,23 @@
             "Critical thinking"
           ],
           "answer": 0,
-          "explanation": "The book marks “Clarity” as the answer.",
+          "explanation": "The book marks “Clarity” as the answer.\n\n“Clarity” is a quality of instruction or communication, not a core competency for learners. The core competencies are Collaboration, Communication, Critical Thinking, Creativity, etc.",
           "source": "MoE/GES/AD I/2020, Section A, question 9"
+        },
+        {
+          "id": "index-split-047-1-complete-10",
+          "topic": "Section A",
+          "prompt": "Which one of the following reasons best explains why teachers should ensure that there are physical pathways for students in the classroom? The pathways .......",
+          "options": [
+            "allow student private space to work for themselves.",
+            "make it easier for teachers to attend to individual student needs.",
+            "make it easier for teachers to see the board from the back.",
+            "make students less likely to become distracted."
+          ],
+          "answer": 1,
+          "explanation": "Reviewed answer: make it easier for teachers to attend to individual student needs..\n\nClear pathways allow the teacher to move efficiently throughout the classroom to provide individualized support, feedback, and management.\n\nThe option is unbolded in the source, but the linked book explanation supports this answer.",
+          "source": "MoE/GES/AD I/2020, Section A, question 10",
+          "answerBasis": "reviewed"
         },
         {
           "id": "index_split_047-11-8",
@@ -644,7 +1197,7 @@
             "values"
           ],
           "answer": 0,
-          "explanation": "The book marks “ethics” as the answer.",
+          "explanation": "The book marks “ethics” as the answer.\n\nProfessional ethics is integrated into the domain of “Professional Values and Attitudes.” It is not a separate standalone component of the NTS.",
           "source": "MoE/GES/AD I/2020, Section A, question 12"
         },
         {
@@ -658,7 +1211,7 @@
             "Personal development and leadership competence"
           ],
           "answer": 1,
-          "explanation": "The book marks “Critical thinking and problem solving” as the answer.",
+          "explanation": "The book marks “Critical thinking and problem solving” as the answer.\n\nAnalyzing issues to resolve problems is the direct definition of critical thinking and problem solving.",
           "source": "MoE/GES/AD I/2020, Section A, question 13"
         },
         {
@@ -672,7 +1225,7 @@
             "National Council for Curriculum and Assessment."
           ],
           "answer": 2,
-          "explanation": "The book marks “Ministry of Education.” as the answer.",
+          "explanation": "The book marks “Ministry of Education.” as the answer.\n\nThis is the core mandate of the Ministry of Education (MoE). Other agencies implement specific aspects of these policies.",
           "source": "MoE/GES/AD I/2020, Section A, question 14"
         },
         {
@@ -686,7 +1239,7 @@
             "Public Financial Management Act, 2016 (Act 921)"
           ],
           "answer": 1,
-          "explanation": "The book marks “Education Regulatory Bodies Act, 2020 (Act 1023)” as the answer.",
+          "explanation": "The book marks “Education Regulatory Bodies Act, 2020 (Act 1023)” as the answer.\n\nAct 1023 establishes bodies like NTC and NaCCA. It focuses on regulating educational bodies, not primarily on financial administration. The other acts are core financial governance laws.",
           "source": "MoE/GES/AD I/2020, Section A, question 15"
         },
         {
@@ -700,7 +1253,7 @@
             "weekly"
           ],
           "answer": 1,
-          "explanation": "The book marks “daily” as the answer.",
+          "explanation": "The book marks “daily” as the answer.\n\nContinuous assessment (ongoing, daily evaluation) provides a more comprehensive, valid, and reliable picture of a student’s abilities and progress than periodic tests.",
           "source": "MoE/GES/AD I/2020, Section A, question 16"
         },
         {
@@ -723,7 +1276,7 @@
           "prompt": "Which one of the following refers to a situation where a learner studies simply because work is assigned by the teacher?",
           "options": [
             "Cognitive memorizing.",
-            "Experiential learning .",
+            "Experiential learning.",
             "Sensory learning.",
             "None of the above"
           ],
@@ -742,7 +1295,7 @@
             "summative"
           ],
           "answer": 0,
-          "explanation": "The book marks “diagnostic” as the answer.",
+          "explanation": "The book marks “diagnostic” as the answer.\n\nDiagnostic assessment is used before instruction to identify students’ prior knowledge, strengths, and weaknesses.",
           "source": "MoE/GES/AD I/2020, Section A, question 19"
         },
         {
@@ -756,13 +1309,13 @@
             "psychomotor"
           ],
           "answer": 1,
-          "explanation": "The book marks “cognitive” as the answer.",
+          "explanation": "The book marks “cognitive” as the answer.\n\nCognitive learning models focus on the internal mental processes of learning, such as thinking, memory, knowing, and problem-solving.",
           "source": "MoE/GES/AD I/2020, Section A, question 20"
         },
         {
           "id": "index_split_047-21-18",
           "topic": "Section A",
-          "prompt": "Which of the following is/are termed as student-centered learning methods?\nI. Direct Instruction\nII. Inquiry-based learning\nIII. Cooperative learning",
+          "prompt": "Which of the following is/are termed as student-centered learning methods?\n\nI. Direct Instruction\nII. Inquiry-based learning\nIII. Cooperative learning",
           "options": [
             "I and II only",
             "I, III and III",
@@ -770,7 +1323,7 @@
             "II only"
           ],
           "answer": 2,
-          "explanation": "The book marks “II and III only” as the answer.",
+          "explanation": "The book marks “II and III only” as the answer.\n\nInquiry-based learning and Cooperative learning are student-centered. Direct Instruction is a teacher-centered approach.",
           "source": "MoE/GES/AD I/2020, Section A, question 21"
         },
         {
@@ -784,7 +1337,7 @@
             "Statistics, Research, and Information Management(SRIM)"
           ],
           "answer": 3,
-          "explanation": "The book marks “Statistics, Research, and Information Management(SRIM)” as the answer.",
+          "explanation": "The book marks “Statistics, Research, and Information Management(SRIM)” as the answer.\n\nThe SRIM Directorate is specifically responsible for managing the EMIS, which is the central repository for educational data in Ghana.",
           "source": "MoE/GES/AD I/2020, Section A, question 22"
         },
         {
@@ -798,7 +1351,7 @@
             "norm-referenced test"
           ],
           "answer": 1,
-          "explanation": "The book marks “criterion-referenced test” as the answer.",
+          "explanation": "The book marks “criterion-referenced test” as the answer.\n\nA criterion-referenced test measures a student’s performance against a fixed set of learning standards or criteria (the curriculum), not against other students.",
           "source": "MoE/GES/AD I/2020, Section A, question 23"
         },
         {
@@ -812,7 +1365,7 @@
             "transfer to places where they want to serve."
           ],
           "answer": 0,
-          "explanation": "The book marks “freedom in the selection of content and methods of teaching.” as the answer.",
+          "explanation": "The book marks “freedom in the selection of content and methods of teaching.” as the answer.\n\nTrue accountability is paired with autonomy. When teachers are given the professional freedom to make instructional decisions, they take greater ownership and responsibility for the outcomes.",
           "source": "MoE/GES/AD I/2020, Section A, question 24"
         },
         {
@@ -826,7 +1379,7 @@
             "test the conclusion."
           ],
           "answer": 0,
-          "explanation": "The book marks “help the learners define what is it to be solved.” as the answer.",
+          "explanation": "The book marks “help the learners define what is it to be solved.” as the answer.\n\nIn the problem-solving method, the teacher acts as a facilitator, guiding students to define the problem clearly before they proceed to find solutions.",
           "source": "MoE/GES/AD I/2020, Section A, question 25"
         },
         {
@@ -854,7 +1407,7 @@
             "replace all kinds of fees that were payable by children enrolled in schools."
           ],
           "answer": 3,
-          "explanation": "The book marks “replace all kinds of fees that were payable by children enrolled in schools.” as the answer.",
+          "explanation": "The book marks “replace all kinds of fees that were payable by children enrolled in schools.” as the answer.\n\nThe primary purpose of the Capitation Grant was to remove financial barriers to education by replacing various fees that prevented children from enrolling and attending school.",
           "source": "MoE/GES/AD I/2020, Section A, question 27"
         },
         {
@@ -868,7 +1421,7 @@
             "All of the above"
           ],
           "answer": 3,
-          "explanation": "The book marks “All of the above” as the answer.",
+          "explanation": "The book marks “All of the above” as the answer.\n\nUNESCO’s framework for teachers includes mastery of subject matter (content knowledge), innovativeness (pedagogical skills), and justice (professional ethics).",
           "source": "MoE/GES/AD I/2020, Section A, question 28"
         },
         {
@@ -882,7 +1435,7 @@
             "Role-play"
           ],
           "answer": 2,
-          "explanation": "The book marks “Recitation” as the answer.",
+          "explanation": "The book marks “Recitation” as the answer.\n\nRecitation involves oral repetition and is ineffective for teaching practical, hands-on skills. Demonstration, Discussion, and Role-play are more suitable for skill acquisition.",
           "source": "MoE/GES/AD I/2020, Section A, question 29"
         },
         {
@@ -896,7 +1449,7 @@
             "All of the above"
           ],
           "answer": 3,
-          "explanation": "The book marks “All of the above” as the answer.",
+          "explanation": "The book marks “All of the above” as the answer.\n\nResearch shows that learning style, school environment, and socio-cultural background all significantly influence student learning outcomes.",
           "source": "MoE/GES/AD I/2020, Section A, question 30"
         },
         {
@@ -910,7 +1463,7 @@
             "pose the question to the whole class and then select somebody to answer."
           ],
           "answer": 3,
-          "explanation": "The book marks “pose the question to the whole class and then select somebody to answer.” as the answer.",
+          "explanation": "The book marks “pose the question to the whole class and then select somebody to answer.” as the answer.\n\nPosing the question to the entire class first (“wait time”) ensures all students think about the answer, which promotes broader participation and discussion.",
           "source": "MoE/GES/AD I/2020, Section A, question 31"
         },
         {
@@ -924,7 +1477,7 @@
             "Training officer"
           ],
           "answer": 1,
-          "explanation": "The book marks “Partnership Coordinator” as the answer.",
+          "explanation": "The book marks “Partnership Coordinator” as the answer.\n\nGES District Directorate has recognized schedules such as GEO, SISO and TO. However the role of PO is usually handled at the national level.",
           "source": "MoE/GES/AD I/2020, Section A, question 32"
         },
         {
@@ -938,7 +1491,7 @@
             "The lesson plan must be strictly followed"
           ],
           "answer": 3,
-          "explanation": "The book marks “The lesson plan must be strictly followed” as the answer.",
+          "explanation": "The book marks “The lesson plan must be strictly followed” as the answer.\n\nA lesson plan is a guide. Effective teachers are flexible and adapt their plans based on student needs and responses during the lesson. Strict adherence can be counterproductive.",
           "source": "MoE/GES/AD I/2020, Section A, question 33"
         },
         {
@@ -966,7 +1519,7 @@
             "Varied teaching and learning resources are utilised to promote learning"
           ],
           "answer": 0,
-          "explanation": "The book marks “Lesson notes are vetted by school head” as the answer.",
+          "explanation": "The book marks “Lesson notes are vetted by school head” as the answer.\n\nWhile having notes checked can be part of a system, it is not a characteristic of the lesson plan itself. A well-planned lesson is defined by its objectives, procedures, and resources, not by who vets it.",
           "source": "MoE/GES/AD I/2020, Section A, question 35"
         },
         {
@@ -980,7 +1533,7 @@
             "procure any item related to stationery."
           ],
           "answer": 2,
-          "explanation": "The book marks “organise extra classes for pupils.” as the answer.",
+          "explanation": "The book marks “organise extra classes for pupils.” as the answer.\n\nThe Capitation Grant is meant for educational materials, minor repairs, and co-curricular activities. It is not for paying teachers for extra classes.",
           "source": "MoE/GES/AD I/2020, Section A, question 36"
         },
         {
@@ -994,7 +1547,7 @@
             "Objectives of the lesson"
           ],
           "answer": 3,
-          "explanation": "The book marks “Objectives of the lesson” as the answer.",
+          "explanation": "The book marks “Objectives of the lesson” as the answer.\n\nThe lesson objectives are the primary guide. All instructional materials must be selected based on how effectively they will help achieve the specific learning outcomes for that lesson.",
           "source": "MoE/GES/AD I/2020, Section A, question 37"
         },
         {
@@ -1008,7 +1561,7 @@
             "Introduction"
           ],
           "answer": 2,
-          "explanation": "The book marks “Evaluation” as the answer.",
+          "explanation": "The book marks “Evaluation” as the answer.\n\nThe evaluation (or conclusion) stage of a lesson is where students summarize and synthesize what they have learned.",
           "source": "MoE/GES/AD I/2020, Section A, question 38"
         },
         {
@@ -1036,7 +1589,7 @@
             "synthesize information on what is learnt."
           ],
           "answer": 1,
-          "explanation": "The book marks “memorize and recite what is learnt.” as the answer.",
+          "explanation": "The book marks “memorize and recite what is learnt.” as the answer.\n\nThe application phase is for using knowledge in new contexts. Memorization and recitation are lower-order skills typically associated with the knowledge/remembering level, not application.",
           "source": "MoE/GES/AD I/2020, Section A, question 40"
         },
         {
@@ -1056,7 +1609,7 @@
         {
           "id": "index_split_047-42-39",
           "topic": "Section A",
-          "prompt": "What type of punishment involves the infliction of physical harm on a learner who has",
+          "prompt": "What type of punishment involves the infliction of physical harm on a learner who has\nbroken a school rule?",
           "options": [
             "Corporal",
             "Isolation",
@@ -1064,7 +1617,7 @@
             "Withdrawal"
           ],
           "answer": 0,
-          "explanation": "The book marks “Corporal” as the answer.",
+          "explanation": "The book marks “Corporal” as the answer.\n\nCorporal punishment is the intentional infliction of physical pain as a penalty for an offense.",
           "source": "MoE/GES/AD I/2020, Section A, question 42"
         },
         {
@@ -1092,7 +1645,7 @@
             "All of the above"
           ],
           "answer": 3,
-          "explanation": "The book marks “All of the above” as the answer.",
+          "explanation": "The book marks “All of the above” as the answer.\n\nThe affective domain deals with emotions, attitudes, and values. Feelings, attitudes, and stereotypes (which are generalized attitudes) all fall under this domain.",
           "source": "MoE/GES/AD I/2020, Section A, question 44"
         },
         {
@@ -1106,7 +1659,7 @@
             "provide leadership for learning."
           ],
           "answer": 3,
-          "explanation": "The book marks “provide leadership for learning.” as the answer.",
+          "explanation": "The book marks “provide leadership for learning.” as the answer.\n\nThe primary role of an instructional leader (headteacher) is to ensure high-quality teaching and learning occurs for all students. All other responsibilities support this core mission.",
           "source": "MoE/GES/AD I/2020, Section A, question 45"
         },
         {
@@ -1120,7 +1673,7 @@
             "Supervision"
           ],
           "answer": 0,
-          "explanation": "The book marks “Forecasting” as the answer.",
+          "explanation": "The book marks “Forecasting” as the answer.\n\nHenri Fayol’s five functions of management are Forecasting & Planning, Organizing, Commanding, Coordinating, and Controlling.",
           "source": "MoE/GES/AD I/2020, Section A, question 46"
         },
         {
@@ -1148,7 +1701,7 @@
             "perceive that their performance compares favourably with that of peers engaged in the same tasks."
           ],
           "answer": 1,
-          "explanation": "The book marks “believe that the work they are doing is interesting and relates to their own lives.” as the answer.",
+          "explanation": "The book marks “believe that the work they are doing is interesting and relates to their own lives.” as the answer.\n\nIntrinsic motivation comes from within the learner—when they find the task inherently interesting, enjoyable, and personally relevant.",
           "source": "MoE/GES/AD I/2020, Section A, question 48"
         },
         {
@@ -1162,7 +1715,7 @@
             "Teachers in understanding pupils"
           ],
           "answer": 0,
-          "explanation": "The book marks “Children learn more effectively” as the answer.",
+          "explanation": "The book marks “Children learn more effectively” as the answer.\n\nWhile supervision involves helping teachers, its ultimate and fundamental purpose is to improve student learning outcomes. The teacher is the means to this end.",
           "source": "MoE/GES/AD I/2020, Section A, question 49"
         },
         {
@@ -1176,16 +1729,316 @@
             "Student’s needs and purposes"
           ],
           "answer": 3,
-          "explanation": "The book marks “Student’s needs and purposes” as the answer.",
+          "explanation": "The book marks “Student’s needs and purposes” as the answer.\n\nFor goals to be motivating and effective, they must be meaningful and relevant to the students’ own lives, interests, and perceived needs.",
           "source": "MoE/GES/AD I/2020, Section A, question 50"
+        },
+        {
+          "id": "index-split-047-1-complete-51",
+          "topic": "Section B",
+          "prompt": "The overall goal of the Ministry of Education is to provide relevant and quality education for disadvantaged Ghanaians.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThe MoE's goal is to provide quality education for all Ghanaians, not just a specific subset (the disadvantaged). Its mission is inclusive.",
+          "source": "MoE/GES/AD I/2020, Section B, question 51"
+        },
+        {
+          "id": "index-split-047-1-complete-52",
+          "topic": "Section B",
+          "prompt": "The National Teaching Council is not the mandated body that oversees the posting of newly trained teachers in Ghana.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThe GES is the body responsible for the recruitment and posting of teachers. The NTC's mandate is for teacher licensing, registration, and professional development, not posting.",
+          "source": "MoE/GES/AD I/2020, Section B, question 52"
+        },
+        {
+          "id": "index-split-047-1-complete-53",
+          "topic": "Section B",
+          "prompt": "The advancement in literacy, numeracy as well as Science, Technology, Engineering, and Mathematics (STEM) fields is central to the Ministry of Education's vision of producing learners with strong experiential learning capabilities and backgrounds in career-focused programmes.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThis aligns perfectly with the stated goals of Ghana's Ministry of Education and the focus of its pre-tertiary curriculum reforms, particularly the emphasis on STEM.",
+          "source": "MoE/GES/AD I/2020, Section B, question 53"
+        },
+        {
+          "id": "index-split-047-1-complete-54",
+          "topic": "Section B",
+          "prompt": "Strategies such as writing detailed test questions or prompts, including clear directions, and establishing and communicating clear grading criteria increase test reliability.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThese strategies reduce ambiguity and subjective interpretation, ensuring the assessment consistently measures what it is intended to measure, which is the definition of reliability.",
+          "source": "MoE/GES/AD I/2020, Section B, question 54"
+        },
+        {
+          "id": "index-split-047-1-complete-55",
+          "topic": "Section B",
+          "prompt": "The standards-based curriculum was rolled out for the primary schools in Ghana in the academic year 2017/2018.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThe new standards-based curriculum was officially rolled out for Kindergarten to Primary 6 in the 2019/2020 academic year.",
+          "source": "MoE/GES/AD I/2020, Section B, question 55"
+        },
+        {
+          "id": "index-split-047-1-complete-56",
+          "topic": "Section B",
+          "prompt": "A person who has been exposed to an infectious illness may be quarantined to see if they will become sick.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThis is the standard definition and purpose of quarantine—to separate and restrict the movement of well people who have been exposed to a contagious disease to see if they become ill.",
+          "source": "MoE/GES/AD I/2020, Section B, question 56"
+        },
+        {
+          "id": "index-split-047-1-complete-57",
+          "topic": "Section B",
+          "prompt": "The aim of schooling is not only to develop individual students, but to develop their social, cultural and economic capital for advancement of society as a whole.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThis reflects a broad, sociocultural view of education's purpose, which is to develop individuals who can contribute to the social, cultural, and economic progress of their community and nation.",
+          "source": "MoE/GES/AD I/2020, Section B, question 57"
+        },
+        {
+          "id": "index-split-047-1-complete-58",
+          "topic": "Section B",
+          "prompt": "The release of a teacher from one Directorate of Education to another in the GES system presently depends, in part, on the approval of the teacher's current District Director of Education.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nInternal transfers within GES require the concurrence and release from the current head of the institution or district director before the transfer can be affected.",
+          "source": "MoE/GES/AD I/2020, Section B, question 58"
+        },
+        {
+          "id": "index-split-047-1-complete-59",
+          "topic": "Section B",
+          "prompt": "The purpose of evaluating learning is to make a judgment about the quality of education provided.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD I/2020, Section B, question 59"
+        },
+        {
+          "id": "index-split-047-1-complete-60",
+          "topic": "Section B",
+          "prompt": "Measurement is the quantitative assessment of performance of learners.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nMeasurement is the process of assigning a numerical value (a score) to a learner's performance or an attribute. It is the quantitative aspect of assessment.",
+          "source": "MoE/GES/AD I/2020, Section B, question 60"
+        },
+        {
+          "id": "index-split-047-1-complete-61",
+          "topic": "Section B",
+          "prompt": "The association of teachers, pupils, parents, members of the community and Chiefs constitute the School Management Committee.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThis describes the composition of a Parent-Teacher Association (PTA). The School Management Committee (SMC) has a more specific membership defined by law, typically including the headteacher, PTA representatives, unit committee representatives, and other appointed members, but not all pupils, teachers, or chiefs.",
+          "source": "MoE/GES/AD I/2020, Section B, question 61"
+        },
+        {
+          "id": "index-split-047-1-complete-62",
+          "topic": "Section B",
+          "prompt": "Both formative and summative assessments are primarily used to monitor the learning process.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nFormative assessment is used to monitor the learning process and provide ongoing feedback. Summative assessment is used to evaluate learning at the end of an instructional period (e.g., assign a grade).",
+          "source": "MoE/GES/AD I/2020, Section B, question 62"
+        },
+        {
+          "id": "index-split-047-1-complete-63",
+          "topic": "Section B",
+          "prompt": "The Ministry of Education is one of the agencies under the Ghana Education Service.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThis is reversed. The Ghana Education Service (GES) is an agency under the Ministry of Education (MoE). The MoE is the parent ministry.",
+          "source": "MoE/GES/AD I/2020, Section B, question 63"
+        },
+        {
+          "id": "index-split-047-1-complete-64",
+          "topic": "Section B",
+          "prompt": "School Performance Improvement Planning(SPIP) is undertaken by stakeholders at the school level, first to pave way for preparing School Performance Appraisals.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThe School Performance Appraisal is the evaluation of the school's performance. The School Performance Improvement Plan (SPIP) is the result of that appraisal—it is the plan developed to address the weaknesses identified in the appraisal. The plan paves the way for improvement, not the other way around.",
+          "source": "MoE/GES/AD I/2020, Section B, question 64"
+        },
+        {
+          "id": "index-split-047-1-complete-65",
+          "topic": "Section B",
+          "prompt": "The Minister for Education is assisted by two Deputy Ministers, who are appointed by Technical Advisors to the President.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nDeputy Ministers are appointed by the President of the Republic of Ghana, subject to parliamentary approval, not by technical advisors.",
+          "source": "MoE/GES/AD I/2020, Section B, question 65"
+        },
+        {
+          "id": "index-split-047-1-complete-66",
+          "topic": "Section B",
+          "prompt": "The Ministry of Education (MOE), like other state organs of its type, derive their status and functions from Civil Service Law, PNDCL 327 of 1993.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD I/2020, Section B, question 66"
+        },
+        {
+          "id": "index-split-047-1-complete-67",
+          "topic": "Section B",
+          "prompt": "A new coronavirus variant, technically named OMICRON, was first detected in South Africa in 2019.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThe Omicron variant was first reported to the WHO by South Africa in November 2021, not 2019.",
+          "source": "MoE/GES/AD I/2020, Section B, question 67"
+        },
+        {
+          "id": "index-split-047-1-complete-68",
+          "topic": "Section B",
+          "prompt": "When you are around anyone from outside your regular household, physical distancing and mask-wearing are essential to avoid spreading the coronavirus.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD I/2020, Section B, question 68"
+        },
+        {
+          "id": "index-split-047-1-complete-69",
+          "topic": "Section B",
+          "prompt": "Situations where masks aren’t being worn or are being removed to eat or drink are especially likely to spread the coronavirus and cause illness.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD I/2020, Section B, question 69"
+        },
+        {
+          "id": "index-split-047-1-complete-70",
+          "topic": "Section B",
+          "prompt": "People with food allergies can be vaccinated for the coronavirus.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD I/2020, Section B, question 70"
+        },
+        {
+          "id": "index-split-047-1-complete-71",
+          "topic": "Section B",
+          "prompt": "Personality tests are valid measures of a person's ability to teach.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nWhile certain personality traits may be desirable, personality tests are not validated or reliable instruments for directly measuring teaching ability or effectiveness.",
+          "source": "MoE/GES/AD I/2020, Section B, question 71"
+        },
+        {
+          "id": "index-split-047-1-complete-72",
+          "topic": "Section B",
+          "prompt": "Licensure and exit tests are the best predictors of classroom performance of teachers.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nWhile these tests measure content knowledge, they are widely considered weak predictors of actual teaching effectiveness, which relies more on pedagogical skills, classroom management, and interpersonal abilities.",
+          "source": "MoE/GES/AD I/2020, Section B, question 72"
+        },
+        {
+          "id": "index-split-047-1-complete-73",
+          "topic": "Section B",
+          "prompt": "If a person teaches with a high degree of clarity, he/she will spend less time going over material.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nHigh-clarity instruction (explaining concepts logically, using good examples, checking for understanding) leads to better student comprehension the first time, reducing the need for re-teaching.",
+          "source": "MoE/GES/AD I/2020, Section B, question 73"
+        },
+        {
+          "id": "index-split-047-1-complete-74",
+          "topic": "Section B",
+          "prompt": "Student performance is higher in classes where the teacher devotes large amounts of time to the materials needed rather than teaching content.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nThis statement is illogical and incorrect. Student performance is higher when teachers devote sufficient time to teaching the content effectively, not just to managing materials. The focus should be on instructional time.",
+          "source": "MoE/GES/AD I/2020, Section B, question 74"
+        },
+        {
+          "id": "index-split-047-1-complete-75",
+          "topic": "Section B",
+          "prompt": "Constructivism is an approach to teaching that allows students to construct their own understanding and meanings.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.\n\nThis is the fundamental principle of constructivism—a theory that posits learners actively construct their own understanding and knowledge of the world through experience and reflection.",
+          "source": "MoE/GES/AD I/2020, Section B, question 75"
         }
       ]
     },
     {
       "schema": 1,
       "id": "index-split-050-1",
-      "title": "MoE/GES/AD II/2020 — Section A",
-      "version": 1,
+      "title": "MoE/GES/AD II/2020 — Complete paper",
+      "version": 2,
       "questions": [
         {
           "id": "index_split_050-1-1",
@@ -1218,7 +2071,7 @@
         {
           "id": "index_split_050-3-3",
           "topic": "Section A",
-          "prompt": "Which of the following is/are the objective(s) of the 1987 Education Reform?\nI. Increase access to basic education.\nII. Shorten the pre-university education structure from 17 years to 12 years.\nIII. Make education cost-effective.\nIV. Improve the quality of education by making it more relevant to socio-economic conditions.",
+          "prompt": "Which of the following is/are the objective(s) of the 1987 Education Reform?\n\nI. Increase access to basic education.\nII. Shorten the pre-university education structure from 17 years to 12 years.\nIII. Make education cost-effective.\nIV. Improve the quality of education by making it more relevant to socio-economic conditions.",
           "options": [
             "I only",
             "II and III only",
@@ -1286,9 +2139,23 @@
           "source": "MoE/GES/AD II/2020, Section A, question 7"
         },
         {
+          "id": "index-split-050-1-complete-8",
+          "topic": "Section A",
+          "prompt": "How many units has the Technical and Vocational Education Division (TVED) of the Ghana Education Service (GES) Headquarters?",
+          "options": [
+            "7",
+            "8",
+            "9",
+            "10"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “7” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section A, question 8"
+        },
+        {
           "id": "index_split_050-9-8",
           "topic": "Section A",
-          "prompt": "Which of the following is/are not the objective(s) of the Free Compulsory Universal Basic Education (FCUBE)?\nI. Improving the quality of learning and teaching.\nII. Improving access to basic education facilities.\nIII. Encouraging private sector participation in the provision of education facilities.\nIV. Improving management efficiency.",
+          "prompt": "Which of the following is/are not the objective(s) of the Free Compulsory Universal Basic Education (FCUBE)?\n\nI. Improving the quality of learning and teaching.\nII. Improving access to basic education facilities.\nIII. Encouraging private sector participation in the provision of education facilities.\nIV. Improving management efficiency.",
           "options": [
             "III only",
             "II and III only",
@@ -1316,7 +2183,7 @@
         {
           "id": "index_split_050-11-10",
           "topic": "Section A",
-          "prompt": "Which of the following is/are not the way(s) through which education policies are formulated?\nI. Imposition by elites.\nII. Political discussions.\nIII. Stakeholder consultations.",
+          "prompt": "Which of the following is/are not the way(s) through which education policies are formulated?\n\nI. Imposition by elites.\nII. Political discussions.\nIII. Stakeholder consultations.",
           "options": [
             "I only",
             "I, II and III",
@@ -1326,6 +2193,20 @@
           "answer": 0,
           "explanation": "The book marks “I only” as the answer.",
           "source": "MoE/GES/AD II/2020, Section A, question 11"
+        },
+        {
+          "id": "index-split-050-1-complete-12",
+          "topic": "Section A",
+          "prompt": "How many divisions are under the jurisdiction of the Deputy Director General (Quality and Access) of the Ghana Education Service?",
+          "options": [
+            "5",
+            "6",
+            "7",
+            "8"
+          ],
+          "answer": 2,
+          "explanation": "The book marks “7” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section A, question 12"
         },
         {
           "id": "index_split_050-13-11",
@@ -1414,7 +2295,7 @@
         {
           "id": "index_split_050-19-17",
           "topic": "Section A",
-          "prompt": "Which of the following sentences is/are correct about the nature of teaching?\nI. It is remedial.\nII. It is diagnostic.\nIII. It is both remedial and diagnostic.",
+          "prompt": "Which of the following sentences is/are correct about the nature of teaching?\n\nI. It is remedial.\nII. It is diagnostic.\nIII. It is both remedial and diagnostic.",
           "options": [
             "I only",
             "II only",
@@ -1720,9 +2601,23 @@
           "source": "MoE/GES/AD II/2020, Section A, question 40"
         },
         {
+          "id": "index-split-050-1-complete-41",
+          "topic": "Section A",
+          "prompt": "Mrs. Yamoah teaches Junior High School 3. When her students enter her classroom each day, they walk to their assigned desks and take their seats. Immediately, they take out their notebooks to write down and answer the question that is on the board that reviews the previous day’s lesson. While the students are quietly working, Mrs. Yamoah takes attendance. Once everyone has answered the question, Mrs. Yamoah reviews it with her class before moving on to the day’s lesson.\nWhich of the following terms accurately describes the situation above?",
+          "options": [
+            "A disorganized classroom",
+            "A flexible classroom",
+            "A rigid classroom",
+            "A well-managed classroom"
+          ],
+          "answer": 3,
+          "explanation": "The book marks “A well-managed classroom” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section A, question 41"
+        },
+        {
           "id": "index_split_050-42-39",
           "topic": "Section A",
-          "prompt": "Which of the following is not one of the core domains of the National",
+          "prompt": "Which of the following is not one of the core domains of the National\nTeachers' Standards?",
           "options": [
             "Professional ethics",
             "Professional knowledge",
@@ -1844,6 +2739,306 @@
           "answer": 0,
           "explanation": "The book marks “evaluation” as the answer.",
           "source": "MoE/GES/AD II/2020, Section A, question 50"
+        },
+        {
+          "id": "index-split-050-1-complete-51",
+          "topic": "Section B",
+          "prompt": "The Ministry of Education formulates and implements approved national policies and programmes on education in Ghana.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 51"
+        },
+        {
+          "id": "index-split-050-1-complete-52",
+          "topic": "Section B",
+          "prompt": "Teacher Education Division (TED) is one of the divisions at the Ghana Education Service Headquarters.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 52"
+        },
+        {
+          "id": "index-split-050-1-complete-53",
+          "topic": "Section B",
+          "prompt": "In any school situation, performance tasks are hands-on activities that require students to demonstrate their ability to perform certain actions.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 53"
+        },
+        {
+          "id": "index-split-050-1-complete-54",
+          "topic": "Section B",
+          "prompt": "Teachers who are respected and liked are associated with greater student satisfaction and higher achievement.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 54"
+        },
+        {
+          "id": "index-split-050-1-complete-55",
+          "topic": "Section B",
+          "prompt": "A teacher cannot exhibit referent power from the first day of class by giving students a sense of belonging and acceptance.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 55"
+        },
+        {
+          "id": "index-split-050-1-complete-56",
+          "topic": "Section B",
+          "prompt": "Classrooms are said to have norms when only few of the students agree on what is and/or what is not socially acceptable classroom behaviour.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 56"
+        },
+        {
+          "id": "index-split-050-1-complete-57",
+          "topic": "Section B",
+          "prompt": "Social psychologists believe that the process of group formation begins when its members agree to go against the norms of the group.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 57"
+        },
+        {
+          "id": "index-split-050-1-complete-58",
+          "topic": "Section B",
+          "prompt": "Licensure and exit tests are the best predictors of classroom performance of teachers.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 58"
+        },
+        {
+          "id": "index-split-050-1-complete-59",
+          "topic": "Section B",
+          "prompt": "If a teacher teaches with a high degree of clarity, he/she will spend less time going over material.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 59"
+        },
+        {
+          "id": "index-split-050-1-complete-60",
+          "topic": "Section B",
+          "prompt": "Student performance is higher in classes where the teacher devotes large amounts of time to the process and materials needed rather than teaching content.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 60"
+        },
+        {
+          "id": "index-split-050-1-complete-61",
+          "topic": "Section B",
+          "prompt": "What a teacher does not say is every bit as important as what a teacher does say.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 61"
+        },
+        {
+          "id": "index-split-050-1-complete-62",
+          "topic": "Section B",
+          "prompt": "Competitive activities have little value in establishing or maintaining an effective classroom climate and should thus be avoided.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 62"
+        },
+        {
+          "id": "index-split-050-1-complete-63",
+          "topic": "Section B",
+          "prompt": "Students feel important and are encouraged to participate in class when a teacher uses their ideas in moving a class lesson or activity forward.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 63"
+        },
+        {
+          "id": "index-split-050-1-complete-64",
+          "topic": "Section B",
+          "prompt": "Bid-rigging may result in the supply of inferior textbooks and supplies",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 64"
+        },
+        {
+          "id": "index-split-050-1-complete-65",
+          "topic": "Section B",
+          "prompt": "In assessing learning, it is not important to know the purpose of assessment before selecting an assessment approach.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 65"
+        },
+        {
+          "id": "index-split-050-1-complete-66",
+          "topic": "Section B",
+          "prompt": "Types of corruption in elementary-secondary education range from academic cheating to bribery and nepotism in teaching appointments, to bid-rigging in the procurement of textbooks and supplies.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 66"
+        },
+        {
+          "id": "index-split-050-1-complete-67",
+          "topic": "Section B",
+          "prompt": "When families are made to pay bribes for services, this puts poor students at a disadvantage and thus reduces equal access to education.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 67"
+        },
+        {
+          "id": "index-split-050-1-complete-68",
+          "topic": "Section B",
+          "prompt": "Giving teachers the authority and responsibility to apply their own professional knowledge to making decisions in their area of responsibility is an important aspect of collegiality.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 68"
+        },
+        {
+          "id": "index-split-050-1-complete-69",
+          "topic": "Section B",
+          "prompt": "Establishing rules and procedures is one of the least important classroom management tasks.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 69"
+        },
+        {
+          "id": "index-split-050-1-complete-70",
+          "topic": "Section B",
+          "prompt": "The performing stage begins when students want to show they can do some things independently of the teacher.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 70"
+        },
+        {
+          "id": "index-split-050-1-complete-71",
+          "topic": "Section B",
+          "prompt": "Written assessments are activities in which the student selects or composes a response to a prompt.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 71"
+        },
+        {
+          "id": "index-split-050-1-complete-72",
+          "topic": "Section B",
+          "prompt": "The teacher cannot alter the classroom climate but should work for student success regardless of the climate.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 72"
+        },
+        {
+          "id": "index-split-050-1-complete-73",
+          "topic": "Section B",
+          "prompt": "In Ghana, the National Teachers' Standards set out the maximum levels of practice that all trained teachers must reach by the end of their pre-service teacher education course in order to play such a critical role.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.\n\nNational Teachers’ Standards Set out rather the minimum not the maximum, practice levels",
+          "source": "MoE/GES/AD II/2020, Section B, question 73"
+        },
+        {
+          "id": "index-split-050-1-complete-74",
+          "topic": "Section B",
+          "prompt": "The skills that must be demonstrated in performance tasks cannot vary considerably.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 1,
+          "explanation": "The book marks “False” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 74"
+        },
+        {
+          "id": "index-split-050-1-complete-75",
+          "topic": "Section B",
+          "prompt": "In a school, teachers have many different types of assessment available to them.",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": 0,
+          "explanation": "The book marks “True” as the answer.",
+          "source": "MoE/GES/AD II/2020, Section B, question 75"
         }
       ]
     }
