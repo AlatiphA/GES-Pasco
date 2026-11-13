@@ -105,6 +105,12 @@ function prepareOffline() {
   offlineJob = (async () => {
     const cache = await caches.open(CACHE_NAME);
     const results = await Promise.allSettled(FILES_TO_CACHE.map(async url => {
+      // Exact third-party URLs are unchanged dependencies already verified by
+      // a previous working shell. New app files always come from this release.
+      if (/^https:\/\//.test(url)) {
+        const existing = await matchCached(url);
+        if (existing?.ok) return {url, response:existing};
+      }
       const response = await fetchWithTimeout(new Request(url, {cache:'reload'}));
       if (!response.ok || (url.endsWith('.epub') && !await validBook(response))) throw new Error('Incomplete download: '+url);
       if (url === './version.js' && !(await response.clone().text()).includes('"'+globalThis.GES_PASCO_VERSION+'"')) throw new Error('A newer release is available. Install the app update before repairing downloads.');
