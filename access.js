@@ -19,7 +19,9 @@
    const result=await Promise.race([Promise.all([gesPascoDb.collection('users').doc(owner).get({source:'server'}),gesPascoDb.collection('subscriptions').doc(owner).get({source:'server'}),gesPascoDb.collection('paymentAdmins').doc(owner).get({source:'server'}),gesPascoDb.collection('reportAdmins').doc(owner).get({source:'server'}),gesPascoDb.collection('accountControls').doc(owner).get({source:'server'})]),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Access check timed out')),15000);})]);
    if(token!==epoch||gesPascoAuth.currentUser?.uid!==owner)return false;
    const [profile,subscription,admin,reviewAdmin,control]=result;source={createdAtMs:profile.data()?.createdAt?.toMillis?.(),authCreatedAtMs:Date.parse(user.metadata?.creationTime),endsAtMs:subscription.data()?.endsAtMs,admin:(admin.exists&&admin.data().active===true)||(reviewAdmin.exists&&reviewAdmin.data().active===true),control:control.data()||{}};state=core.evaluate(source);remember();
-   stopControl=gesPascoDb.collection('accountControls').doc(owner).onSnapshot(snapshot=>{if(token!==epoch)return;source.control=snapshot.data()||{};state=core.evaluate(source);remember();render();},()=>{});
+   const stopControls=gesPascoDb.collection('accountControls').doc(owner).onSnapshot(snapshot=>{if(token!==epoch||snapshot.metadata?.fromCache)return;source.control=snapshot.data()||{};state=core.evaluate(source);remember();render();},()=>{});
+   const stopSubscription=gesPascoDb.collection('subscriptions').doc(owner).onSnapshot(snapshot=>{if(token!==epoch||snapshot.metadata?.fromCache)return;source.endsAtMs=snapshot.data()?.endsAtMs;state=core.evaluate(source);remember();render();},()=>{});
+   stopControl=()=>{stopControls();stopSubscription();};
   }catch{if(token===epoch){state=core.offline(cached(owner),owner);}}
   finally{clearTimeout(timer);}
   if(token!==epoch)return false;render();return state.allowed;

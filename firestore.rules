@@ -140,6 +140,14 @@ service cloud.firestore {
     }
     match /subscriptions/{uid} {
       allow read: if signedIn() && (isOwner(uid) || paymentAdmin());
+      // Removing paid access ends only the current entitlement. Receipts and reading grants remain.
+      allow update: if paymentAdmin() && uid != request.auth.uid
+        && !(exists(/databases/$(database)/documents/paymentAdmins/$(uid)) && get(/databases/$(database)/documents/paymentAdmins/$(uid)).data.active == true)
+        && !(exists(/databases/$(database)/documents/reportAdmins/$(uid)) && get(/databases/$(database)/documents/reportAdmins/$(uid)).data.active == true)
+        && resource.data.endsAtMs is int && resource.data.endsAtMs > request.time.toMillis()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['endsAtMs','updatedBy','updatedAt'])
+        && request.resource.data.endsAtMs == 0
+        && request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time;
       allow create, update: if paymentAdmin()
         && request.resource.data.keys().hasOnly(['uid','planId','endsAtMs','requestId','updatedBy','updatedAt'])
         && request.resource.data.keys().hasAll(['uid','planId','endsAtMs','requestId','updatedBy','updatedAt'])

@@ -1,3 +1,4 @@
+const assert=require('node:assert/strict');
 const {test,before,after}=require('node:test');const {createRequire}=require('node:module');const req=createRequire(process.env.GES_REPORT_TEST_PACKAGE||require('node:path').resolve('package.json'));const {initializeTestEnvironment,assertSucceeds:yes,assertFails:no}=req('@firebase/rules-unit-testing');const {doc,setDoc,getDoc,getDocs,collection,query,where,updateDoc,deleteDoc,writeBatch,serverTimestamp}=req('firebase/firestore');let env;
 before(async()=>{env=await initializeTestEnvironment({projectId:'demo-ges-pasco-reports',firestore:{host:'127.0.0.1',port:8080,rules:require('node:fs').readFileSync('firestore.rules','utf8')}});await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'reportAdmins/reviewer'),{active:true}));});after(async()=>env?.cleanup());
 const db=id=>id?env.authenticatedContext(id,{email:id+'@example.com'}).firestore():env.unauthenticatedContext().firestore();
@@ -83,3 +84,15 @@ test('payment administrators upload protected editions; free users can get sampl
 });
 
 test('Users administrators can read reviewer flags without granting roles or exposing them to ordinary users',async()=>{await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'paymentAdmins/users-finance'),{active:true}));const finance=db('users-finance');await yes(getDoc(doc(finance,'reportAdmins/reviewer')));await yes(getDoc(doc(finance,'reportAdmins/ordinary-profile')));await yes(getDoc(doc(db('reviewer'),'reportAdmins/reviewer')));await no(getDoc(doc(db('alice'),'reportAdmins/reviewer')));await no(getDocs(collection(finance,'reportAdmins')));await no(setDoc(doc(finance,'reportAdmins/alice'),{active:true}));await no(updateDoc(doc(finance,'reportAdmins/reviewer'),{active:false}));});
+
+
+test('paid access removal is narrow, preserves reading grants and receipts, and cannot renew or rewrite payments',async()=>{
+ const future=Date.now()+3600000;await env.withSecurityRulesDisabled(async c=>{const d=c.firestore();for(const uid of ['revoke-reader','revoke-expired','revoke-plan','finance','reviewer'])await setDoc(doc(d,'subscriptions/'+uid),{uid,planId:'m1',endsAtMs:uid==='revoke-expired'?Date.now()-1000:future,requestId:'approved-'+uid,updatedBy:'finance',updatedAt:serverTimestamp()});await setDoc(doc(d,'accountControls/revoke-reader'),{uid:'revoke-reader',status:'active',accessMode:'full-access'});});
+ const removal={endsAtMs:0,updatedBy:'finance',updatedAt:serverTimestamp()};
+ await no(updateDoc(doc(db('revoke-reader'),'subscriptions/revoke-reader'),{...removal,updatedBy:'revoke-reader'}));await no(updateDoc(doc(db('reviewer'),'subscriptions/revoke-reader'),{...removal,updatedBy:'reviewer'}));
+ for(const uid of ['finance','reviewer','revoke-expired'])await no(updateDoc(doc(db('finance'),'subscriptions/'+uid),removal));
+ await no(updateDoc(doc(db('finance'),'subscriptions/revoke-plan'),{...removal,planId:'m12'}));await no(updateDoc(doc(db('finance'),'subscriptions/revoke-plan'),{...removal,requestId:'forged'}));await no(updateDoc(doc(db('finance'),'subscriptions/revoke-plan'),{...removal,endsAtMs:Date.now()+7200000}));
+ await yes(updateDoc(doc(db('finance'),'subscriptions/revoke-reader'),removal));
+ const subscription=await getDoc(doc(db('finance'),'subscriptions/revoke-reader')),grant=await getDoc(doc(db('finance'),'accountControls/revoke-reader'));assert.equal(subscription.data().endsAtMs,0);assert.equal(subscription.data().requestId,'approved-revoke-reader');assert.equal(grant.data().accessMode,'full-access');await yes(getDoc(doc(db('revoke-reader'),'protectedLibrary/current')));
+ await no(updateDoc(doc(db('finance'),'subscriptions/revoke-reader'),removal));
+});

@@ -12,6 +12,10 @@ const SAMPLE_BOOK_CACHE = "ges-pasco-sample-library-v1";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
+  "./admin.html",
+  "./admin.css",
+  "./admin-page.js",
+  "./admin-users-core.js",
   "./faq.html",
   "./privacy.html",
   "./terms.html",
