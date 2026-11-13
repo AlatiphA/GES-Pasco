@@ -1,3 +1,7 @@
 node_modules/
 *-debug.log
 .firebase/
+
+# Local source files for administrator upload; never publish these files
+library/full-library.source.epub
+premium-practice-bank.source.json

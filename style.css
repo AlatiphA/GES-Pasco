@@ -634,6 +634,10 @@ body.sepia #readingInfo { color: rgba(100, 60, 20, 0.5); }
   display: block;
 }
 
+.tocItem.tocLocked > a { color: #956433; }
+body.dark .tocItem.tocLocked > a,
+body.night .tocItem.tocLocked > a { color: #d6ad7d; }
+
 .tocToggle {
   width: 24px;
   min-width: 24px;
@@ -1977,3 +1981,9 @@ html[data-access-locked] #readerApp > footer{visibility:hidden!important;}
 
 /* Reader pinches belong to text sizing; retain single-finger panning. */
 #viewer, #viewer iframe { touch-action: pan-x pan-y; }
+
+#protectedContentDialog,#premiumAccessDialog {position:fixed;inset:0;margin:auto;width:min(560px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;padding:0;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-surface);color:var(--ui-text);--account-line:var(--ui-border);--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-accent:var(--ui-accent);}
+#protectedContentDialog::backdrop,#premiumAccessDialog::backdrop {background:#0008;}
+#protectedContentClose,#premiumAccessClose {width:44px;height:44px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
+#protectedContentDialog label {display:grid;gap:8px;margin:16px 0 8px;font-weight:600;}
+#protectedContentDialog input {max-width:100%;padding:10px;border:1px solid var(--ui-border);border-radius:8px;color:inherit;background:var(--ui-surface);}

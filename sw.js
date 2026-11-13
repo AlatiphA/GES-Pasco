@@ -28,6 +28,7 @@ const FILES_TO_CACHE = [
   "./auth.js",
   "./access-core.js",
   "./access.js",
+  "./premium-content.js",
   "./account-settings.js",
   "./account-menu.js",
   "./momo-core.js",
