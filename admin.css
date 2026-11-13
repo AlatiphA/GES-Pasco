@@ -6,7 +6,7 @@ body.adminPage{background:var(--ui-bg);color:var(--ui-text);line-height:1.6;--ac
 .adminBack{color:var(--ui-accent);text-decoration:none;display:flex;align-items:center;gap:8px;}.adminBack svg{width:22px;height:22px;}
 .adminPage main.adminShell{position:static;inset:auto;width:100%;height:auto;overflow:visible;max-width:1080px;margin:28px auto;padding:0 20px 40px;}.adminIntro{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:24px;}.adminIntro h1{font-size:28px;margin:0 0 4px;}.adminIntro p{margin:4px 0;color:var(--ui-muted);}
 .adminNavigation{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0;}.adminNavigation button{min-height:44px;padding:10px 18px;border:1px solid var(--ui-border);border-radius:10px;background:var(--ui-surface);color:var(--ui-text);font:inherit;cursor:pointer;}.adminNavigation button[aria-pressed=true]{border-color:var(--ui-accent);background:var(--ui-selected);color:var(--ui-accent);font-weight:700;}
-body.adminPage dialog:is(#momoDialog,#reportsDialog,#quizAdminDialog,#protectedContentDialog){position:static;inset:auto;margin:0;padding:0;width:100%;max-width:none;max-height:none;overflow:visible;border:0;border-radius:0;background:transparent;color:inherit;box-shadow:none;font-size:15px;}
+body.adminPage dialog:is(#momoDialog,#reportsDialog,#quizAdminDialog,#protectedContentDialog,#adminReportsPanel){position:static;inset:auto;margin:0;padding:0;width:100%;max-width:none;max-height:none;overflow:visible;border:0;border-radius:0;background:transparent;color:inherit;box-shadow:none;font-size:15px;}
 .adminPage .adminPanel[hidden],.adminPage [hidden]{display:none!important;}.adminPage .adminPanel .practiceHeader{position:static;background:transparent;padding:0 0 16px;border-bottom:1px solid var(--ui-border);}.adminPanel .practiceHeader button{display:none;}
 .adminPage .adminPanel:focus{outline:none;}.adminPage .adminPanel .practiceHeader h2{font-size:21px;}
 .adminPage #momoBody,.adminPage #quizAdminBody,.adminPage #reportsBody{padding:20px 0;}.adminPage #momoStatus,.adminPage #quizAdminStatus,.adminPage #reportsStatus{padding:12px 0;color:var(--ui-muted);}
@@ -16,3 +16,17 @@ body.adminPage dialog:is(#momoDialog,#reportsDialog,#quizAdminDialog,#protectedC
 .adminPage label{display:grid;gap:8px;}.adminPage input,.adminPage select,.adminPage textarea{min-width:0;max-width:100%;font:inherit;border:1px solid var(--ui-border);border-radius:8px;padding:10px 12px;background:var(--ui-surface);color:var(--ui-text);}.adminPage .appAppearance{font-size:13px;}
 .adminPage :is(button,a,input,select,textarea,summary):focus-visible{outline:2px solid var(--ui-accent);outline-offset:3px;}.adminPage .readerRecoveryBody{padding:20px 0;}
 @media(max-width:600px){.adminPage .adminHeader{padding:14px 16px;flex-wrap:wrap;}.adminHeading{font-size:14px;}.adminHeading img{width:32px;height:32px;}.adminPage main.adminShell{margin:20px auto;padding:0 14px 28px;}.adminIntro{flex-direction:column;}.adminIntro h1{font-size:24px;}.adminNavigation{gap:8px;}.adminNavigation button{padding:9px 12px;font-size:14px;}.adminPage .userSearch{grid-template-columns:1fr;}.adminPage .reportCard{padding:16px;}}
+.adminPage .adminNavigation{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));}
+.adminPage .userResults{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;}
+.adminPage .userResults .reportCard{margin:0;min-width:0;overflow-wrap:anywhere;}
+.adminPage .userCard>details>summary{border:1px solid var(--ui-border);border-radius:9px;padding:10px 12px;color:var(--ui-accent);cursor:pointer;min-height:44px;}
+.adminPage .userCard .userFacts{font-size:13px;}.adminPage .userCard .userEntitlement{font-size:14px;}
+.adminPage #adminReportsBody{padding:12px 0;}.adminPage #adminReportsStatus{color:var(--ui-muted);padding:12px 0;}
+.overviewCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));gap:14px;margin:20px 0;}
+.overviewCard,.overviewSection{min-width:0;padding:20px;border:1px solid var(--ui-border);border-radius:14px;background:var(--ui-surface);overflow-wrap:anywhere;}
+.overviewCard h3{font-size:14px;margin:0 0 12px;}.overviewCard strong{font-size:27px;line-height:1.2;}.overviewCard p{font-size:13px;color:var(--ui-muted);margin-bottom:0;}
+.overviewSection{margin:24px 0;}.overviewSection h3{font-size:19px;margin:0 0 14px;}.overviewExportActions{display:flex;flex-wrap:wrap;gap:10px;}
+.overviewTableScroll{overflow-x:auto;max-width:100%;}.overviewTableScroll table{width:100%;border-collapse:collapse;font-size:13px;text-align:left;}
+.overviewTableScroll th,.overviewTableScroll td{padding:12px;border-bottom:1px solid var(--ui-border);vertical-align:top;min-width:110px;overflow-wrap:anywhere;}
+.overviewTableScroll caption{text-align:left;color:var(--ui-muted);padding:0 0 12px;}.overviewWarning{padding:12px;border:1px solid var(--ui-accent);border-radius:10px;}
+@media(max-width:700px){.adminPage .adminNavigation{grid-template-columns:repeat(2,minmax(0,1fr));}.adminPage .userResults{grid-template-columns:minmax(0,1fr);}.overviewSection{padding:16px;}.overviewExportActions>*{flex:1 1 140px;}}

@@ -163,6 +163,54 @@ service cloud.firestore {
         && (!exists(/databases/$(database)/documents/subscriptions/$(uid)) || request.resource.data.requestId != resource.data.requestId);
       allow delete: if false;
     }
+    // Append-only app audit. Each event must accompany the actual source write.
+    // Existing clients remain compatible; direct Console edits are not logged here.
+    function validControlAudit(d) {
+      let path = /databases/$(database)/documents/accountControls/$(d.targetUid);
+      let next = getAfter(path).data;
+      return d.sourceId == d.targetUid && next.updatedBy == request.auth.uid
+        && next.updatedAt == request.time
+        && ((!exists(path)) || next.diff(get(path).data).affectedKeys().hasAny(['status','accessMode']))
+        && ((d.action == 'account.suspended' && next.status == 'suspended'
+              && (!exists(path) || get(path).data.status != 'suspended'))
+          || (d.action == 'account.activated' && next.status == 'active'
+              && exists(path) && get(path).data.status == 'suspended')
+          || (d.action == 'reading.policy'
+              && (!exists(path) || get(path).data.accessMode != next.accessMode)));
+    }
+    function validPaymentAudit(d) {
+      let path = /databases/$(database)/documents/momoRequests/$(d.sourceId);
+      let next = getAfter(path).data;
+      return get(path).data.status == 'pending' && next.uid == d.targetUid
+        && next.reviewedBy == request.auth.uid && next.reviewedAt == request.time
+        && ((d.action == 'payment.approved' && next.status == 'approved')
+          || (d.action == 'payment.rejected' && next.status == 'rejected'));
+    }
+    function validRemovalAudit(d) {
+      let path = /databases/$(database)/documents/subscriptions/$(d.targetUid);
+      let next = getAfter(path).data;
+      return d.sourceId == d.targetUid && get(path).data.endsAtMs > request.time.toMillis()
+        && next.endsAtMs == 0 && next.updatedBy == request.auth.uid && next.updatedAt == request.time;
+    }
+    function validMessageAudit(d) {
+      let path = /databases/$(database)/documents/users/$(d.targetUid)/adminMessages/$(d.sourceId);
+      return !exists(path) && getAfter(path).data.authorUid == request.auth.uid
+        && getAfter(path).data.createdAt == request.time;
+    }
+    match /adminAudit/{eventId} {
+      allow read: if paymentAdmin();
+      allow create: if paymentAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid','targetUid','sourceId','action','createdAt'])
+        && request.resource.data.keys().hasAll(['actorUid','targetUid','sourceId','action','createdAt'])
+        && request.resource.data.actorUid == request.auth.uid && request.resource.data.createdAt == request.time
+        && request.resource.data.targetUid is string && request.resource.data.targetUid.size() > 0 && request.resource.data.targetUid.size() <= 128
+        && request.resource.data.sourceId is string && request.resource.data.sourceId.size() > 0 && request.resource.data.sourceId.size() <= 128
+        && ((request.resource.data.action in ['account.suspended','account.activated','reading.policy'] && validControlAudit(request.resource.data))
+          || (request.resource.data.action in ['payment.approved','payment.rejected'] && validPaymentAudit(request.resource.data))
+          || (request.resource.data.action == 'subscription.removed' && validRemovalAudit(request.resource.data))
+          || (request.resource.data.action == 'message.sent' && validMessageAudit(request.resource.data)));
+      allow update, delete: if false;
+    }
     match /protectedLibrary/{libraryId} {
       allow get: if libraryId == 'current' && fullReaderAccess();
       allow list: if false;
