@@ -28,7 +28,7 @@
   byId('accountVerifyEmail').addEventListener('click',()=>perform(sendVerification,byId('securitySettingsStatus')));
   byId('accountCheckVerification').addEventListener('click',()=>perform(refreshEmail,byId('securitySettingsStatus')));
   byId('accountSendReset').addEventListener('click',()=>perform(sendReset,byId('securitySettingsStatus')));
-  for(const id of ['profileClose','profileBackdrop','logoutBtn'])byId(id).addEventListener('click',clearPasswords);
+  for(const id of ['profileClose','profileBackdrop','profileBtn','logoutBtn'])byId(id).addEventListener('click',clearPasswords);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')clearPasswords();});
   document.querySelector('.accountSecuritySection').addEventListener('toggle',e=>{if(!e.target.open)clearPasswords();});
   gesPascoAuth.onAuthStateChanged(()=>{clearPasswords();status.textContent='';byId('securitySettingsStatus').textContent='';render();});
