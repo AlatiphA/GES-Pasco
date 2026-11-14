@@ -14,14 +14,8 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
 
-  <!-- Inherit the reader theme before paint -->
-  <script>
-    (function() {
-      var t = localStorage.getItem("theme-v2") || "dark";
-      document.documentElement.classList.remove("dark", "sepia", "night");
-      if (t !== "light") document.documentElement.classList.add(t);
-    })();
-  </script>
+  <link rel="stylesheet" href="./ui-palette.css" />
+  <script src="./ui-theme.js"></script>
 
   <style>
 
@@ -32,45 +26,11 @@
       min-height: 100%;
     }
 
-    /* THEMES */
+    /* Same interface palette and appearance setting as the application. */
     body {
-      background: #f5f5f5;
-      color: #111111;
-      --bg: #f5f5f5;
-      --text: #111111;
-      --surface: #ffffff;
-      --border: #dddddd;
-      --accent: #956433;
-    }
-
-    html.dark body {
-      background: #111111;
-      color: #eeeeee;
-      --bg: #111111;
-      --text: #eeeeee;
-      --surface: #1e1e1e;
-      --border: #333333;
-      --accent: #5aa3f0;
-    }
-
-    html.sepia body {
-      background: #f4ede0;
-      color: #2c1a0e;
-      --bg: #f4ede0;
-      --text: #2c1a0e;
-      --surface: #fbf5e9;
-      --border: #d5c5aa;
-      --accent: #7a4a1a;
-    }
-
-    html.night body {
-      background: #000000;
-      color: #bbbbbb;
-      --bg: #000000;
-      --text: #bbbbbb;
-      --surface: #090909;
-      --border: #2a2a2a;
-      --accent: #4dabff;
+      background:var(--ui-bg);color:var(--ui-text);
+      --bg:var(--ui-bg);--text:var(--ui-text);--surface:var(--ui-surface);
+      --border:var(--ui-border);--accent:var(--ui-accent);
     }
 
     /* HEADER */
@@ -107,19 +67,6 @@
       text-align: center;
     }
 
-    .themeToggle {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
 
     /* HERO */
     .faqHero {
@@ -479,10 +426,10 @@
       
      <div class="faqItem">
         <button class="faqQuestion">
-          Is it possible to hide the support section?
+          Where can I view subscription plans?
           <i class="fa-solid fa-chevron-down icon"></i>
         </button>
-        <div class="faqAnswer">An older supporter key may hide the original support panel. It is separate from subscriptions and does not grant paid access. For a subscription, use <strong>Account → MoMo and subscriptions</strong> and submit your actual payment transaction ID.</div>
+        <div class="faqAnswer">The sidebar now shows a <strong>Subscription</strong> card with your current access status. Select <strong>View plans</strong> on its right, or use <strong>Account → MoMo and subscriptions</strong>. Optional support is separate from a subscription and does not unlock paid access.</div>
        </div>
 
      <div class="faqItem">
@@ -524,25 +471,13 @@
       });
     });
 
-    /* FAQ inherits the reader theme. No independent FAQ theme control. */
-    function applyFaqTheme(theme) {
-      theme = theme || localStorage.getItem("theme-v2") || "dark";
-      document.documentElement.classList.remove("dark", "sepia", "night");
-      if (theme !== "light") document.documentElement.classList.add(theme);
-    }
-
-    applyFaqTheme();
-
-    /* localStorage changes in the reader window propagate to this iframe. */
-    window.addEventListener("storage", (event) => {
-      if (event.key === "theme-v2") applyFaqTheme(event.newValue || "dark");
-    });
-
-    /* Parent shell also sends the current theme when FAQ opens/changes. */
+    /* Accept only the embedding app's resolved appearance. Standalone FAQ
+       uses ui-theme.js for saved/System appearance and cross-tab changes. */
     window.addEventListener("message", (event) => {
-      if (event.data && event.data.type === "ges-pasco-theme") {
-        applyFaqTheme(event.data.theme);
-      }
+      if (event.origin !== location.origin || event.source !== window.parent || window.parent === window) return;
+      if (event.data?.type !== "ges-pasco-ui-theme" || !["light", "dark"].includes(event.data.theme)) return;
+      document.documentElement.dataset.uiTheme = event.data.theme;
+      document.documentElement.style.colorScheme = event.data.theme;
     });
 
     /* Copy MoMo number */

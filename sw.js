@@ -27,6 +27,8 @@ const FILES_TO_CACHE = [
   "./version.js",
   "./updates.js",
   "./ui-theme.js",
+  "./ui-palette.css",
+  "./sidebar-subscription.js",
   "./offline-reader.js",
   "./reader-recovery.js",
   "./user-guide.js",

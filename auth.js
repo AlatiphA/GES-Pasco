@@ -123,6 +123,8 @@
   });
 
   function showMessage(message, type = "error") {
+    const form = [loginForm, signupForm, forgotForm].find(form => !form.hidden) || loginForm;
+    form.querySelector(".authPrimary").after(authMessage);
     authMessage.textContent = message;
     authMessage.className = `authMessage ${type}`;
     authMessage.hidden = false;
@@ -186,8 +188,10 @@
       const input = document.getElementById(button.dataset.target);
       const showing = input.type === "text";
       input.type = showing ? "password" : "text";
-      button.setAttribute("aria-label", showing ? "Show password" : "Hide password");
-      button.innerHTML = showing ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
+      const label = button.dataset.passwordLabel || "password";
+      button.setAttribute("aria-label", (showing ? "Show " : "Hide ") + label);
+      button.setAttribute("aria-pressed", String(!showing));
+      button.innerHTML = showing ? '<i class="fa-regular fa-eye" aria-hidden="true"></i>' : '<i class="fa-regular fa-eye-slash" aria-hidden="true"></i>';
     });
   });
 
