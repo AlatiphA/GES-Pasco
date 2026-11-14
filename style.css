@@ -1,3 +1,4 @@
+@import url("./ui-palette.css");
 /* =========================
    CUSTOM FONTS
 ========================= */
@@ -1566,16 +1567,10 @@ body.faqModalOpen { overflow: hidden; }
   .faqModalPanel { height: min(860px, calc(100vh - 48px)); border-radius: 16px; box-shadow: 0 18px 60px rgba(0,0,0,.35); }
 }
 
-/* FAQ shell inherits the active reader theme */
-body.dark .faqModalPanel, body.dark .faqModalHeader { background: #111111; color: #eeeeee; }
-body.dark .faqModalHeader { border-bottom-color: #333333; }
-body.dark .faqModalFrame { background: #111111; }
-body.sepia .faqModalPanel, body.sepia .faqModalHeader { background: #f4ede0; color: #2c1a0e; }
-body.sepia .faqModalHeader { border-bottom-color: #d5c5aa; }
-body.sepia .faqModalFrame { background: #f4ede0; }
-body.night .faqModalPanel, body.night .faqModalHeader { background: #000000; color: #bbbbbb; }
-body.night .faqModalHeader { border-bottom-color: #2a2a2a; }
-body.night .faqModalFrame { background: #000000; }
+/* Help follows app appearance independently of the book palette. */
+.faqModalPanel,.faqModalHeader {background:var(--ui-surface);color:var(--ui-text);}
+.faqModalHeader {border-bottom-color:var(--ui-border);}
+.faqModalFrame {background:var(--ui-bg);}
 
 /* PromoHub account layout: fixed summary, scrollable accordion settings. */
 .profileMenu {
@@ -1637,8 +1632,6 @@ body.night .profileMenu {--account-bg:#080808;--account-raised:#171b1c;}
 .userCard summary{padding:12px 0;cursor:pointer;font-weight:600;}.userActions{padding:12px 0;}.accessPolicies{width:100%;}.accessPolicies button[aria-pressed=true]{border-color:var(--ui-accent);background:var(--ui-selected);opacity:1;}
 .accessToggle{position:relative;display:inline-flex;align-items:center;gap:10px;}.accessToggle:before{content:'';display:block;width:34px;height:20px;border-radius:20px;background:var(--ui-muted);box-shadow:inset 0 0 0 2px var(--ui-muted);}.accessToggle:after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--ui-surface);left:17px;top:50%;transform:translateY(-50%);}.accessToggle[aria-checked=true]:before{background:var(--ui-accent);box-shadow:inset 0 0 0 2px var(--ui-accent);}.accessToggle[aria-checked=true]:after{left:31px;}
 @media(max-width:480px){.userFacts{grid-template-columns:1fr;gap:2px;}.userFacts dd{margin-bottom:8px;}.userActions>.profileAction{width:100%;}.accessPolicies>.profileAction{flex:1 1 100%;}}
-html[data-ui-theme] {--ui-bg:#f4f2ed;--ui-surface:#fff;--ui-raised:#faf8f4;--ui-text:#242b29;--ui-muted:#606b66;--ui-border:#d4d9d4;--ui-accent:#805025;--ui-selected:#f4e9dc;}
-html[data-ui-theme="dark"] {--ui-bg:#151a1c;--ui-surface:#20282a;--ui-raised:#293335;--ui-text:#f0f3f0;--ui-muted:#b5c1bc;--ui-border:#47534f;--ui-accent:#e1b583;--ui-selected:#3d332a;}
 html[data-ui-theme] header,html[data-ui-theme] footer,html[data-ui-theme] .bottomFooter,html[data-ui-theme] .sidebar,html[data-ui-theme] .sidebarTabs,html[data-ui-theme] .themePickerInner,html[data-ui-theme] .fontPickerInner,html[data-ui-theme] .searchBox {background:var(--ui-surface);color:var(--ui-text);border-color:var(--ui-border);}
 html[data-ui-theme] .profileMenu {--account-bg:var(--ui-surface);--account-text:var(--ui-text);--account-muted:var(--ui-muted);--account-line:var(--ui-border);--account-raised:var(--ui-raised);--account-accent:var(--ui-accent);}
 html[data-ui-theme] .sidebarTabs {border-bottom:1px solid var(--ui-border);}
@@ -2006,3 +1999,29 @@ html[data-access-locked] #readerApp > footer{visibility:hidden!important;}
 #protectedContentClose,#premiumAccessClose {width:44px;height:44px;border:0;border-radius:8px;background:transparent;color:inherit;font-size:26px;cursor:pointer;}
 #protectedContentDialog label {display:grid;gap:8px;margin:16px 0 8px;font-weight:600;}
 #protectedContentDialog input {max-width:100%;padding:10px;border:1px solid var(--ui-border);border-radius:8px;color:inherit;background:var(--ui-surface);}
+
+/* Compact subscription summary, with plans beside its text on every screen. */
+.sidebarSubscription {flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:16px 4px;border-top:1px solid var(--ui-border);color:var(--ui-text);}
+.sidebarSubscriptionText {flex:1;min-width:0;}
+.sidebarSubscription h2 {margin:0 0 6px;font-size:14px;line-height:1.4;color:var(--ui-accent);}
+.sidebarSubscription p {margin:4px 0;font-size:12px;line-height:1.5;overflow-wrap:anywhere;}
+#sidebarSubscriptionHint {color:var(--ui-muted);}
+.sidebarPlansButton {flex:0 0 auto;min-height:44px;padding:10px 12px;border:1px solid var(--ui-border);border-radius:10px;background:var(--ui-raised);color:var(--ui-text);font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;}
+.sidebarPlansButton:hover {border-color:var(--ui-accent);}
+.sidebarPlansButton:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+.authForm .authMessage {margin:0;}
+
+/* Match the existing sign-in eye controls without changing form submission. */
+.accountPasswordWrap {position:relative;display:flex;align-items:center;min-width:0;}
+.accountSettingsForm .accountPasswordWrap input {padding-right:52px;}
+.profileMenu .accountPasswordWrap .passwordToggle {display:grid;place-items:center;right:4px;width:40px;height:40px;min-height:0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--ui-muted);font-size:16px;box-shadow:none;}
+
+.securityPanelContent :is(.securityIdentity,.resetPasswordCard) {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;}
+.securityCardText {min-width:0;overflow-wrap:anywhere;}
+.securityCardText p:last-child {margin-bottom:0;}
+.securityIdentity .profileSettingActions {margin:0;max-width:180px;justify-content:flex-end;}
+.securityPanelContent :is(.securityIdentity,.resetPasswordCard) .profileAction {font-size:13px;}
+@media(max-width:500px){
+ .securityPanelContent :is(.securityIdentity,.resetPasswordCard) {grid-template-columns:minmax(0,1fr);gap:12px;}
+ .securityIdentity .profileSettingActions,.resetPasswordCard > .profileAction {justify-self:end;}
+}

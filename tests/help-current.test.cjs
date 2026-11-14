@@ -13,13 +13,13 @@ test('current help keeps sample access, update and bookmark guidance consistent'
 });
 test('new FAQ entries expand with the existing accordion without changing the reader theme',()=>{
  const dom=new JSDOM(fs.readFileSync('faq.html','utf8'),{url:'https://example.com/GES-Pasco/faq.html',runScripts:'outside-only'}),w=dom.window;
- w.localStorage.setItem('theme-v2','sepia');
+ w.localStorage.setItem('theme-v2','sepia');w.localStorage.setItem('ges-pasco-ui-theme','light');w.eval(fs.readFileSync('ui-theme.js','utf8'));
  for(const script of w.document.querySelectorAll('script:not([src])'))w.eval(script.textContent);
  const questions=[...w.document.querySelectorAll('.faqQuestion')];
  for(const title of ['How do I install an app update?','Why did an older bookmark show 0%?','Why does the Users page show an access error?']){
   const button=questions.find(b=>b.textContent.trim()===title);assert.ok(button,title);button.click();
   assert.ok(button.closest('.faqItem').classList.contains('open'));assert.equal(w.document.querySelectorAll('.faqItem.open').length,1);
-  assert.ok(w.document.documentElement.classList.contains('sepia'));
+  assert.equal(w.document.documentElement.dataset.uiTheme,'light');assert.equal(w.localStorage.getItem('theme-v2'),'sepia');
  }
  dom.window.close();
 });
