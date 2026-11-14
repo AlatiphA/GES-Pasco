@@ -2025,3 +2025,20 @@ html[data-access-locked] #readerApp > footer{visibility:hidden!important;}
  .securityPanelContent :is(.securityIdentity,.resetPasswordCard) {grid-template-columns:minmax(0,1fr);gap:12px;}
  .securityIdentity .profileSettingActions,.resetPasswordCard > .profileAction {justify-self:end;}
 }
+
+/* MTN recipient: number on the left, yellow copy action on the right. */
+.momoRecipientCard {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid rgba(255,196,0,.35);border-radius:10px;background:rgba(255,196,0,.08);}
+.momoRecipientDetails {flex:1;min-width:0;}
+#momoBody .momoRecipientDetails h3 {margin:0 0 4px;font-size:13px;color:#805b00;}
+.momoRecipientDetails strong {display:block;font-size:18px;letter-spacing:.025em;white-space:nowrap;}
+#momoBody .momoRecipientDetails p {margin:4px 0 0;font-size:12px;color:var(--ui-muted);}
+#momoBody .momoRecipientCopy {flex:0 0 auto;max-width:116px;min-height:44px;padding:10px 12px;border:1px solid #ffcc00;border-radius:8px;background:#ffcc00;color:#111;font-size:12px;font-weight:700;line-height:1.4;}
+#momoBody .momoRecipientCopy:hover {background:#e6b800;border-color:#e6b800;}
+#momoBody .momoRecipientCopy:focus-visible {outline:2px solid var(--ui-accent);outline-offset:3px;}
+html[data-ui-theme="dark"] #momoBody .momoRecipientDetails h3 {color:#ffcc00;}
+
+@media(max-width:380px){
+ .momoRecipientCard {gap:10px;padding:10px;}
+ .momoRecipientDetails strong {font-size:16px;letter-spacing:0;}
+ #momoBody .momoRecipientCopy {max-width:90px;padding:8px 10px;font-size:11px;}
+}
