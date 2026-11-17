@@ -45,28 +45,35 @@
  }
  function setStatus(text){document.getElementById('protectedContentStatus').textContent=text;}
  async function verifyAdmin(){const user=gesPascoAuth.currentUser;if(!user)throw Error('Sign in with a payment-administrator account.');const snap=await db.collection('paymentAdmins').doc(user.uid).get({source:'server'});if(!snap.exists||snap.data().active!==true)throw Error('Payment-administrator access is required.');return user.uid;}
- function hexHash(bytes){return digest(bytes);}
- function encodeBase64(bytes){let binary='';for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary);}
- async function uploadFiles(epubFile,bankFile){
-  const uid=await verifyAdmin();if(!epubFile||!bankFile)throw Error('Choose both the original full EPUB and its premium question-set JSON.');
-  if(epubFile.size<100||epubFile.size>25*1024*1024)throw Error('The EPUB must be smaller than 25 MB.');
-  const epubBytes=new Uint8Array(await epubFile.arrayBuffer());if(epubBytes[0]!==80||epubBytes[1]!==75||epubBytes[2]!==3||epubBytes[3]!==4)throw Error('The selected book is not a readable EPUB.');
-  const raw=await bankFile.text();if(raw.length>650000)throw Error('The premium question-set file is too large.');const parsed=JSON.parse(raw);if(parsed.schema!==1||!Array.isArray(parsed.banks)||!parsed.banks.length||parsed.banks.length>100||parsed.banks.some(b=>!b||typeof b.id!=='string'||sampleBankIds.has(b.id)||!window.GESPascoQuizCore.validBank(b)))throw Error('Choose the prepared premium question-set JSON, not the three free sample sets.');
-  const editionId='edition-'+Date.now().toString(36),chunks=Math.ceil(epubBytes.length/chunkBytes),root=db.collection('protectedLibrary').doc(editionId);
-  for(let i=0;i<chunks;i++){if(gesPascoAuth.currentUser?.uid!==uid)throw Error('The signed-in account changed; upload stopped.');const slice=epubBytes.subarray(i*chunkBytes,Math.min((i+1)*chunkBytes,epubBytes.length));await root.collection('chunks').doc(String(i)).set({index:i,payload:encodeBase64(slice),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});setStatus('Uploading protected book… '+Math.round((i+1)/chunks*75)+'%');}
-  const practiceJson=JSON.stringify({schema:1,banks:parsed.banks}),epubSha256=await hexHash(epubBytes);if(practiceJson.length>650000)throw Error('The premium question sets exceed the Firestore size limit.');
-  if(gesPascoAuth.currentUser?.uid!==uid)throw Error('The signed-in account changed; upload stopped.');await db.collection('protectedLibrary').doc('current').set({editionId,epubBytes:epubBytes.length,epubChunks:chunks,epubSha256,practiceJson,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-  window.GESPascoAdminPage?.saved(document.getElementById('protectedContentDialog'));setStatus('Protected library uploaded. Subscribers can now open the complete EPUB and practice sets.');window.dispatchEvent(new Event('ges-pasco-protected-content-updated'));
+ const entry=document.getElementById('protectedContentAdminEntry'),dialog=document.getElementById('protectedContentDialog'),close=document.getElementById('protectedContentClose'),epubInput=document.getElementById('protectedEpubFile'),bankInput=document.getElementById('protectedBankFile'),upload=document.getElementById('protectedContentUpload'),refresh=document.getElementById('protectedLibraryRefresh'),summary=document.getElementById('protectedLibraryCurrent');
+ let libraryBusy=false,libraryReady=false,libraryEpoch=0;
+ function controls(){if(!upload)return;upload.disabled=libraryBusy||!libraryReady||(!epubInput.files?.length&&!bankInput.files?.length);epubInput.disabled=bankInput.disabled=libraryBusy;refresh.disabled=libraryBusy;if(close)close.disabled=libraryBusy;}
+ function describe(m){if(!summary)return;let count=0;try{count=JSON.parse(m?.practiceJson).banks.length;}catch{}summary.textContent=m?'Current edition: '+m.editionId+' · '+Math.round(m.epubBytes/1024)+' KB · '+count+' premium question sets.':'No protected library has been published. Choose both files for the first upload.';}
+ window.GESPascoAdminPage?.registerGuard(()=>!libraryBusy);
+ async function checkLibrary(){
+  const token=++libraryEpoch;libraryReady=false;controls();setStatus('Checking administrator access and the current library…');
+  try{const uid=await bounded(verifyAdmin()),m=await window.GESPascoLibraryUpload.readState(db);if(token!==libraryEpoch||gesPascoAuth.currentUser?.uid!==uid)return;describe(m);libraryReady=true;setStatus('Choose the replacement full EPUB, premium question sets, or both. Empty fields keep the current content.');}
+  catch(error){if(token===libraryEpoch){setStatus(error.message||'Could not check the current library.');if(summary)summary.textContent='Connect and check the current library before publishing.';}}
+  finally{if(token===libraryEpoch)controls();}
  }
- const entry=document.getElementById('protectedContentAdminEntry'),dialog=document.getElementById('protectedContentDialog'),close=document.getElementById('protectedContentClose'),epubInput=document.getElementById('protectedEpubFile'),bankInput=document.getElementById('protectedBankFile'),upload=document.getElementById('protectedContentUpload');
- window.GESPascoAdminPage?.registerGuard(()=>!upload?.disabled);
- async function openAdmin(){if(window.GESPascoAdminPage)window.GESPascoAdminPage.open(dialog);else if(!dialog.open)dialog.showModal();setStatus('Checking administrator access…');try{await verifyAdmin();setStatus('Choose the two local source files listed below, then upload. The files are sent to protected Firestore documents and are not added to the public app.');}catch(error){setStatus(error.message||'Could not verify administrator access.');}}
- entry?.addEventListener('click',openAdmin);close?.addEventListener('click',()=>dialog.close());dialog?.addEventListener('cancel',e=>{e.preventDefault();dialog.close();});
+ async function openAdmin(){if(window.GESPascoAdminPage)window.GESPascoAdminPage.open(dialog);else if(!dialog.open)dialog.showModal();await checkLibrary();}
+ entry?.addEventListener('click',openAdmin);refresh?.addEventListener('click',checkLibrary);
+ for(const input of [epubInput,bankInput])input?.addEventListener('change',controls);
+ close?.addEventListener('click',()=>{if(!libraryBusy){++libraryEpoch;dialog.close();}});dialog?.addEventListener('cancel',e=>{e.preventDefault();if(!libraryBusy){++libraryEpoch;dialog.close();}});
+ window.addEventListener('beforeunload',event=>{if(libraryBusy){event.preventDefault();event.returnValue='';}});
  document.getElementById('premiumAccessClose')?.addEventListener('click',()=>document.getElementById('premiumAccessDialog').close());
  document.getElementById('premiumAccessSubscribe')?.addEventListener('click',()=>{document.getElementById('premiumAccessDialog').close();if(window.GESPascoAccess?.state?.().kind==='subscription'&&!window.GESPascoAccess.fullAccess()){window.GESPascoDevices?.open();return;}window.GESPascoMomo?.openForRenewal?.();});
  window.addEventListener('ges-pasco-premium-unavailable',event=>{if(window.GESPascoAccess?.fullAccess?.()!==true)return;const message=document.getElementById('premiumAccessMessage'),subscribe=document.getElementById('premiumAccessSubscribe'),modal=document.getElementById('premiumAccessDialog');if(message)message.textContent='Your account has full access, but the protected library could not be opened: '+(event.detail?.message||'Reconnect and try again.');if(subscribe)subscribe.hidden=true;if(modal&&!modal.open)modal.showModal();});
- upload?.addEventListener('click',async()=>{if(upload.disabled)return;upload.disabled=true;epubInput.disabled=true;bankInput.disabled=true;try{await uploadFiles(epubInput.files[0],bankInput.files[0]);}catch(error){setStatus(error.message||'Upload did not finish. Existing protected content remains active.');}finally{upload.disabled=false;epubInput.disabled=false;bankInput.disabled=false;}});
- gesPascoAuth.onAuthStateChanged(async user=>{adminUid='';if(entry)entry.hidden=true;if(!user)return;try{const snap=await db.collection('paymentAdmins').doc(user.uid).get({source:'server'});if(gesPascoAuth.currentUser?.uid!==user.uid)return;adminUid=snap.exists&&snap.data().active===true?user.uid:'';if(entry)entry.hidden=!adminUid;}catch{}});
+ upload?.addEventListener('click',async()=>{
+  if(upload.disabled||libraryBusy)return;const uid=gesPascoAuth.currentUser?.uid,token=libraryEpoch;libraryBusy=true;controls();
+  const isCurrent=()=>token===libraryEpoch&&gesPascoAuth.currentUser?.uid===uid;
+  try{
+   const result=await window.GESPascoLibraryUpload.upload({db,epubFile:epubInput.files[0],bankFile:bankInput.files[0],validBank:bank=>window.GESPascoQuizCore.validBank(bank),isCurrent,verifyAdmin:()=>bounded(verifyAdmin()),onStatus:text=>{if(isCurrent())setStatus(text);}});
+   if(!isCurrent())return;describe(result);epubInput.value=bankInput.value='';window.GESPascoAdminPage?.saved(dialog);setStatus('Published successfully. The selected content is now available in protected storage. Unselected content was kept. Saved full books check for this edition when readers open online.');window.dispatchEvent(new Event('ges-pasco-protected-content-updated'));
+  }catch(error){if(isCurrent())setStatus((error.message||'Update did not finish.')+' Check the current library before retrying.');}
+  finally{libraryBusy=false;controls();}
+ });
+ gesPascoAuth.onAuthStateChanged(async user=>{++libraryEpoch;libraryReady=false;adminUid='';if(entry)entry.hidden=true;controls();if(!user){if(summary)summary.textContent='Sign in with a payment-administrator account.';return;}try{const snap=await db.collection('paymentAdmins').doc(user.uid).get({source:'server'});if(gesPascoAuth.currentUser?.uid!==user.uid)return;adminUid=snap.exists&&snap.data().active===true?user.uid:'';if(entry)entry.hidden=!adminUid;}catch{}});
  window.addEventListener('ges-pasco-access-updated',event=>{const d=event.detail||{};const clearPrivateCache=uid=>{idbDelete(uid);try{localStorage.removeItem('ges-pasco-premium-banks-'+uid);localStorage.removeItem('ges-pasco-published-quizzes-'+uid);}catch{}};if(activeFullUid&&(!d.fullAccess||d.uid!==activeFullUid)){clearPrivateCache(activeFullUid);activeFullUid='';}if(d.uid&&!d.fullAccess)clearPrivateCache(d.uid);if(d.fullAccess&&d.uid)activeFullUid=d.uid;});
  window.GESPascoPremiumContent={isSampleHref,readableHref,showPaywall:paywall,bookBlob,practiceBanks,hasOfflineBook:async uid=>!!(await idbRead(uid))?.blob,hasFullContent:()=>loadedFullContent};
 })();

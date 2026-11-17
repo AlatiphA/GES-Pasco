@@ -2042,3 +2042,21 @@ html[data-ui-theme="dark"] #momoBody .momoRecipientDetails h3 {color:#ffcc00;}
  .momoRecipientDetails strong {font-size:16px;letter-spacing:0;}
  #momoBody .momoRecipientCopy {max-width:90px;padding:8px 10px;font-size:11px;}
 }
+
+/* Account menu affordance, matching SchoolHub while using the GES palette. */
+.headerActions {flex:0 0 auto;width:auto;}
+.profileBtn {display:flex;align-items:center;justify-content:center;gap:5px;width:64px;min-width:64px;height:40px;padding:7px 9px;border-radius:999px;border:1px solid var(--ui-border);background:var(--ui-surface);color:var(--ui-text);overflow:visible;}
+.profileBtn:hover {background:var(--ui-selected);filter:none;}
+.profileBtn:focus-visible {outline:2px solid var(--ui-accent);outline-offset:2px;}
+.profilePersonIcon {width:22px;height:22px;flex:0 0 22px;}
+.profileDropdownArrow {width:14px;height:14px;flex:0 0 14px;transition:transform .15s ease;}
+.profileBtn[aria-expanded="true"] .profileDropdownArrow {transform:rotate(180deg);}
+.libraryUpdateBody {display:grid;gap:16px;}
+.libraryUpdateBody>p {margin:0;}
+.libraryUpdateBody .settingsCard {display:grid;gap:10px;min-width:0;padding:18px;background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:14px;}
+.libraryUpdateBody h3,.libraryUpdateBody .settingsCard p {margin:0;}
+.libraryUpdateBody label {font-weight:700;}
+.libraryUpdateBody input[type="file"] {width:100%;min-width:0;max-width:100%;font:inherit;color:var(--ui-text);}
+.libraryUpdateBody .practiceMuted {color:var(--ui-muted);font-size:13px;overflow-wrap:anywhere;}
+.libraryUpdateBody #protectedContentStatus {padding:12px;border-radius:10px;background:var(--ui-selected);color:var(--ui-text);}
+.libraryUpdateBody .settingsCard>button {justify-self:start;}

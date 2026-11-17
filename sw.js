@@ -40,6 +40,7 @@ const FILES_TO_CACHE = [
   "./reader-devices-core.js",
   "./reader-devices.js",
   "./access.js",
+  "./protected-library-upload.js",
   "./premium-content.js",
   "./account-settings.js",
   "./account-menu.js",

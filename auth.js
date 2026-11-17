@@ -64,10 +64,10 @@
     profileName.textContent = name;
     profileEmail.textContent = email;
     profileAccountType.textContent = providerIds.includes("google.com") ? "Google account" : "Email account";
-    profileInitials.textContent = initials;
+    if (profileInitials) profileInitials.textContent = initials;
     profileMenuInitials.textContent = initials;
 
-    [profileAvatarImage, profileMenuAvatarImage].forEach(img => {
+    [profileAvatarImage, profileMenuAvatarImage].filter(Boolean).forEach(img => {
       if (photoURL) {
         img.src = photoURL;
         img.hidden = false;
@@ -76,7 +76,7 @@
         img.hidden = true;
       }
     });
-    profileInitials.hidden = Boolean(photoURL);
+    if (profileInitials) profileInitials.hidden = Boolean(photoURL);
     profileMenuInitials.hidden = Boolean(photoURL);
   }
 
