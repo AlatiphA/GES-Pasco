@@ -72,9 +72,9 @@ const FILES_TO_CACHE = [
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/webfonts/fa-regular-400.woff2",
   "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
   "https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js",
-  "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js",
-  "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js",
-  "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js",
+  "https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js",
+  "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js",
+  "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore-compat.js",
 ];
 
 // Bound every network miss so a slow connection cannot hold app startup or installation open.
